@@ -10,6 +10,9 @@ from torchvision.datasets import CocoDetection
 import pandas as pd
 from torch.utils.data import DataLoader
 from config import CSV_PATH, BATCH_SIZE
+import numpy as np
+from typing import Sequence
+
 
 class UnifiedImageDataset(Dataset):
     def __init__(self, source, size=(224,224), mode="auto", subset_ratio=1.0):
@@ -113,18 +116,73 @@ class UnifiedImageDataset(Dataset):
                 pass
         return None
 
-df = pd.read_csv(CSV_PATH)
-assert "local_path" in df.columns, "CSV must have a local_path column!"
 
-dataset = UnifiedImageDataset(
-    df.rename(columns={"local_path": "file_path"}), 
-    mode="file_df"
-)
+class PrecompClipColorDataset(Dataset):
+    """
+    Wraps preloaded numpy arrays (embeddings + histograms) and yields per-sample
+    tensors with a per-item histogram renormalization (exactly like the notebook).
+    """
+    def __init__(self, indices, embeddings_arr, hist_arr):
+        self.indices = np.asarray(indices)
+        self.emb  = embeddings_arr.astype(np.float32, copy=False)   # [N, clip_dim]
+        self.hist = hist_arr.astype(np.float32,  copy=False)        # [N, hist_dim]
 
-loader = DataLoader(
-    dataset,
-    batch_size=BATCH_SIZE,
-    shuffle=False,
-    num_workers=4,
-    pin_memory=True
-)
+    def __len__(self): 
+        return len(self.indices)
+
+    def __getitem__(self, idx):
+        i = int(self.indices[idx])
+        z = torch.from_numpy(self.emb[i]).float()   # [clip_dim]
+        h = torch.from_numpy(self.hist[i]).float()  # [hist_dim]
+        s = h.sum()
+        if s <= 1e-8:
+            h = h + 1e-8
+            s = h.sum()
+        h = h / s
+        return z, h
+
+class PrecompClipEdgeDataset(Dataset):
+    """
+    Dataset for (precomputed CLIP embedding → edge map) pairs.
+
+    Args:
+        indices: subset indices referring into the embeddings/edge arrays
+        embeddings: np.ndarray [N, D] or memmap; float32 preferred (we cast anyway)
+        edge_maps:  np.ndarray [N, 224*224] or memmap; can be uint8 (0–255) or float
+        normalize_edges: if True, convert to float32 in [0,1] (divides by 255 if needed)
+    """
+    def __init__(
+        self,
+        indices: Sequence[int],
+        embeddings: np.ndarray,
+        edge_maps: np.ndarray,
+        normalize_edges: bool = True,
+    ):
+        self.indices = np.asarray(indices)
+        self.emb = embeddings
+        self.edges = edge_maps
+        self.normalize_edges = normalize_edges
+
+        # quick sanity (same N)
+        assert self.emb.shape[0] == self.edges.shape[0], \
+            "Embeddings and edge_maps must have same number of rows."
+
+    def __len__(self) -> int:
+        return len(self.indices)
+
+    def __getitem__(self, idx):
+        i = int(self.indices[idx])
+
+        z = self.emb[i]
+        if z.dtype != np.float32:
+            z = z.astype(np.float32, copy=False)
+        z = torch.from_numpy(z).float()
+
+        e = self.edges[i]
+        if e.dtype != np.float32:
+            e = e.astype(np.float32, copy=False)
+        if self.normalize_edges and e.max() > 1.0:
+            e = e / 255.0
+        e = torch.from_numpy(e).float()
+
+        return z, e

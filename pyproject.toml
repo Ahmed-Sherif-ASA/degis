@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "degis"
+version = "0.1.0"
+description = "Disentangled Embeddings Guided Synthesis"
+authors = ["Ahmed Sherif <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+torch = "*"
+torchvision = "*"
+torchaudio = "*"
+tqdm = "*"
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
+opencv-python-headless = "*"
+scikit-learn = "*"
+scikit-image = "*"
+einops = "*"
+ftfy = "*"
+regex = "*"
+requests = "*"
+Pillow = "*"
+diffusers = "*"
+transformers = "*"
+accelerate = "*"
+open-clip-torch = { git = "https://github.com/mlfoundations/open_clip.git" }
+ip-adapter = { git = "https://github.com/Ahmed-Sherif-ASA/IP-Adapter" }
+pyparsing = "==3.1.1"
+geomloss = "*"
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.30.1"

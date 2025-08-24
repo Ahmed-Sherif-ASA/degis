@@ -1,49 +1,68 @@
 import open_clip
+import torch
+import numpy as np
+from tqdm import tqdm
+from config import HF_HUB_CACHE
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model_name = "ViT-H-14"
 pretrained = "laion2b_s32b_b79k"
 
+# create model (create_model_and_transforms doesn't need a device arg)
 clip_model, _, preprocess = open_clip.create_model_and_transforms(
     model_name=model_name,
     pretrained=pretrained,
-    device=device
+    cache_dir=HF_HUB_CACHE,
 )
-clip_model = clip_model.to(device).half()
+
+# half precision only on CUDA
+clip_model = clip_model.to(device)
+if device.type == "cuda":
+    clip_model = clip_model.half()
 clip_model.eval()
 
 
+# features/clip_embeddings.py
 
 def compute_clip_embedding(image_tensor: torch.Tensor) -> torch.Tensor:
-    image_input = image_tensor.unsqueeze(0).to(device)  # [1,3,H,W]
+    x = image_tensor.unsqueeze(0).to(device)  # [1,3,H,W]
     with torch.no_grad():
-        z = clip_model.encode_image(image_input).float().squeeze(0)
-    return z
+        if device.type == "cuda":
+            x = x.half()
+            with torch.cuda.amp.autocast():
+                z = clip_model.encode_image(x)
+        else:
+            z = clip_model.encode_image(x)
+    return z.float().squeeze(0)  # always return fp32 on CPU-friendly dtype
 
-def generate_embeddings(loader, embeddings_path, compute_clip_embedding, force_recompute=False):
-    print("### CLIP Embedding Generation ###")
-    print("Total images:", len(loader.dataset))
 
+def generate_embeddings_fp16(loader, save_path, force_recompute=False):
     try:
         if not force_recompute:
-            embeddings = np.load(embeddings_path)
-            print(f"Loaded from {embeddings_path}")
-            return embeddings
-    except Exception as e:
-        print(f"Loading failed: {e}. Recomputing...")
+            emb = np.load(save_path)
+            print(f"→ Loaded precomputed from {save_path}")
+            return emb
+    except FileNotFoundError:
+        print("→ No existing file, recomputing…")
 
-    emb_list = []
-    with torch.no_grad():
-        for batch in tqdm(loader, desc="Computing CLIP embeddings"):
-            imgs, _ = batch
-            for img in imgs:
-                z = compute_clip_embedding(img)
-                emb_list.append(z.cpu().numpy())
+    all_embs = []
+    for imgs, _ in tqdm(loader, desc="CLIP batched encode"):
+        imgs = imgs.to(device)
+        if device.type == "cuda":
+            imgs = imgs.half()
+            with torch.no_grad(), torch.cuda.amp.autocast():
+                z = clip_model.encode_image(imgs)
+        else:
+            with torch.no_grad():
+                z = clip_model.encode_image(imgs)
 
-    embeddings = np.stack(emb_list, axis=0)
-    np.save(embeddings_path, embeddings)
-    print(f"Saved to {embeddings_path}")
+        all_embs.append(z.float().cpu().numpy())
+
+    embeddings = np.concatenate(all_embs, axis=0)
+    np.save(save_path, embeddings)
+    print(f"→ Saved embeddings to {save_path}")
     return embeddings
 
 def generate_embeddings_fp16(loader, save_path, force_recompute=False):
@@ -67,11 +86,3 @@ def generate_embeddings_fp16(loader, save_path, force_recompute=False):
     np.save(save_path, embeddings)
     print(f"→ Saved embeddings to {save_path}")
     return embeddings
-
-
-
-embeddings = generate_embeddings_fp16(
-    loader,
-    'test_embedding.npy',
-    force_recompute=True
-)
