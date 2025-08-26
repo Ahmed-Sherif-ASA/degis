@@ -21,8 +21,8 @@ from torch.utils.data import DataLoader
 
 import config
 from data.dataset import PrecompClipColorDataset
-from models.heads import ColorHead, RestHead
-from models.train import train_color_disentanglement
+from models.color_heads import ColorHead, RestHead
+from models.train_color import train_color_disentanglement
 
 torch.backends.cudnn.benchmark = True
 torch.manual_seed(42); np.random.seed(42)
@@ -106,7 +106,7 @@ def main():
         T_min=1.0,
         blur=args.blur,
         lr=args.lr, wd=args.wd,
-        save_prefix="best_color_head"
+        save_prefix="best_color_head_rgb_100"
     )
 
 if __name__ == "__main__":
