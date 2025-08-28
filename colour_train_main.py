@@ -18,6 +18,8 @@ import numpy as np
 import torch
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
+import json, time, platform
+from utils.logger import MetricsLogger, short_git_hash
 
 import config
 from data.dataset import PrecompClipColorDataset
@@ -44,6 +46,14 @@ def parse_args():
 def main():
     args = parse_args()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # --- make run directory
+    stamp = time.strftime("%Y%m%d-%H%M%S")
+    run_name = f"{args.hist_kind}_tk{args.top_k or 'all'}_b{args.batch_size}"
+    outdir = os.path.join("runs", f"{run_name}-{stamp}")
+    os.makedirs(outdir, exist_ok=True)
+    print("Run dir:", outdir)
+
+    logger = MetricsLogger(outdir=outdir)
 
     # paths
     emb_path = getattr(config, "EMBEDDINGS_TARGET_PATH",
@@ -73,10 +83,11 @@ def main():
     train_ds = PrecompClipColorDataset(idx_train, emb, hist)
     val_ds   = PrecompClipColorDataset(idx_val,   emb, hist)
 
-    train_loader = DataLoader(train_ds, batch_size=4096, shuffle=True,
-                              num_workers=16, pin_memory=True)
-    val_loader   = DataLoader(val_ds,   batch_size=8192, shuffle=False,
-                              num_workers=16, pin_memory=True)
+    # use the CLI sizes you already parse
+    train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True,
+                            num_workers=16, pin_memory=True)
+    val_loader   = DataLoader(val_ds,   batch_size=args.val_batch_size, shuffle=False,
+                            num_workers=16, pin_memory=True)
 
     # optional rarity weighting
     weights_vec = None
@@ -90,6 +101,20 @@ def main():
     # models
     color_head = ColorHead(clip_dim=clip_dim, hist_dim=hist_dim).to(device)
     rest_head  = RestHead(clip_dim=clip_dim).to(device)
+
+    gpu_name = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu"
+    logger.set_meta(
+        run_name=run_name,
+        hist_kind=args.hist_kind,
+        top_k=args.top_k, blur=args.blur,
+        lambda_ortho=args.lambda_ortho, lambda_leak=0.25,   # your current default
+        epochs=args.epochs, batch_size=args.batch_size, val_batch_size=args.val_batch_size,
+        optimizer="AdamW", lr=args.lr, weight_decay=args.wd,
+        device=str(device), gpu_name=gpu_name, seed=42,
+        param_count_color=MetricsLogger.param_count(color_head),
+        param_count_rest=MetricsLogger.param_count(rest_head),
+        git_commit=short_git_hash(),
+    )
 
     # train (same defaults as notebook)
     train_color_disentanglement(
@@ -106,7 +131,8 @@ def main():
         T_min=1.0,
         blur=args.blur,
         lr=args.lr, wd=args.wd,
-        save_prefix="best_color_head_rgb_100"
+        save_prefix = os.path.join(outdir, "best_color_head_tmp"),
+        logger=logger,                   # NEW
     )
 
 if __name__ == "__main__":
