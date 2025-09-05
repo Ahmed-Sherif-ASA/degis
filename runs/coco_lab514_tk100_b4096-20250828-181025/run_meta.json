@@ -1,0 +1,23 @@
+{
+  "run_name": "coco_lab514_tk100_b4096",
+  "hist_kind": "lab514",
+  "top_k": 100,
+  "blur": 0.05,
+  "lambda_ortho": 0.1,
+  "lambda_leak": 0.25,
+  "epochs": 200,
+  "batch_size": 4096,
+  "val_batch_size": 8192,
+  "optimizer": "AdamW",
+  "lr": 0.001,
+  "weight_decay": 0.01,
+  "device": "cuda",
+  "gpu_name": "NVIDIA GeForce RTX 5090",
+  "seed": 42,
+  "param_count_color": 2363394,
+  "param_count_rest": 1050112,
+  "git_commit": "8468a3f",
+  "wall_seconds": 250.4287097454071,
+  "it_per_sec_final": 19.326857496078762,
+  "samples_per_sec_final": 78810.93149154009
+}

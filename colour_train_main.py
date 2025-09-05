@@ -32,6 +32,7 @@ torch.manual_seed(42); np.random.seed(42)
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument("--hist-kind", choices=["rgb512","lab514","hcl514"], default="hcl514")
+    p.add_argument("--emb-kind",  choices=["base","xl","auto"], default="xl")
     p.add_argument("--epochs", type=int, default=200)
     p.add_argument("--batch-size", type=int, default=128)
     p.add_argument("--val-batch-size", type=int, default=256)
@@ -39,8 +40,8 @@ def parse_args():
     p.add_argument("--wd", type=float, default=1e-2)
     p.add_argument("--blur", type=float, default=0.05)
     p.add_argument("--lambda-ortho", type=float, default=0.1)
-    p.add_argument("--top-k", type=int, default=None)  # None ⇒ full target
-    p.add_argument("--weighting", action="store_true") # rarity weighting off by default
+    p.add_argument("--top-k", type=int, default=None)
+    p.add_argument("--weighting", action="store_true")
     return p.parse_args()
 
 def main():
@@ -48,7 +49,7 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # --- make run directory
     stamp = time.strftime("%Y%m%d-%H%M%S")
-    run_name = f"{args.hist_kind}_tk{args.top_k or 'all'}_b{args.batch_size}"
+    run_name = f"{config.NAME}_{args.hist_kind}_tk{args.top_k or 'all'}_b{args.batch_size}"
     outdir = os.path.join("runs", f"{run_name}-{stamp}")
     os.makedirs(outdir, exist_ok=True)
     print("Run dir:", outdir)
@@ -56,8 +57,10 @@ def main():
     logger = MetricsLogger(outdir=outdir)
 
     # paths
-    emb_path = getattr(config, "EMBEDDINGS_TARGET_PATH",
-               getattr(config, "EMBEDDINGS_PATH", None))
+    if args.emb_kind == "xl":
+        emb_path = config.HF_XL_EMBEDDINGS_TARGET_PATH
+    else:
+        emb_path = config.EMBEDDINGS_TARGET_PATH
     assert emb_path, "Set EMBEDDINGS_TARGET_PATH in config.py"
 
     hist_map = {

@@ -15,7 +15,7 @@ from typing import Sequence
 
 
 class UnifiedImageDataset(Dataset):
-    def __init__(self, source, size=(224,224), mode="auto", subset_ratio=1.0):
+    def __init__(self, source, size=(224,224), mode="auto", subset_ratio=1.0, transform=None):
         """
         source      :
             - if mode=='coco'   → a torchvision.datasets.CocoDetection
@@ -25,7 +25,7 @@ class UnifiedImageDataset(Dataset):
         subset_ratio: fraction to sample from your DataFrame or COCO set
         """
         self.size         = size
-        self.tf           = Compose([Resize(size), ToTensor()])
+        self.tf           = transform or Compose([Resize(size), ToTensor()])
         self.subset_ratio = subset_ratio
         self.mode         = mode
 

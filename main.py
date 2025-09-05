@@ -1,62 +1,61 @@
-# import pandas as pd
-# from torch.utils.data import DataLoader
+import pandas as pd
+from torch.utils.data import DataLoader
 
-# from data.dataset import UnifiedImageDataset
-# from features.clip_embeddings import generate_embeddings_fp16
-# from features.color_histograms import generate_color_histograms  # if you use it
-# from config import CSV_PATH, BATCH_SIZE, EMBEDDINGS_TARGET_PATH  # etc.
-# from multiprocessing import cpu_count
+from data.dataset import UnifiedImageDataset
+from features.clip_embeddings_xl_hf import generate_embeddings_xl
+from config import CSV_PATH, BATCH_SIZE, HF_XL_EMBEDDINGS_TARGET_PATH
+from multiprocessing import cpu_count
 
 
-# df = pd.read_csv(CSV_PATH)
-# print('xxxx')
-# print(df.head())
-# print(df.shape)
+df = pd.read_csv(CSV_PATH)
+print('xxxx')
+print(df.head())
+print(df.shape)
 # assert "local_path" in df.columns, "CSV must have a local_path column!"
 
-# def print_system_profile():
-#     import os, shutil, platform, psutil, torch
-#     print("=== SYSTEM PROFILE ===")
-#     print("Python:", platform.python_version())
-#     print("PyTorch:", torch.__version__)
-#     print("CPU cores:", psutil.cpu_count(logical=True))
-#     vm = psutil.virtual_memory()
-#     print(f"RAM: {vm.total/1e9:.1f} GB, free {vm.available/1e9:.1f} GB")
-#     du = shutil.disk_usage("/data")
-#     print(f"/data disk: total {du.total/1e9:.1f} GB, free {du.free/1e9:.1f} GB")
-#     print("CUDA available:", torch.cuda.is_available())
-#     if torch.cuda.is_available():
-#         i = torch.cuda.current_device()
-#         print("GPU:", torch.cuda.get_device_name(i))
-#         print(f"VRAM total: {torch.cuda.get_device_properties(i).total_memory/1e9:.1f} GB")
-#     print("======================")
+def print_system_profile():
+    import os, shutil, platform, psutil, torch
+    print("=== SYSTEM PROFILE ===")
+    print("Python:", platform.python_version())
+    print("PyTorch:", torch.__version__)
+    print("CPU cores:", psutil.cpu_count(logical=True))
+    vm = psutil.virtual_memory()
+    print(f"RAM: {vm.total/1e9:.1f} GB, free {vm.available/1e9:.1f} GB")
+    du = shutil.disk_usage("/data")
+    print(f"/data disk: total {du.total/1e9:.1f} GB, free {du.free/1e9:.1f} GB")
+    print("CUDA available:", torch.cuda.is_available())
+    if torch.cuda.is_available():
+        i = torch.cuda.current_device()
+        print("GPU:", torch.cuda.get_device_name(i))
+        print(f"VRAM total: {torch.cuda.get_device_properties(i).total_memory/1e9:.1f} GB")
+    print("======================")
 
-# print_system_profile()
+print_system_profile()
 
-# dataset = UnifiedImageDataset(
-#     df.rename(columns={"local_path": "file_path"}), 
-#     mode="file_df"
-# )
+dataset = UnifiedImageDataset(
+    df.rename(columns={"local_path": "file_path"}), 
+    mode="file_df"
+)
 
-# num_cpu = cpu_count()
+num_cpu = cpu_count()
 
-# loader = DataLoader(
-#     dataset,
-#     batch_size=224,                    # then try 160/192/224
-#     shuffle=False,
-#     num_workers=min(32, max(8, num_cpu // 8)),  # 16–32 is a good sweet spot
-#     pin_memory=True,
-#     persistent_workers=True,
-#     prefetch_factor=6,                 # 4–8
-#     pin_memory_device="cuda",
-# )
+loader = DataLoader(
+    dataset,
+    batch_size=224,                    # then try 160/192/224
+    shuffle=False,
+    num_workers=min(32, max(8, num_cpu // 8)),  # 16–32 is a good sweet spot
+    pin_memory=True,
+    persistent_workers=True,
+    prefetch_factor=6,                 # 4–8
+    pin_memory_device="cuda",
+)
 
 
-# embeddings = generate_embeddings_fp16(
-#     loader,
-#     EMBEDDINGS_TARGET_PATH,
-#     force_recompute=True
-# )
+embeddings = generate_embeddings_xl(
+    loader,
+    HF_XL_EMBEDDINGS_TARGET_PATH,
+    force_recompute=True
+)
 
 # import config
 # from features.color_histograms import generate_color_histograms
@@ -463,33 +462,33 @@
 
 
 # THE ONE I RAN FOR EDGE MAPS
-import config
-from features.color_histograms import generate_color_histograms
-from data.dataset import UnifiedImageDataset
-import time
-import pandas as pd
-from torch.utils.data import DataLoader
-from features.edge_maps import generate_edge_maps
+# import config
+# from features.color_histograms import generate_color_histograms
+# from data.dataset import UnifiedImageDataset
+# import time
+# import pandas as pd
+# from torch.utils.data import DataLoader
+# from features.edge_maps import generate_edge_maps
 
-df = pd.read_csv(config.CSV_PATH)
+# df = pd.read_csv(config.CSV_PATH)
 
-dataset = UnifiedImageDataset(
-    df.rename(columns={"local_path": "file_path"}), 
-    mode="file_df"
-)
+# dataset = UnifiedImageDataset(
+#     df.rename(columns={"local_path": "file_path"}), 
+#     mode="file_df"
+# )
 
-loader = DataLoader(
-    dataset,
-    batch_size=265,                    # then try 160/192/224
-    shuffle=False,
-    num_workers=64,  # 16–32 is a good sweet spot
-    pin_memory=True,
-    persistent_workers=True,
-    prefetch_factor=6,                 # 4–8
-    pin_memory_device="cuda",
-)
+# loader = DataLoader(
+#     dataset,
+#     batch_size=265,                    # then try 160/192/224
+#     shuffle=False,
+#     num_workers=64,  # 16–32 is a good sweet spot
+#     pin_memory=True,
+#     persistent_workers=True,
+#     prefetch_factor=6,                 # 4–8
+#     pin_memory_device="cuda",
+# )
 
-edge_maps = generate_edge_maps(loader, config.EDGE_MAPS_PATH, method="canny", force_recompute=False)
+# edge_maps = generate_edge_maps(loader, config.EDGE_MAPS_PATH, method="canny", force_recompute=False)
 
 
 
