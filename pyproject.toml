@@ -1,33 +1,51 @@
-[tool.poetry]
+[project]
 name = "degis"
 version = "0.1.0"
 description = "Disentangled Embeddings Guided Synthesis"
-authors = ["Ahmed Sherif <you@example.com>"]
+authors = [
+    {name = "Ahmed Sherif", email = "you@example.com"}
+]
+readme = "README_PACKAGE.md"
+requires-python = ">=3.10"
+dependencies = [
+    "torch",
+    "torchvision", 
+    "torchaudio",
+    "tqdm",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "opencv-python-headless",
+    "scikit-learn",
+    "scikit-image",
+    "einops",
+    "ftfy",
+    "regex",
+    "requests",
+    "Pillow",
+    "diffusers",
+    "transformers",
+    "accelerate",
+    "pyparsing==3.1.1",
+    "geomloss",
+    "ip-adapter @ git+https://github.com/Ahmed-Sherif-ASA/IP-Adapter@main",
+    "psutil",
+    "pyyaml",
+    "safetensors",
+    "huggingface-hub",
+]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-torch = "*"
-torchvision = "*"
-torchaudio = "*"
-tqdm = "*"
-numpy = "*"
-pandas = "*"
-matplotlib = "*"
-opencv-python-headless = "*"
-scikit-learn = "*"
-scikit-image = "*"
-einops = "*"
-ftfy = "*"
-regex = "*"
-requests = "*"
-Pillow = "*"
-diffusers = "*"
-transformers = "*"
-accelerate = "*"
-open-clip-torch = { git = "https://github.com/mlfoundations/open_clip.git" }
-ip-adapter = { git = "https://github.com/Ahmed-Sherif-ASA/IP-Adapter" }
-pyparsing = "==3.1.1"
-geomloss = "*"
+[project.scripts]
+degis-embeddings = "degis.cli.generate_embeddings:main"
+degis-features = "degis.cli.generate_features:main"
+degis-train-color = "degis.cli.train_color:main"
+degis-train-edge = "degis.cli.train_edge:main"
 
-[tool.poetry.group.dev.dependencies]
-ipykernel = "^6.30.1"
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["degis*"]
+exclude = ["tests*", "runs*", "*.ipynb", "*.pyc", "__pycache__*"]

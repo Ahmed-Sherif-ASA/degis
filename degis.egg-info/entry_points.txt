@@ -1,0 +1,5 @@
+[console_scripts]
+degis-embeddings = degis.cli.generate_embeddings:main
+degis-features = degis.cli.generate_features:main
+degis-train-color = degis.cli.train_color:main
+degis-train-edge = degis.cli.train_edge:main
