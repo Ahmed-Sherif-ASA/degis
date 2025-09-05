@@ -1,0 +1,66 @@
+# Python bytecode and cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Unit test / coverage reports
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project-specific ignores
+# Uncomment these if you want to ignore them:
+# runs/                    # Training run outputs
+# data/                    # Dataset files
+# *.pth                    # PyTorch model files
+# *.bin                    # Binary model files
+# *.safetensors           # SafeTensors model files
+# *.ckpt                   # Checkpoint files
+# *.pkl                    # Pickle files
+# *.pickle                 # Pickle files
+
+# Hugging Face cache
+hf-cache/
+.cache/
+huggingface/
+
+# Model checkpoints and outputs (uncomment if needed)
+# checkpoints/
+# outputs/
+# logs/
+# wandb/
+
+# Temporary files
+*.tmp
+*.temp
