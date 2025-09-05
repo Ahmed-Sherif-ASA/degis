@@ -9,7 +9,7 @@ NAME = "laion_5m"
 # NAME = "adimagenet"
 DATA_DIR = "/data/thesis/data"
 MODELS_DIR = "/data/thesis/models"
-EDGE_MAPS_PATH = f"{DATA_DIR}/{NAME}=_edge_maps.npy"
+EDGE_MAPS_PATH = f"{DATA_DIR}/{NAME}_edge_maps.npy"
 HF_HUB_CACHE = f"{DATA_DIR}/models"
 CSV_PATH = f"/data/thesis/{NAME}_manifest.csv"
 
