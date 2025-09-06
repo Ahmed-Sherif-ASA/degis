@@ -5,6 +5,11 @@ Utilities package for degis.
 from .image_utils import create_control_edge_pil
 from .auto_setup import setup_environment, detect_environment, download_required_models, print_setup_summary
 from .model_downloader import download_ip_adapter_checkpoint, download_all_ip_adapter_models
+from .emd_generation import (
+    calculate_emd_distance, 
+    generate_with_emd_constraint, 
+    generate_from_dataset_id_xl_with_emd
+)
 
 __all__ = [
     'create_control_edge_pil',
@@ -13,5 +18,8 @@ __all__ = [
     'download_required_models',
     'print_setup_summary',
     'download_ip_adapter_checkpoint',
-    'download_all_ip_adapter_models'
+    'download_all_ip_adapter_models',
+    'calculate_emd_distance',
+    'generate_with_emd_constraint',
+    'generate_from_dataset_id_xl_with_emd'
 ]
