@@ -287,5 +287,10 @@ def get_color_embedding(
 ) -> torch.Tensor:
     """Get color embedding from CLIP embedding using trained color head."""
     with torch.no_grad():
-        _, _, color_embedding = color_head(clip_embedding)
+        logits, probs, color_embedding = color_head(clip_embedding)
+        print(f"Debug get_color_embedding:")
+        print(f"  - Input shape: {clip_embedding.shape}")
+        print(f"  - Logits shape: {logits.shape}")
+        print(f"  - Probs shape: {probs.shape}")
+        print(f"  - Color embedding shape: {color_embedding.shape}")
     return color_embedding

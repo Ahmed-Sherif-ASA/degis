@@ -208,8 +208,37 @@ def generate_from_dataset_id_xl_with_emd(
     original_histogram = histograms[colour_index]
     
     # Get CLIP embedding and compute color embedding
-    z_clip = torch.as_tensor(embeddings[colour_index], dtype=torch.float32, device=device).unsqueeze(0)
-    color_embedding = color_head(z_clip)[1]  # Get probabilities from color head
+    z_clip_raw = embeddings[colour_index]
+    print(f"Debug: Raw embedding shape: {z_clip_raw.shape}")
+    print(f"Debug: Raw embedding dtype: {z_clip_raw.dtype}")
+    
+    z_clip = torch.as_tensor(z_clip_raw, dtype=torch.float32, device=device).unsqueeze(0)
+    print(f"Debug: Processed embedding shape: {z_clip.shape}")
+    print(f"Debug: Color head expects: {color_head.fc1.in_features} dimensions")
+    
+    # Check dimension mismatch
+    if z_clip.shape[1] != color_head.fc1.in_features:
+        raise ValueError(
+            f"Embedding dimension mismatch! "
+            f"Got {z_clip.shape[1]}D embedding but color head expects {color_head.fc1.in_features}D. "
+            f"This suggests you're using the wrong embedding type or the embeddings array is corrupted."
+        )
+    
+    # Use the degis function to get color embedding (handles the color head properly)
+    from ..core.generation import get_color_embedding
+    
+    print(f"Debug: About to call color head with input shape: {z_clip.shape}")
+    
+    # Debug the color head outputs
+    with torch.no_grad():
+        logits, probs, c_emb = color_head(z_clip)
+        print(f"Debug: Color head outputs:")
+        print(f"  - logits shape: {logits.shape}")
+        print(f"  - probs shape: {probs.shape}")
+        print(f"  - c_emb shape: {c_emb.shape}")
+    
+    color_embedding = get_color_embedding(color_head, z_clip)
+    print(f"Debug: Final color_embedding shape: {color_embedding.shape}")
     
     # Create control image from edge data
     from ..core.generation import create_edge_control_image
