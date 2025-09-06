@@ -8,6 +8,7 @@ import numpy as np
 from PIL import Image, ImageOps
 from torchvision import transforms
 from typing import List, Optional, Tuple, Union
+from pathlib import Path
 
 try:
     import ip_adapter
@@ -16,6 +17,30 @@ try:
     GENERATION_AVAILABLE = True
 except ImportError:
     GENERATION_AVAILABLE = False
+
+
+def _download_checkpoint_if_needed(checkpoint_path: str, model_type: str) -> str:
+    """
+    Download IP-Adapter checkpoint if it doesn't exist locally.
+    
+    Args:
+        checkpoint_path: Path to the checkpoint file
+        model_type: Type of model ('sd15' or 'sdxl')
+        
+    Returns:
+        Path to the checkpoint file (downloaded if needed)
+    """
+    if os.path.exists(checkpoint_path):
+        return checkpoint_path
+    
+    print(f"IP-Adapter {model_type} checkpoint not found at {checkpoint_path}")
+    print(f"Downloading IP-Adapter {model_type} checkpoint...")
+    
+    from ..utils.model_downloader import download_ip_adapter_checkpoint
+    
+    downloaded_path = download_ip_adapter_checkpoint(model_type)
+    print(f"✓ Downloaded IP-Adapter {model_type} checkpoint")
+    return downloaded_path
 
 
 class ImageGenerator:
@@ -109,6 +134,9 @@ class IPAdapterGenerator(ImageGenerator):
         # Create IP-Adapter
         if ip_ckpt is None:
             ip_ckpt = get_ip_adapter_sd15_path()
+        
+        # Download checkpoint if needed
+        ip_ckpt = _download_checkpoint_if_needed(ip_ckpt, 'sd15')
             
         self.ip_adapter = IPAdapter(
             sd_pipe=self.pipe,
@@ -165,6 +193,9 @@ class IPAdapterXLGenerator(ImageGenerator):
         # Create IP-Adapter XL
         if ip_ckpt is None:
             ip_ckpt = get_ip_adapter_sdxl_path()
+        
+        # Download checkpoint if needed
+        ip_ckpt = _download_checkpoint_if_needed(ip_ckpt, 'sdxl')
             
         self.ip_adapter = IPAdapterXL(
             sd_pipe=self.pipe,
