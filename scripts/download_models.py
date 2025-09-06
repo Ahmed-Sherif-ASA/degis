@@ -11,7 +11,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from degis.config.models import MODEL_REGISTRY, get_model_config, set_model_path
+from degis.models_config.models import MODEL_REGISTRY, set_model_path
+from degis.config import MODEL_CACHE
 from degis.utils.model_manager import get_model_manager
 
 def download_ip_adapter_models():
@@ -24,8 +25,7 @@ def download_ip_adapter_models():
         print("Error: huggingface_hub not installed. Install with: pip install huggingface_hub")
         return False
     
-    config = get_model_config()
-    models_dir = Path(config["models_dir"])
+    models_dir = Path(os.getenv("DEGIS_MODELS_DIR", "./models"))
     models_dir.mkdir(parents=True, exist_ok=True)
     
     # Download IP-Adapter SD 1.5
@@ -63,15 +63,14 @@ def download_all_models():
     print("Setting up model environment...")
     
     # Set up model manager
-    config = get_model_config()
     manager = get_model_manager(
-        cache_dir=config["cache_dir"],
-        models_dir=config["models_dir"]
+        cache_dir=MODEL_CACHE,
+        models_dir=os.getenv("DEGIS_MODELS_DIR", "./models")
     )
     
-    print(f"Cache directory: {config['cache_dir']} (local to project)")
-    print(f"Models directory: {config['models_dir']}")
-    print(f"You can see the cache structure in: {config['cache_dir']}/")
+    print(f"Cache directory: {MODEL_CACHE} (local to project)")
+    print(f"Models directory: {os.getenv('DEGIS_MODELS_DIR', './models')}")
+    print(f"You can see the cache structure in: {MODEL_CACHE}/")
     
     # Download IP-Adapter models
     if not download_ip_adapter_models():

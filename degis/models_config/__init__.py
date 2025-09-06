@@ -4,7 +4,6 @@ Configuration package for degis.
 
 from .models import (
     MODEL_REGISTRY,
-    get_model_config,
     get_model_path,
     set_model_path,
     get_sd15_path,
@@ -19,7 +18,6 @@ from .models import (
 
 __all__ = [
     'MODEL_REGISTRY',
-    'get_model_config',
     'get_model_path',
     'set_model_path',
     'get_sd15_path',

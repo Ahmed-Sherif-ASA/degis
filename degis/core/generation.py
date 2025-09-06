@@ -81,13 +81,10 @@ class IPAdapterGenerator(ImageGenerator):
         
         # Import model management
         from ..models_config.models import (
-            get_model_config, get_sd15_path, get_controlnet_sd15_path, 
+            get_sd15_path, get_controlnet_sd15_path, 
             get_ip_adapter_sd15_path, get_clip_vit_h14_path
         )
         from ..config import MODEL_CACHE
-        
-        # Get model configuration
-        config = get_model_config()
         
         # Use model management system for defaults
         model_id = model_id or get_sd15_path()
@@ -140,13 +137,10 @@ class IPAdapterXLGenerator(ImageGenerator):
         
         # Import model management
         from ..models_config.models import (
-            get_model_config, get_sdxl_path, get_controlnet_sdxl_path, 
+            get_sdxl_path, get_controlnet_sdxl_path, 
             get_ip_adapter_sdxl_path, get_clip_vit_bigg14_path
         )
         from ..config import MODEL_CACHE
-        
-        # Get model configuration
-        config = get_model_config()
         
         # Use model management system for defaults
         model_id = model_id or get_sdxl_path()

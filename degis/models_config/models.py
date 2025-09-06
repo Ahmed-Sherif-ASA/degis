@@ -50,14 +50,6 @@ MODEL_REGISTRY = {
     },
 }
 
-# Environment-based configuration
-def get_model_config() -> Dict[str, str]:
-    """Get model configuration from environment variables."""
-    return {
-        "cache_dir": os.getenv("DEGIS_CACHE_DIR", "./model-cache"),  # Local cache in project
-        "models_dir": os.getenv("DEGIS_MODELS_DIR", "./models"),
-        "data_dir": os.getenv("DEGIS_DATA_DIR", "./data"),
-    }
 
 
 def get_model_path(model_key: str, config: Optional[Dict[str, str]] = None) -> str:
@@ -75,7 +67,6 @@ def get_model_path(model_key: str, config: Optional[Dict[str, str]] = None) -> s
         raise ValueError(f"Unknown model key: {model_key}")
     
     model_info = MODEL_REGISTRY[model_key]
-    config = config or get_model_config()
     
     # If local path is set, use it
     if model_info.get("local_path"):
@@ -106,7 +97,6 @@ def download_model(model_key: str, force_download: bool = False) -> str:
         raise ValueError(f"Unknown model key: {model_key}")
     
     model_info = MODEL_REGISTRY[model_key]
-    config = get_model_config()
     
     # For HuggingFace models, use the library's caching
     if "hf_id" in model_info:

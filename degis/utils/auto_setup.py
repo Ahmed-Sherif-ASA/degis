@@ -196,12 +196,11 @@ def download_required_models(force_download: bool = False) -> bool:
     """
     try:
         from .model_manager import get_model_manager
-        from ..models_config.models import get_model_config
+        from ..config import MODEL_CACHE
         
-        config = get_model_config()
         manager = get_model_manager(
-            cache_dir=config["cache_dir"],
-            models_dir=config["models_dir"]
+            cache_dir=MODEL_CACHE,
+            models_dir=os.getenv("DEGIS_MODELS_DIR", "./models")
         )
         
         print("📥 Downloading required models...")

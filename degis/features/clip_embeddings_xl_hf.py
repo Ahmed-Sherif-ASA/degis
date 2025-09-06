@@ -28,14 +28,11 @@ from PIL import Image
 from transformers import CLIPVisionModelWithProjection, CLIPImageProcessor
 
 # ---- config ----
-from ..models_config.models import get_model_config, get_clip_vit_bigg14_path
+from ..models_config.models import get_clip_vit_bigg14_path
 from ..config import MODEL_CACHE
 
-# Use model management system
-config = get_model_config()
-
-# IMPORTANT: use the SAME model ID as IPAdapterXL's image_encoder_path
-MODEL_ID = "laion/CLIP-ViT-bigG-14-laion2B-39B-b160k"
+# Get model ID from registry (same as IPAdapterXL's image_encoder_path)
+MODEL_ID = get_clip_vit_bigg14_path()
 
 # ---- device / perf ----
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
