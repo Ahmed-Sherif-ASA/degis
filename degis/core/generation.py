@@ -80,7 +80,7 @@ class IPAdapterGenerator(ImageGenerator):
             raise ImportError("IP-Adapter and diffusers are required for image generation")
         
         # Import model management
-        from ..config.models import (
+        from ..models_config.models import (
             get_model_config, get_sd15_path, get_controlnet_sd15_path, 
             get_ip_adapter_sd15_path, get_clip_vit_h14_path
         )
@@ -147,7 +147,7 @@ class IPAdapterXLGenerator(ImageGenerator):
             raise ImportError("IP-Adapter and diffusers are required for image generation")
         
         # Import model management
-        from ..config.models import (
+        from ..models_config.models import (
             get_model_config, get_sdxl_path, get_controlnet_sdxl_path, 
             get_ip_adapter_sdxl_path, get_clip_vit_bigg14_path
         )

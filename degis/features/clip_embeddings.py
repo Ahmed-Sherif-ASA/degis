@@ -2,7 +2,7 @@ import open_clip
 import torch
 import numpy as np
 from tqdm import tqdm
-from ..config.models import get_model_config, get_clip_vit_h14_path
+from ..models_config.models import get_model_config, get_clip_vit_h14_path
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

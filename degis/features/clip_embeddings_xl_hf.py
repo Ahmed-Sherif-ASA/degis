@@ -28,7 +28,7 @@ from PIL import Image
 from transformers import CLIPVisionModelWithProjection, CLIPImageProcessor
 
 # ---- config ----
-from ..config.models import get_model_config, get_clip_vit_bigg14_path
+from ..models_config.models import get_model_config, get_clip_vit_bigg14_path
 
 # Use model management system
 config = get_model_config()

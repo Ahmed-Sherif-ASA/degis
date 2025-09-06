@@ -204,7 +204,7 @@ def download_required_models(force_download: bool = False) -> bool:
     """
     try:
         from .model_manager import get_model_manager
-        from ..config.models import get_model_config
+        from ..models_config.models import get_model_config
         
         config = get_model_config()
         manager = get_model_manager(
