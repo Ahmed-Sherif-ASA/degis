@@ -85,12 +85,8 @@ def setup_environment(
     os.environ["DEGIS_MODELS_DIR"] = actual_paths["models_dir"]
     os.environ["DEGIS_CACHE_DIR"] = actual_paths["cache_dir"]
     
-    # Set up HuggingFace cache environment
-    os.environ["HF_HOME"] = actual_paths["cache_dir"]
-    os.environ["HUGGINGFACE_HUB_CACHE"] = os.path.join(actual_paths["cache_dir"], "hub")
-    os.environ["TRANSFORMERS_CACHE"] = os.path.join(actual_paths["cache_dir"], "transformers")
-    os.environ["DIFFUSERS_CACHE"] = os.path.join(actual_paths["cache_dir"], "diffusers")
-    os.environ["TORCH_HOME"] = os.path.join(actual_paths["cache_dir"], "torch")
+    from ..models_config.models import setup_huggingface_cache
+    setup_huggingface_cache(actual_paths["cache_dir"])
     
     # Download models if requested
     if auto_download:

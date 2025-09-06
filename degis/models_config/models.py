@@ -59,6 +59,29 @@ def get_model_config() -> Dict[str, str]:
         "data_dir": os.getenv("DEGIS_DATA_DIR", "./data"),
     }
 
+def setup_huggingface_cache(cache_dir: Optional[str] = None) -> str:
+    """
+    Set up HuggingFace environment variables for proper subdirectory caching.
+    
+    Args:
+        cache_dir: Cache directory path. If None, uses get_model_config()["cache_dir"]
+        
+    Returns:
+        The cache directory path that was set up
+    """
+    if cache_dir is None:
+        config = get_model_config()
+        cache_dir = config["cache_dir"]
+    
+    # Set up environment variables for proper subdirectory caching
+    os.environ["HF_HOME"] = cache_dir
+    os.environ["HUGGINGFACE_HUB_CACHE"] = os.path.join(cache_dir, "hub")
+    os.environ["TRANSFORMERS_CACHE"] = os.path.join(cache_dir, "transformers")
+    os.environ["DIFFUSERS_CACHE"] = os.path.join(cache_dir, "diffusers")
+    os.environ["TORCH_HOME"] = os.path.join(cache_dir, "torch")
+    
+    return cache_dir
+
 def get_model_path(model_key: str, config: Optional[Dict[str, str]] = None) -> str:
     """
     Get the path for a specific model.

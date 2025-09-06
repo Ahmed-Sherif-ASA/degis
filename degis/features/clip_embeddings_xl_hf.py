@@ -28,7 +28,7 @@ from PIL import Image
 from transformers import CLIPVisionModelWithProjection, CLIPImageProcessor
 
 # ---- config ----
-from ..models_config.models import get_model_config, get_clip_vit_bigg14_path
+from ..models_config.models import get_model_config, setup_huggingface_cache, get_clip_vit_bigg14_path
 
 # Use model management system
 config = get_model_config()
@@ -46,8 +46,10 @@ else:
     _dtype = torch.float32
 
 # ---- load vision tower + processor ----
-_vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, cache_dir=config["cache_dir"])
-preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID, cache_dir=config["cache_dir"])
+setup_huggingface_cache()
+
+_vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID)
+preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID)
 
 _vision = _vision.to(device, dtype=_dtype).eval()
 
@@ -174,8 +176,8 @@ def update_model_id(ip_adapter_model):
         MODEL_ID = new_id
         
         # Reload the model
-        _vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, cache_dir=config["cache_dir"])
-        preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID, cache_dir=config["cache_dir"])
+        _vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID)
+        preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID)
         
         _vision = _vision.to(device, dtype=_dtype).eval()
         XL_EMB_DIM = int(getattr(_vision.config, "projection_dim", 0)) or 1024

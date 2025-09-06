@@ -81,7 +81,7 @@ class IPAdapterGenerator(ImageGenerator):
         
         # Import model management
         from ..models_config.models import (
-            get_model_config, get_sd15_path, get_controlnet_sd15_path, 
+            get_model_config, setup_huggingface_cache, get_sd15_path, get_controlnet_sd15_path, 
             get_ip_adapter_sd15_path, get_clip_vit_h14_path
         )
         
@@ -94,13 +94,7 @@ class IPAdapterGenerator(ImageGenerator):
         image_encoder_path = image_encoder_path or get_clip_vit_h14_path()
         cache_dir = cache_dir or config["cache_dir"]
             
-        # Setup cache directory
-        if cache_dir:
-            os.environ["HF_HOME"] = cache_dir
-            os.environ["HUGGINGFACE_HUB_CACHE"] = os.path.join(cache_dir, "hub")
-            os.environ["TRANSFORMERS_CACHE"] = os.path.join(cache_dir, "transformers")
-            os.environ["DIFFUSERS_CACHE"] = os.path.join(cache_dir, "diffusers")
-            os.environ["TORCH_HOME"] = os.path.join(cache_dir, "torch")
+        setup_huggingface_cache(cache_dir)
         
         # Create ControlNet
         self.controlnet = ControlNetModel.from_pretrained(controlnet_id)
@@ -112,7 +106,6 @@ class IPAdapterGenerator(ImageGenerator):
             torch_dtype=torch_dtype,
             safety_checker=None,
             feature_extractor=None,
-            cache_dir=cache_dir,
         ).to(self.device)
         
         self.pipe.controlnet = self.pipe.controlnet.to(dtype=torch_dtype)
@@ -148,7 +141,7 @@ class IPAdapterXLGenerator(ImageGenerator):
         
         # Import model management
         from ..models_config.models import (
-            get_model_config, get_sdxl_path, get_controlnet_sdxl_path, 
+            get_model_config, setup_huggingface_cache, get_sdxl_path, get_controlnet_sdxl_path, 
             get_ip_adapter_sdxl_path, get_clip_vit_bigg14_path
         )
         
@@ -161,13 +154,7 @@ class IPAdapterXLGenerator(ImageGenerator):
         image_encoder_path = image_encoder_path or get_clip_vit_bigg14_path()
         cache_dir = cache_dir or config["cache_dir"]
             
-        # Setup cache directory
-        if cache_dir:
-            os.environ["HF_HOME"] = cache_dir
-            os.environ["HUGGINGFACE_HUB_CACHE"] = os.path.join(cache_dir, "hub")
-            os.environ["TRANSFORMERS_CACHE"] = os.path.join(cache_dir, "transformers")
-            os.environ["DIFFUSERS_CACHE"] = os.path.join(cache_dir, "diffusers")
-            os.environ["TORCH_HOME"] = os.path.join(cache_dir, "torch")
+        setup_huggingface_cache(cache_dir)
         
         # Create ControlNet
         self.controlnet = ControlNetModel.from_pretrained(controlnet_id)
@@ -179,7 +166,6 @@ class IPAdapterXLGenerator(ImageGenerator):
             torch_dtype=torch_dtype,
             safety_checker=None,
             feature_extractor=None,
-            cache_dir=cache_dir,
         ).to(self.device)
         
         self.pipe.controlnet = self.pipe.controlnet.to(dtype=torch_dtype)
