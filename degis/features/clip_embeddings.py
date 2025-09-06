@@ -13,25 +13,36 @@ config = get_model_config()
 model_name = "ViT-H-14"
 pretrained = "laion2b_s32b_b79k"
 
-setup_huggingface_cache()
+# Initialize as None - will be loaded lazily
+clip_model = None
+preprocess = None
 
-# create model (create_model_and_transforms doesn't need a device arg)
-clip_model, _, preprocess = open_clip.create_model_and_transforms(
-    model_name=model_name,
-    pretrained=pretrained,
-    cache_dir=config["cache_dir"],
-)
+def _ensure_model_loaded():
+    """Ensure the model is loaded (lazy loading)."""
+    global clip_model, preprocess
+    
+    if clip_model is None:
+        setup_huggingface_cache()
+        
+        # create model (create_model_and_transforms doesn't need a device arg)
+        clip_model, _, preprocess = open_clip.create_model_and_transforms(
+            model_name=model_name,
+            pretrained=pretrained,
+            cache_dir=config["cache_dir"],
+        )
 
-# half precision only on CUDA
-clip_model = clip_model.to(device)
-if device.type == "cuda":
-    clip_model = clip_model.half()
-clip_model.eval()
+        # half precision only on CUDA
+        clip_model = clip_model.to(device)
+        if device.type == "cuda":
+            clip_model = clip_model.half()
+        clip_model.eval()
 
 
 # features/clip_embeddings.py
 
 def compute_clip_embedding(image_tensor: torch.Tensor) -> torch.Tensor:
+    _ensure_model_loaded()
+    
     x = image_tensor.unsqueeze(0).to(device)  # [1,3,H,W]
     with torch.no_grad():
         if device.type == "cuda":
@@ -44,6 +55,8 @@ def compute_clip_embedding(image_tensor: torch.Tensor) -> torch.Tensor:
 
 
 def generate_embeddings_fp16(loader, save_path, force_recompute=False):
+    _ensure_model_loaded()
+    
     try:
         if not force_recompute:
             emb = np.load(save_path)
@@ -64,28 +77,6 @@ def generate_embeddings_fp16(loader, save_path, force_recompute=False):
                 z = clip_model.encode_image(imgs)
 
         all_embs.append(z.float().cpu().numpy())
-
-    embeddings = np.concatenate(all_embs, axis=0)
-    np.save(save_path, embeddings)
-    print(f"→ Saved embeddings to {save_path}")
-    return embeddings
-
-def generate_embeddings_fp16(loader, save_path, force_recompute=False):
-    try:
-        if not force_recompute:
-            emb = np.load(save_path)
-            print(f"→ Loaded precomputed from {save_path}")
-            return emb
-    except FileNotFoundError:
-        print("→ No existing file, recomputing…")
-
-    all_embs = []
-    for imgs, _ in tqdm(loader, desc="CLIP batched encode"):
-        # imgs: [B,3,H,W] in float32 [0,1]
-        imgs = imgs.to(device).half()                 # to fp16
-        with torch.no_grad(), torch.cuda.amp.autocast():
-            z = clip_model.encode_image(imgs)         # [B,1024] fp16
-        all_embs.append(z.float().cpu().numpy())      # back to fp32 on CPU
 
     embeddings = np.concatenate(all_embs, axis=0)
     np.save(save_path, embeddings)

@@ -46,16 +46,26 @@ else:
     _dtype = torch.float32
 
 # ---- load vision tower + processor ----
-setup_huggingface_cache()
+# Initialize as None - will be loaded lazily
+_vision = None
+preprocess_xl = None
+XL_EMB_DIM = None
 
-_vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID)
-preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID)
-
-_vision = _vision.to(device, dtype=_dtype).eval()
-
-# Embedding dim IPAdapterXL expects from .image_embeds
-XL_EMB_DIM = int(getattr(_vision.config, "projection_dim", 0)) or 1024
-print(f"Model projection_dim: {XL_EMB_DIM}")
+def _ensure_model_loaded():
+    """Ensure the model is loaded (lazy loading)."""
+    global _vision, preprocess_xl, XL_EMB_DIM
+    
+    if _vision is None:
+        setup_huggingface_cache()
+        
+        _vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID)
+        preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID)
+        
+        _vision = _vision.to(device, dtype=_dtype).eval()
+        
+        # Embedding dim IPAdapterXL expects from .image_embeds
+        XL_EMB_DIM = int(getattr(_vision.config, "projection_dim", 0)) or 1024
+        print(f"Model projection_dim: {XL_EMB_DIM}")
 
 
 def _to_pil_list(x: Union[torch.Tensor, Image.Image, List[Image.Image]]):
@@ -80,6 +90,8 @@ def compute_clip_embedding_xl(image: Union[torch.Tensor, Image.Image, List[Image
     Returns a single/global embedding for one image (float32 CPU) shaped [XL_EMB_DIM].
     If a list is passed, only the first image is encoded (use batched API for many).
     """
+    _ensure_model_loaded()
+    
     pil_list = _to_pil_list(image)
     px = preprocess_xl(images=pil_list[:1], return_tensors="pt").pixel_values.to(device, dtype=_dtype)
 
@@ -108,6 +120,8 @@ def generate_embeddings_xl(
     - loader should yield (imgs, _) with imgs as tensors [B,3,H,W] in [0,1] or PIL lists.
     - Saves float32 numpy array of shape [N, XL_EMB_DIM].
     """
+    _ensure_model_loaded()
+    
     if (not force_recompute) and os.path.exists(save_path):
         arr = np.load(save_path, mmap_mode=None)
         print(f"→ Loaded precomputed from {save_path} (shape={arr.shape})")
@@ -146,6 +160,8 @@ def check_ip_adapter_compatibility(ip_adapter_model):
     
     Returns: (is_compatible, expected_dim, actual_dim)
     """
+    _ensure_model_loaded()
+    
     expected_dim = ip_adapter_model.image_encoder.config.projection_dim
     actual_dim = XL_EMB_DIM
     
@@ -176,6 +192,7 @@ def update_model_id(ip_adapter_model):
         MODEL_ID = new_id
         
         # Reload the model
+        setup_huggingface_cache()
         _vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID)
         preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID)
         
