@@ -84,10 +84,6 @@ def setup_environment(
     os.environ["DEGIS_DATA_DIR"] = actual_paths["data_dir"]
     os.environ["DEGIS_MODELS_DIR"] = actual_paths["models_dir"]
     os.environ["DEGIS_CACHE_DIR"] = actual_paths["cache_dir"]
-    
-    from ..models_config.models import setup_huggingface_cache
-    setup_huggingface_cache(actual_paths["cache_dir"])
-    
     # Download models if requested
     if auto_download:
         try:

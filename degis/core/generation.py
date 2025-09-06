@@ -81,9 +81,10 @@ class IPAdapterGenerator(ImageGenerator):
         
         # Import model management
         from ..models_config.models import (
-            get_model_config, setup_huggingface_cache, get_sd15_path, get_controlnet_sd15_path, 
+            get_model_config, get_sd15_path, get_controlnet_sd15_path, 
             get_ip_adapter_sd15_path, get_clip_vit_h14_path
         )
+        from ..config import MODEL_CACHE
         
         # Get model configuration
         config = get_model_config()
@@ -92,9 +93,7 @@ class IPAdapterGenerator(ImageGenerator):
         model_id = model_id or get_sd15_path()
         controlnet_id = controlnet_id or get_controlnet_sd15_path()
         image_encoder_path = image_encoder_path or get_clip_vit_h14_path()
-        cache_dir = cache_dir or config["cache_dir"]
-            
-        setup_huggingface_cache(cache_dir)
+        cache_dir = cache_dir or MODEL_CACHE
         
         # Create ControlNet
         self.controlnet = ControlNetModel.from_pretrained(controlnet_id)
@@ -141,9 +140,10 @@ class IPAdapterXLGenerator(ImageGenerator):
         
         # Import model management
         from ..models_config.models import (
-            get_model_config, setup_huggingface_cache, get_sdxl_path, get_controlnet_sdxl_path, 
+            get_model_config, get_sdxl_path, get_controlnet_sdxl_path, 
             get_ip_adapter_sdxl_path, get_clip_vit_bigg14_path
         )
+        from ..config import MODEL_CACHE
         
         # Get model configuration
         config = get_model_config()
@@ -152,9 +152,7 @@ class IPAdapterXLGenerator(ImageGenerator):
         model_id = model_id or get_sdxl_path()
         controlnet_id = controlnet_id or get_controlnet_sdxl_path()
         image_encoder_path = image_encoder_path or get_clip_vit_bigg14_path()
-        cache_dir = cache_dir or config["cache_dir"]
-            
-        setup_huggingface_cache(cache_dir)
+        cache_dir = cache_dir or MODEL_CACHE
         
         # Create ControlNet
         self.controlnet = ControlNetModel.from_pretrained(controlnet_id)

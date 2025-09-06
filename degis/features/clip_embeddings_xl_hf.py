@@ -28,7 +28,8 @@ from PIL import Image
 from transformers import CLIPVisionModelWithProjection, CLIPImageProcessor
 
 # ---- config ----
-from ..models_config.models import get_model_config, setup_huggingface_cache, get_clip_vit_bigg14_path
+from ..models_config.models import get_model_config, get_clip_vit_bigg14_path
+from ..config import MODEL_CACHE
 
 # Use model management system
 config = get_model_config()
@@ -56,8 +57,6 @@ def _ensure_model_loaded():
     global _vision, preprocess_xl, XL_EMB_DIM
     
     if _vision is None:
-        setup_huggingface_cache()
-        
         _vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID)
         preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID)
         
@@ -192,7 +191,6 @@ def update_model_id(ip_adapter_model):
         MODEL_ID = new_id
         
         # Reload the model
-        setup_huggingface_cache()
         _vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID)
         preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID)
         

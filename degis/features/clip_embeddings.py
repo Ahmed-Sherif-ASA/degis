@@ -8,7 +8,7 @@ from ..models_config.models import get_model_config, get_clip_vit_h14_path
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Use model management system
-from ..models_config.models import setup_huggingface_cache
+from ..config import MODEL_CACHE
 config = get_model_config()
 model_name = "ViT-H-14"
 pretrained = "laion2b_s32b_b79k"
@@ -22,9 +22,6 @@ def _ensure_model_loaded():
     global clip_model, preprocess
     
     if clip_model is None:
-        setup_huggingface_cache()
-        
-        # create model (create_model_and_transforms doesn't need a device arg)
         clip_model, _, preprocess = open_clip.create_model_and_transforms(
             model_name=model_name,
             pretrained=pretrained,

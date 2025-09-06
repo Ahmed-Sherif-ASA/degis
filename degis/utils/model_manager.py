@@ -28,19 +28,6 @@ class ModelManager:
         # Ensure directories exist
         os.makedirs(self.cache_dir, exist_ok=True)
         os.makedirs(self.models_dir, exist_ok=True)
-        
-        # Set up environment variables for consistent caching
-        self._setup_cache_environment()
-    
-    def _setup_cache_environment(self):
-        """Set up environment variables for consistent model caching."""
-        os.environ["HF_HOME"] = self.cache_dir
-        os.environ["HUGGINGFACE_HUB_CACHE"] = os.path.join(self.cache_dir, "hub")
-        os.environ["TRANSFORMERS_CACHE"] = os.path.join(self.cache_dir, "transformers")
-        os.environ["DIFFUSERS_CACHE"] = os.path.join(self.cache_dir, "diffusers")
-        os.environ["TORCH_HOME"] = os.path.join(self.cache_dir, "torch")
-        
-        logger.info(f"Cache environment set up: {self.cache_dir}")
     
     def get_model_path(self, model_name: str, model_type: str = "checkpoint") -> str:
         """

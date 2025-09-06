@@ -2,17 +2,6 @@
 
 This directory contains cached machine learning models and will be populated when you first download models.
 
-## Directory Structure
-
-```
-model-cache/
-├── hub/                    # HuggingFace Hub cache
-├── transformers/           # Transformers library cache
-├── diffusers/             # Diffusers library cache
-├── torch/                 # PyTorch model cache
-└── README.md             # This file
-```
-
 ## What Gets Cached Here
 
 - **Stable Diffusion models** (SD 1.5, SDXL)
@@ -32,7 +21,7 @@ Models are automatically cached here when you:
 - **Size**: Can grow to several GB as models are downloaded
 - **Location**: Local to this project (not system-wide)
 - **Cleanup**: Safe to delete - models will be re-downloaded as needed
-- **Git**: Contents are ignored, but directory structure is tracked
+- **Git**: Contents are ignored, but directory and README are tracked
 
 ## Environment Variables
 
