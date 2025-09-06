@@ -28,10 +28,10 @@ from PIL import Image
 from transformers import CLIPVisionModelWithProjection, CLIPImageProcessor
 
 # ---- config ----
-try:
-    from config import HF_HUB_CACHE as HF_CACHE
-except Exception:
-    HF_CACHE = None
+from ..config.models import get_model_config, get_clip_vit_bigg14_path
+
+# Use model management system
+config = get_model_config()
 
 # IMPORTANT: use the SAME model ID as IPAdapterXL's image_encoder_path
 MODEL_ID = "laion/CLIP-ViT-bigG-14-laion2B-39B-b160k"
@@ -46,8 +46,8 @@ else:
     _dtype = torch.float32
 
 # ---- load vision tower + processor ----
-_vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, cache_dir=HF_CACHE)
-preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID, cache_dir=HF_CACHE)
+_vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, cache_dir=config["cache_dir"])
+preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID, cache_dir=config["cache_dir"])
 
 _vision = _vision.to(device, dtype=_dtype).eval()
 
@@ -174,8 +174,8 @@ def update_model_id(ip_adapter_model):
         MODEL_ID = new_id
         
         # Reload the model
-        _vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, cache_dir=HF_CACHE)
-        preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID, cache_dir=HF_CACHE)
+        _vision = CLIPVisionModelWithProjection.from_pretrained(MODEL_ID, cache_dir=config["cache_dir"])
+        preprocess_xl = CLIPImageProcessor.from_pretrained(MODEL_ID, cache_dir=config["cache_dir"])
         
         _vision = _vision.to(device, dtype=_dtype).eval()
         XL_EMB_DIM = int(getattr(_vision.config, "projection_dim", 0)) or 1024

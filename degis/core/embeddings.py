@@ -12,6 +12,7 @@ from ..data.dataset import UnifiedImageDataset
 from ..features.clip_embeddings import generate_embeddings_fp16
 from ..features.clip_embeddings_xl_hf import generate_embeddings_xl as generate_embeddings_xl_hf, preprocess_xl
 from ..config import CSV_PATH, BATCH_SIZE, EMBEDDINGS_TARGET_PATH, HF_XL_EMBEDDINGS_TARGET_PATH
+from ..utils.auto_setup import setup_environment
 
 
 def generate_clip_embeddings(
@@ -38,6 +39,9 @@ def generate_clip_embeddings(
     Returns:
         numpy.ndarray: Generated embeddings
     """
+    # Setup environment (detects server/local, sets cache dirs, etc.)
+    setup_environment()
+    
     # Use defaults from config if not provided
     csv_path = csv_path or CSV_PATH
     output_path = output_path or EMBEDDINGS_TARGET_PATH
@@ -122,6 +126,9 @@ def generate_xl_embeddings(
     Returns:
         numpy.ndarray: Generated embeddings
     """
+    # Setup environment (detects server/local, sets cache dirs, etc.)
+    setup_environment()
+    
     return generate_clip_embeddings(
         csv_path=csv_path,
         output_path=output_path,

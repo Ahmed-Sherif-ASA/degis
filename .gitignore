@@ -50,8 +50,17 @@ Thumbs.db
 # *.pkl                    # Pickle files
 # *.pickle                 # Pickle files
 
-# Hugging Face cache
-hf-cache/
+# Model cache (ignore contents, keep directory structure)
+model-cache/*
+!model-cache/README.md
+!model-cache/hub/
+!model-cache/transformers/
+!model-cache/diffusers/
+!model-cache/torch/
+!model-cache/hub/.gitkeep
+!model-cache/transformers/.gitkeep
+!model-cache/diffusers/.gitkeep
+!model-cache/torch/.gitkeep
 .cache/
 huggingface/
 

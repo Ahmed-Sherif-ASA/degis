@@ -68,16 +68,31 @@ class IPAdapterGenerator(ImageGenerator):
     
     def setup_pipeline(
         self,
-        model_id: str = "runwayml/stable-diffusion-v1-5",
-        controlnet_id: str = "lllyasviel/control_v11p_sd15_canny",
+        model_id: str = None,
+        controlnet_id: str = None,
         ip_ckpt: str = None,
-        image_encoder_path: str = "laion/CLIP-ViT-H-14-laion2B-s32B-b79K",
+        image_encoder_path: str = None,
         cache_dir: str = None,
         torch_dtype: torch.dtype = torch.float16,
     ):
         """Setup IP-Adapter with SD 1.5 pipeline."""
         if not GENERATION_AVAILABLE:
             raise ImportError("IP-Adapter and diffusers are required for image generation")
+        
+        # Import model management
+        from ..config.models import (
+            get_model_config, get_sd15_path, get_controlnet_sd15_path, 
+            get_ip_adapter_sd15_path, get_clip_vit_h14_path
+        )
+        
+        # Get model configuration
+        config = get_model_config()
+        
+        # Use model management system for defaults
+        model_id = model_id or get_sd15_path()
+        controlnet_id = controlnet_id or get_controlnet_sd15_path()
+        image_encoder_path = image_encoder_path or get_clip_vit_h14_path()
+        cache_dir = cache_dir or config["cache_dir"]
             
         # Setup cache directory
         if cache_dir:
@@ -104,7 +119,7 @@ class IPAdapterGenerator(ImageGenerator):
         
         # Create IP-Adapter
         if ip_ckpt is None:
-            ip_ckpt = "/data/thesis/models/ip-adapter_sd15.bin"  # Default path
+            ip_ckpt = get_ip_adapter_sd15_path()
             
         self.ip_adapter = IPAdapter(
             sd_pipe=self.pipe,
@@ -120,16 +135,31 @@ class IPAdapterXLGenerator(ImageGenerator):
     
     def setup_pipeline(
         self,
-        model_id: str = "stabilityai/stable-diffusion-xl-base-1.0",
-        controlnet_id: str = "diffusers/controlnet-canny-sdxl-1.0",
+        model_id: str = None,
+        controlnet_id: str = None,
         ip_ckpt: str = None,
-        image_encoder_path: str = "laion/CLIP-ViT-bigG-14-laion2B-39B-b160k",
+        image_encoder_path: str = None,
         cache_dir: str = None,
         torch_dtype: torch.dtype = torch.float16,
     ):
         """Setup IP-Adapter XL with SDXL pipeline."""
         if not GENERATION_AVAILABLE:
             raise ImportError("IP-Adapter and diffusers are required for image generation")
+        
+        # Import model management
+        from ..config.models import (
+            get_model_config, get_sdxl_path, get_controlnet_sdxl_path, 
+            get_ip_adapter_sdxl_path, get_clip_vit_bigg14_path
+        )
+        
+        # Get model configuration
+        config = get_model_config()
+        
+        # Use model management system for defaults
+        model_id = model_id or get_sdxl_path()
+        controlnet_id = controlnet_id or get_controlnet_sdxl_path()
+        image_encoder_path = image_encoder_path or get_clip_vit_bigg14_path()
+        cache_dir = cache_dir or config["cache_dir"]
             
         # Setup cache directory
         if cache_dir:
@@ -156,7 +186,7 @@ class IPAdapterXLGenerator(ImageGenerator):
         
         # Create IP-Adapter XL
         if ip_ckpt is None:
-            ip_ckpt = "/data/thesis/models/ip-adapter_sdxl.bin"  # Default path
+            ip_ckpt = get_ip_adapter_sdxl_path()
             
         self.ip_adapter = IPAdapterXL(
             sd_pipe=self.pipe,

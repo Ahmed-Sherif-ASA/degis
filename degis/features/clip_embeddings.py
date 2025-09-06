@@ -2,11 +2,13 @@ import open_clip
 import torch
 import numpy as np
 from tqdm import tqdm
-from config import HF_HUB_CACHE
+from ..config.models import get_model_config, get_clip_vit_h14_path
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# Use model management system
+config = get_model_config()
 model_name = "ViT-H-14"
 pretrained = "laion2b_s32b_b79k"
 
@@ -14,7 +16,7 @@ pretrained = "laion2b_s32b_b79k"
 clip_model, _, preprocess = open_clip.create_model_and_transforms(
     model_name=model_name,
     pretrained=pretrained,
-    cache_dir=HF_HUB_CACHE,
+    cache_dir=config["cache_dir"],
 )
 
 # half precision only on CUDA
