@@ -30,10 +30,18 @@ def download_ip_adapter_checkpoint(model_type: str, cache_dir: Optional[str] = N
     except ImportError:
         raise ImportError("huggingface_hub is required for model downloading. Install with: pip install huggingface_hub")
     
+    # Determine the correct subdirectory and filename
+    if model_type == 'sd15':
+        filename = "models/ip-adapter_sd15.bin"
+    elif model_type == 'sdxl':
+        filename = "sdxl_models/ip-adapter_sdxl.bin"
+    else:
+        raise ValueError(f"Unsupported model type: {model_type}. Must be 'sd15' or 'sdxl'")
+    
     try:
         downloaded_path = hf_hub_download(
             repo_id="h94/IP-Adapter",
-            filename=f"ip-adapter_{model_type}.bin",
+            filename=filename,
             cache_dir=cache_dir
         )
         return downloaded_path
