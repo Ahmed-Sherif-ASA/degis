@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from ..data.dataset import UnifiedImageDataset
 from ..features.clip_embeddings import generate_embeddings_fp16
-from ..features.clip_embeddings_xl_hf import generate_embeddings_xl as generate_embeddings_xl_hf
+from ..features.clip_embeddings_xl_hf import generate_embeddings_xl as generate_embeddings_xl_hf, preprocess_xl
 from ..config import CSV_PATH, BATCH_SIZE, EMBEDDINGS_TARGET_PATH, HF_XL_EMBEDDINGS_TARGET_PATH
 
 
@@ -49,7 +49,7 @@ def generate_clip_embeddings(
     
     # Load dataset
     df = pd.read_csv(csv_path)
-    assert "local_path" in df.columns, "CSV must have a local_path column!"
+    assert "local_path" in df.columns or "file_path" in df.columns, "CSV must have either 'local_path' or 'file_path' column!"
     
     # Create dataset with appropriate transform
     if model == "xl":

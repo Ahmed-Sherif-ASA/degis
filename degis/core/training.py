@@ -64,10 +64,18 @@ def train_color_model(
         import time
         stamp = time.strftime("%Y%m%d-%H%M%S")
         run_name = f"color_{hist_kind}_tk{top_k or 'all'}_b{batch_size}"
-        output_dir = os.path.join("runs", f"{run_name}-{stamp}")
+        # Get the project root directory (where this package is located)
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        output_dir = os.path.join(project_root, "runs", f"{run_name}-{stamp}")
     
     os.makedirs(output_dir, exist_ok=True)
+    
+    # Also create the rest directory (needed for saving rest_head)
+    rest_output_dir = output_dir.replace("color_", "rest_")
+    os.makedirs(rest_output_dir, exist_ok=True)
+    
     print("Run dir:", output_dir)
+    print("Rest dir:", rest_output_dir)
     
     # Load data
     emb = np.load(embeddings_path).astype(np.float32, copy=False)
@@ -192,7 +200,9 @@ def train_edge_model(
         import time
         stamp = time.strftime("%Y%m%d-%H%M%S")
         run_name = f"edge_b{batch_size}"
-        output_dir = os.path.join("runs", f"{run_name}-{stamp}")
+        # Get the project root directory (where this package is located)
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        output_dir = os.path.join(project_root, "runs", f"{run_name}-{stamp}")
     
     os.makedirs(output_dir, exist_ok=True)
     print("Run dir:", output_dir)

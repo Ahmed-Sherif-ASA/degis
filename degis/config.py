@@ -4,9 +4,9 @@ import torch
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 # Dataset paths
-NAME = "laion_5m"
+# NAME = "laion_5m"
 # NAME = "coco"
-# NAME = "adimagenet"
+NAME = "test"
 DATA_DIR = "/data/thesis/data"
 MODELS_DIR = "/data/thesis/models"
 EDGE_MAPS_PATH = f"{DATA_DIR}/{NAME}_edge_maps.npy"
