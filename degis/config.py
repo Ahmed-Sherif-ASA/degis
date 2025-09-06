@@ -16,8 +16,6 @@ CSV_PATH = f"/data/thesis/{NAME}_manifest.csv"
 EMBEDDINGS_PATH = f"{DATA_DIR}/{NAME}_clip_embeddings.npy"
 EMBEDDINGS_TARGET_PATH = f"{MODELS_DIR}/{NAME}_embeddings.npy"
 
-XL_EMBEDDINGS_PATH = f"{DATA_DIR}/xl_{NAME}_clip_embeddings.npy"
-XL_EMBEDDINGS_TARGET_PATH = f"{MODELS_DIR}/xl_{NAME}_embeddings.npy"
 HF_XL_EMBEDDINGS_TARGET_PATH = f"{MODELS_DIR}/hf_xl_{NAME}_embeddings.npy"
 
 

@@ -6,16 +6,19 @@ CLI tool for training edge decoder models.
 import argparse
 
 from ..core.training import train_edge_model
-from ..config import HF_XL_EMBEDDINGS_TARGET_PATH, EDGE_MAPS_PATH
+from ..config import EMBEDDINGS_TARGET_PATH, HF_XL_EMBEDDINGS_TARGET_PATH, EDGE_MAPS_PATH
 
 
 def main():
     parser = argparse.ArgumentParser(description="Train edge decoder model")
     
     # Data paths
-    parser.add_argument("--embeddings-path", default=HF_XL_EMBEDDINGS_TARGET_PATH, help="Path to CLIP embeddings")
+    parser.add_argument("--embeddings-path", help="Path to CLIP embeddings")
     parser.add_argument("--edge-maps-path", default=EDGE_MAPS_PATH, help="Path to edge maps")
     parser.add_argument("--output-dir", help="Directory to save model and logs")
+    
+    # Model configuration
+    parser.add_argument("--emb-kind", choices=["base", "xl"], help="Type of embeddings (base=EMBEDDINGS_TARGET_PATH, xl=HF_XL_EMBEDDINGS_TARGET_PATH)")
     
     # Training configuration
     parser.add_argument("--epochs", type=int, default=200, help="Number of training epochs")
@@ -31,9 +34,17 @@ def main():
     
     args = parser.parse_args()
     
+    # Determine embeddings path based on emb_kind if not provided
+    if args.embeddings_path is None:
+        if args.emb_kind == "xl":
+            args.embeddings_path = HF_XL_EMBEDDINGS_TARGET_PATH
+        else:
+            args.embeddings_path = EMBEDDINGS_TARGET_PATH
+    
     print("Training edge decoder model...")
     print(f"Embeddings: {args.embeddings_path}")
     print(f"Edge maps: {args.edge_maps_path}")
+    print(f"Emb kind: {args.emb_kind or 'default (base)'}")
     print(f"Epochs: {args.epochs}")
     print(f"Batch size: {args.batch_size}")
     print(f"Learning rate: {args.lr}")

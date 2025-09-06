@@ -27,7 +27,7 @@ def main():
     # Set default output path based on model
     if args.output_path is None:
         if args.model == "xl":
-            args.output_path = HF_XL_EMBEDDINGS_TARGET_PATH
+            args.output_path = HF_XL_EMBEDDINGS_TARGET_PATH  # Use HF XL by default
         else:
             args.output_path = EMBEDDINGS_TARGET_PATH
     

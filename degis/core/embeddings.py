@@ -10,7 +10,6 @@ from tqdm import tqdm
 
 from ..data.dataset import UnifiedImageDataset
 from ..features.clip_embeddings import generate_embeddings_fp16
-from ..features.clip_embeddings_xl import generate_embeddings_xl, preprocess_xl
 from ..features.clip_embeddings_xl_hf import generate_embeddings_xl as generate_embeddings_xl_hf
 from ..config import CSV_PATH, BATCH_SIZE, EMBEDDINGS_TARGET_PATH, HF_XL_EMBEDDINGS_TARGET_PATH
 
