@@ -7,7 +7,7 @@ import argparse
 import os
 
 from ..core.training import train_color_model
-from ..config import EMBEDDINGS_TARGET_PATH, HF_XL_EMBEDDINGS_TARGET_PATH, COLOR_HIST_PATH_HCL_514, COLOR_HIST_PATH_RGB_512, COLOR_HIST_PATH_LAB_514
+from ..config import EMBEDDINGS_TARGET_PATH, HF_XL_EMBEDDINGS_TARGET_PATH, COLOR_HIST_PATH_HCL_514, COLOR_HIST_PATH_RGB, COLOR_HIST_PATH_LAB_514
 
 
 def main():
@@ -47,7 +47,7 @@ def main():
     # Determine histograms path based on hist_kind if not provided
     if args.histograms_path is None:
         if args.hist_kind == "rgb512":
-            args.histograms_path = COLOR_HIST_PATH_RGB_512
+            args.histograms_path = COLOR_HIST_PATH_RGB
         elif args.hist_kind == "lab514":
             args.histograms_path = COLOR_HIST_PATH_LAB_514
         else:  # hcl514
