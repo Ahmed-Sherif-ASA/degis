@@ -28,6 +28,7 @@ def train_color_model(
     weight_decay=1e-2,
     blur=0.05,
     lambda_ortho=0.1,
+    lambda_consistency=0.1,  # New: consistency loss weight
     top_k=None,
     weighting=False,
     device=None,
@@ -48,6 +49,7 @@ def train_color_model(
         weight_decay: Weight decay
         blur: Sinkhorn blur parameter
         lambda_ortho: Orthogonality loss weight
+        lambda_consistency: Consistency loss weight (color + rest ≈ original)
         top_k: Top-k filtering for histograms
         weighting: Whether to use rarity weighting
         device: Device to use for training
@@ -122,7 +124,7 @@ def train_color_model(
         run_name=f"color_{hist_kind}",
         hist_kind=hist_kind,
         top_k=top_k, blur=blur,
-        lambda_ortho=lambda_ortho, lambda_leak=0.25,
+        lambda_ortho=lambda_ortho, lambda_consistency=lambda_consistency, lambda_leak=0.25,
         epochs=epochs, batch_size=batch_size, val_batch_size=val_batch_size,
         optimizer="AdamW", lr=lr, weight_decay=weight_decay,
         device=str(device), gpu_name=gpu_name, seed=42,
@@ -145,6 +147,7 @@ def train_color_model(
         weights_vec=weights_vec,
         T_min=1.0,
         blur=blur,
+        lambda_consistency=lambda_consistency,
         lr=lr, wd=weight_decay,
         save_prefix=os.path.join(output_dir, "best_color_head_tmp"),
         logger=logger,

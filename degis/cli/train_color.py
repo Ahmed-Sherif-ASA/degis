@@ -28,6 +28,7 @@ def main():
     parser.add_argument("--weight-decay", type=float, default=1e-2, help="Weight decay")
     parser.add_argument("--blur", type=float, default=0.05, help="Sinkhorn blur parameter")
     parser.add_argument("--lambda-ortho", type=float, default=0.1, help="Orthogonality loss weight")
+    parser.add_argument("--lambda-consistency", type=float, default=0.1, help="Consistency loss weight (color + rest ≈ original)")
     parser.add_argument("--top-k", type=int, help="Top-k filtering for histograms")
     parser.add_argument("--weighting", action="store_true", help="Use rarity weighting")
     
@@ -65,6 +66,7 @@ def main():
         weight_decay=args.weight_decay,
         blur=args.blur,
         lambda_ortho=args.lambda_ortho,
+        lambda_consistency=args.lambda_consistency,
         top_k=args.top_k,
         weighting=args.weighting,
         device=args.device,

@@ -56,6 +56,7 @@ def train_color_disentanglement(
     device,
     num_epochs    = 200,
     lambda_ortho  = 0.1,
+    lambda_consistency = 0.1,  # New: consistency loss weight
     lambda_leak   = 0.25,
     top_k         = None,
     use_weighting = False,
@@ -86,7 +87,7 @@ def train_color_disentanglement(
         T = 1.0 - (1.0 - T_min) * (ep - 1) / max(1, (num_epochs - 1))
 
         color_head.train(); rest_head.train()
-        running_color = running_bce = running_leak = running_ortho = running_recon = 0.0
+        running_color = running_bce = running_leak = running_ortho = running_recon = running_consistency = 0.0
         running_gn    = 0.0
         n_steps       = 0
 
@@ -138,12 +139,16 @@ def train_color_disentanglement(
             rest = rest_head(z)
             loss_ortho = orthogonality_loss(c_emb, rest)
             loss_recon = F.mse_loss(rest, z.detach())
+            
+            # Consistency loss: color + rest ≈ original embedding
+            reconstructed = c_emb + rest
+            loss_consistency = F.mse_loss(reconstructed, z)
 
             # Diagnostic only
             bce_metric = F.binary_cross_entropy(probs, hist)
 
             # Final loss
-            loss = loss_color + lambda_leak * loss_leak + lambda_ortho * loss_ortho + 0.1 * loss_recon
+            loss = loss_color + lambda_leak * loss_leak + lambda_ortho * loss_ortho + 0.1 * loss_recon + lambda_consistency * loss_consistency
 
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
@@ -159,6 +164,7 @@ def train_color_disentanglement(
             running_leak  += float(loss_leak.item())
             running_ortho += float(loss_ortho.item())
             running_recon += float(loss_recon.item())
+            running_consistency += float(loss_consistency.item())
             running_gn    += gn
             n_steps       += 1
 
@@ -170,6 +176,7 @@ def train_color_disentanglement(
         train_leak  = running_leak  / max(1, n_steps)
         train_ortho = running_ortho / max(1, n_steps)
         train_recon = running_recon / max(1, n_steps)
+        train_consistency = running_consistency / max(1, n_steps)
         grad_norm   = running_gn    / max(1, n_steps)
 
         val_color = eval_model(val_loader, color_head, sinkhorn, device, top_k=top_k)
@@ -183,8 +190,8 @@ def train_color_disentanglement(
                 epoch=ep,
                 train_emd=train_color, val_emd=val_color,
                 diag_bce=train_bce,
-                leak_loss=train_leak, ortho_loss=train_ortho, recon_loss=train_recon,
-                total_loss=train_color + 0.25*train_leak + 0.1*train_recon + 0.1*train_ortho,
+                leak_loss=train_leak, ortho_loss=train_ortho, recon_loss=train_recon, consistency_loss=train_consistency,
+                total_loss=train_color + 0.25*train_leak + 0.1*train_recon + 0.1*train_ortho + lambda_consistency*train_consistency,
                 lr=float(optimizer.param_groups[0]["lr"]),
                 grad_norm=grad_norm,
                 epoch_seconds=float(time.time() - t_ep),
