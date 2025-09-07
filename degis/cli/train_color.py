@@ -7,7 +7,7 @@ import argparse
 import os
 
 from ..core.training import train_color_model
-from ..config import EMBEDDINGS_TARGET_PATH, HF_XL_EMBEDDINGS_TARGET_PATH, COLOR_HIST_PATH_HCL_514
+from ..config import EMBEDDINGS_TARGET_PATH, HF_XL_EMBEDDINGS_TARGET_PATH, COLOR_HIST_PATH_HCL_514, COLOR_HIST_PATH_RGB_512, COLOR_HIST_PATH_LAB_514
 
 
 def main():
@@ -15,7 +15,7 @@ def main():
     
     # Data paths
     parser.add_argument("--embeddings-path", help="Path to CLIP embeddings")
-    parser.add_argument("--histograms-path", default=COLOR_HIST_PATH_HCL_514, help="Path to color histograms")
+    parser.add_argument("--histograms-path", help="Path to color histograms (auto-determined from --hist-kind if not provided)")
     parser.add_argument("--output-dir", help="Directory to save model and logs")
     
     # Model configuration
@@ -43,6 +43,15 @@ def main():
             args.embeddings_path = HF_XL_EMBEDDINGS_TARGET_PATH
         else:
             args.embeddings_path = EMBEDDINGS_TARGET_PATH
+    
+    # Determine histograms path based on hist_kind if not provided
+    if args.histograms_path is None:
+        if args.hist_kind == "rgb512":
+            args.histograms_path = COLOR_HIST_PATH_RGB_512
+        elif args.hist_kind == "lab514":
+            args.histograms_path = COLOR_HIST_PATH_LAB_514
+        else:  # hcl514
+            args.histograms_path = COLOR_HIST_PATH_HCL_514
     
     print("Training color disentanglement model...")
     print(f"Embeddings: {args.embeddings_path}")
