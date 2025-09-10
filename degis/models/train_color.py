@@ -68,7 +68,7 @@ def train_color_disentanglement(
     patience      = 10,
     save_prefix   = "best_color_head",
     metric_label  = "EMD",
-    logger        = None,     # <— NEW
+    logger        = True,     # <— NEW
 ):
     # Sinkhorn loss (keep backend/blur on the object so eval can reuse them)
     sinkhorn = geomloss.SamplesLoss("sinkhorn", p=2, blur=blur, backend="tensorized")

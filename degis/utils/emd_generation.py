@@ -237,7 +237,7 @@ def generate_from_dataset_id_xl_with_emd(
         print(f"  - probs shape: {probs.shape}")
         print(f"  - c_emb shape: {c_emb.shape}")
     
-    color_embedding = get_color_embedding(color_head, z_clip)
+    color_embedding = degis.get_color_embedding(color_head, z_clip)
     print(f"Debug: Final color_embedding shape: {color_embedding.shape}")
     
     # Create control image from edge data
