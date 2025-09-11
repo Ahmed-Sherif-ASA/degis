@@ -186,15 +186,18 @@ def train_color_disentanglement(
 
         # per-epoch CSV row
         if logger is not None:
+            epoch_seconds = float(time.time() - t_ep)
+            total_loss = train_color + 0.25*train_leak + 0.1*train_recon + 0.1*train_ortho + lambda_consistency*train_consistency
             logger.log_epoch(
                 epoch=ep,
                 train_emd=train_color, val_emd=val_color,
+                loss=float(total_loss),  # Required field
+                lr=float(optimizer.param_groups[0]["lr"]),
+                wall_time=epoch_seconds,  # Required field
                 diag_bce=train_bce,
                 leak_loss=train_leak, ortho_loss=train_ortho, recon_loss=train_recon, consistency_loss=train_consistency,
-                total_loss=train_color + 0.25*train_leak + 0.1*train_recon + 0.1*train_ortho + lambda_consistency*train_consistency,
-                lr=float(optimizer.param_groups[0]["lr"]),
+                total_loss=float(total_loss),  # Keep original too
                 grad_norm=grad_norm,
-                epoch_seconds=float(time.time() - t_ep),
                 it_per_sec=float(logger.it_per_sec()),
                 samples_per_sec=float(logger.samples_per_sec()),
             )
@@ -207,6 +210,41 @@ def train_color_disentanglement(
             rest_pth  = f"{save_prefix.replace('color','rest')}.pth"
             torch.save(color_head.state_dict(), color_pth)
             torch.save(rest_head.state_dict(),  rest_pth)
+            
+            # Save safetensors + hashes
+            try:
+                from safetensors.torch import save_file
+                import hashlib
+                
+                color_st = f"{save_prefix}.safetensors"
+                rest_st = f"{save_prefix.replace('color','rest')}.safetensors"
+                
+                save_file(color_head.state_dict(), color_st)
+                save_file(rest_head.state_dict(), rest_st)
+                
+                def sha256(path):
+                    h = hashlib.sha256()
+                    with open(path, "rb") as f:
+                        for chunk in iter(lambda: f.read(1<<20), b""):
+                            h.update(chunk)
+                    return h.hexdigest()
+                
+                manifest = {
+                    "color_pth_sha256": sha256(color_pth),
+                    "rest_pth_sha256":  sha256(rest_pth),
+                    "color_st_sha256":  sha256(color_st),
+                    "rest_st_sha256":   sha256(rest_st),
+                }
+                with open(os.path.join(outdir, "checkpoint_hashes.json"), "w") as f:
+                    json.dump(manifest, f, indent=2)
+                    
+            except ImportError:
+                print("Warning: safetensors not available, skipping .safetensors files")
+            except Exception as e:
+                print(f"Warning: Failed to create safetensors/hashes: {e}")
+                import traceback
+                traceback.print_exc()
+            
             print("✓ saved best")
 
             # JSON summary for the paper

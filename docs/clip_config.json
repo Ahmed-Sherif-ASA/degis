@@ -1,0 +1,18 @@
+{
+  "clip_vit_h14": {
+    "source": "open_clip",
+    "model_name": "ViT-H-14",
+    "pretrained": "laion2b_s32b_b79k",
+    "projection_dim": 1024,
+    "dtype_runtime": "fp16_on_cuda (saved fp32)",
+    "l2_normalize": false
+  },
+  "clip_vit_bigg14": {
+    "source": "transformers",
+    "model_id": "laion/CLIP-ViT-bigG-14-laion2B-39B-b160k",
+    "embedding_api": "CLIPVisionModelWithProjection.image_embeds",
+    "projection_dim": 1280,
+    "dtype_runtime": "fp16_on_cuda (saved fp32)",
+    "l2_normalize": true
+  }
+}

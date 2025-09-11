@@ -32,6 +32,8 @@ def train_color_model(
     top_k=None,
     weighting=False,
     device=None,
+    csv_name=None,  # New: dataset name for run naming
+    emb_kind=None,  # New: embedding kind for run naming
     **kwargs
 ):
     """
@@ -65,10 +67,18 @@ def train_color_model(
     if output_dir is None:
         import time
         stamp = time.strftime("%Y%m%d-%H%M%S")
-        run_name = f"color_{hist_kind}_tk{top_k or 'all'}_b{batch_size}"
-        # Get the project root directory (where this package is located)
-        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        output_dir = os.path.join(project_root, "runs", f"{run_name}-{stamp}")
+        
+        # Use new naming convention if csv_name and emb_kind are provided
+        if csv_name and emb_kind:
+            run_name = f"{csv_name}_{emb_kind}_{hist_kind}_tk{top_k or 'all'}_b{batch_size}"
+            # Use evaluation_runs directory for new naming convention
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            output_dir = os.path.join(project_root, "evaluation_runs", f"{run_name}-{stamp}")
+        else:
+            # Fallback to old naming convention
+            run_name = f"color_{hist_kind}_tk{top_k or 'all'}_b{batch_size}"
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            output_dir = os.path.join(project_root, "runs", f"{run_name}-{stamp}")
     
     os.makedirs(output_dir, exist_ok=True)
     
@@ -133,6 +143,55 @@ def train_color_model(
         git_commit=short_git_hash(),
     )
     
+    # Create hparams.yaml
+    try:
+        import yaml
+        # Extract dataset name and embedding kind from paths
+        dataset_name = "unknown"
+        if "laion_5m" in embeddings_path:
+            dataset_name = "laion_5m"
+        elif "coco" in embeddings_path:
+            dataset_name = "coco"
+        
+        # Determine encoder ID based on embedding kind or path
+        if 'emb_kind' in locals() and emb_kind == "xl":
+            encoder_id = "ViT-bigG/14"
+        elif 'emb_kind' in locals() and emb_kind == "base":
+            encoder_id = "ViT-H/14"
+        elif "hf_xl" in embeddings_path:
+            encoder_id = "ViT-bigG/14"
+        else:
+            encoder_id = "ViT-H/14"
+        hparams = {
+            "encoder_id": encoder_id,
+            "dataset": dataset_name,
+            "hist_kind": hist_kind,
+            "epochs": epochs,
+            "batch_size": batch_size,
+            "val_batch_size": val_batch_size,
+            "optimizer": "AdamW",
+            "betas": [0.9, 0.999],  # AdamW default
+            "weight_decay": weight_decay,
+            "scheduler": None,
+            "scheduler_params": {},
+            "top_k": top_k,
+            "regularizers": {
+                "blur": blur,
+                "lambda_ortho": lambda_ortho,
+                "lambda_consistency": lambda_consistency,
+                "lambda_leak": 0.25,
+            },
+            "precision": "fp16" if str(device) == "cuda" else "fp32",
+            "seed": 42,
+            "device": str(device),
+        }
+        with open(os.path.join(output_dir, "hparams.yaml"), "w") as f:
+            yaml.safe_dump(hparams, f, sort_keys=False)
+    except ImportError:
+        print("Warning: PyYAML not available, skipping hparams.yaml creation")
+    except Exception as e:
+        print(f"Warning: Failed to create hparams.yaml: {e}")
+    
     # Train model
     train_color_disentanglement(
         train_loader=train_loader,
@@ -152,6 +211,42 @@ def train_color_model(
         save_prefix=os.path.join(output_dir, "best_color_head_tmp"),
         logger=logger,
     )
+    
+    # Generate training curves
+    try:
+        import pandas as pd
+        import matplotlib.pyplot as plt
+        
+        df = pd.read_csv(os.path.join(output_dir, "metrics.csv"))
+        
+        # EMD curves
+        plt.figure(figsize=(10, 6))
+        plt.plot(df.epoch, df.train_emd, label="train", linewidth=2)
+        plt.plot(df.epoch, df.val_emd, label="val", linewidth=2)
+        plt.xlabel("epoch")
+        plt.ylabel("EMD")
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.title(f"EMD Curves - {dataset_name}_{hist_kind}")
+        plt.savefig(os.path.join(output_dir, "emd_curves.png"), dpi=150, bbox_inches='tight')
+        plt.close()
+        
+        # Loss curve
+        plt.figure(figsize=(10, 6))
+        plt.plot(df.epoch, df["loss"], linewidth=2, color='red')
+        plt.xlabel("epoch")
+        plt.ylabel("loss")
+        plt.grid(True, alpha=0.3)
+        plt.title(f"Loss Curve - {dataset_name}_{hist_kind}")
+        plt.savefig(os.path.join(output_dir, "loss_curve.png"), dpi=150, bbox_inches='tight')
+        plt.close()
+        
+        print("✓ Generated training curves (emd_curves.png, loss_curve.png)")
+        
+    except ImportError:
+        print("Warning: matplotlib/pandas not available, skipping training curves")
+    except Exception as e:
+        print(f"Warning: Failed to generate training curves: {e}")
     
     return {
         "output_dir": output_dir,
