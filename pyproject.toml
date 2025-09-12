@@ -32,6 +32,7 @@ dependencies = [
     "pyyaml",
     "safetensors",
     "huggingface-hub",
+    "open_clip_torch",
 ]
 
 [project.optional-dependencies]
@@ -95,6 +96,7 @@ psutil = "*"
 pyyaml = "*"
 safetensors = "*"
 huggingface-hub = "*"
+open-clip-torch = "*"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "*"

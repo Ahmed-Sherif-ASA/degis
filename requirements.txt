@@ -23,6 +23,7 @@ psutil
 pyyaml
 safetensors
 huggingface-hub
+open-clip-torch
 
 # Development dependencies
 jupyter

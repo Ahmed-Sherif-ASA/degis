@@ -24,6 +24,31 @@ This will automatically:
 
 **📖 For detailed setup instructions and troubleshooting, see [SETUP_GUIDE.md](SETUP_GUIDE.md)**
 
+## Server Setup (GPU/CUDA)
+
+**For server environments with GPU/CUDA support:**
+
+```bash
+# Run the server-specific setup script
+./setup_server_fixed.sh
+```
+
+This script handles:
+- Disk space management
+- Poetry/pip fallback
+- CUDA/GPU dependencies
+- Jupyter kernel setup
+
+**⚠️ Important: After running the setup script, you need to select the kernel in VS Code:**
+1. Open any `.ipynb` notebook
+2. Click on the kernel name in the top-right corner
+3. Select **"DEGIS Environment"** from the dropdown
+4. The notebook will now use the correct environment
+
+**📝 Note: The notebooks now have a simple environment check cell instead of automatic setup.**
+- Run the first cell to verify your environment is properly configured
+- No more package installation errors or conflicts
+
 ## Manual Installation
 
 ### Option 1: Poetry (Recommended)
