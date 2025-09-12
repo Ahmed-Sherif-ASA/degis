@@ -7,7 +7,7 @@ A Python package for training disentangled representations of images using CLIP 
 ## System Requirements
 
 **Before installation, ensure you have:**
-- **Python 3.10+** (3.12+ recommended)
+- **Python 3.10-3.12** (3.12.3 tested and recommended)
 - **Disk Space:** At least **15GB free** (for PyTorch, CUDA, and dependencies)
 - **RAM:** At least **8GB** (16GB+ recommended for training)
 - **GPU:** NVIDIA GPU with CUDA support (**strongly recommended** for image generation)
