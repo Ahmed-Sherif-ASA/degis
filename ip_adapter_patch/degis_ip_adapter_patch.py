@@ -21,32 +21,44 @@ from typing import Optional, Union, List, Tuple
 from PIL import Image
 from safetensors import safe_open
 from transformers import CLIPImageProcessor, CLIPVisionModelWithProjection
+from diffusers.pipelines.controlnet import MultiControlNetModel
 
 # Import utilities
-try:
-    from ip_adapter.utils import is_torch2_available, get_generator
-except ImportError:
-    # Fallback if utils not available
-    def is_torch2_available():
-        return torch.__version__.startswith('2.')
-    
-    def get_generator(seed, device):
-        if seed is not None:
-            return torch.Generator(device).manual_seed(seed)
-        return None
+def is_torch2_available():
+    return torch.__version__.startswith('2.')
+
+def get_generator(seed, device):
+    if seed is not None:
+        return torch.Generator(device).manual_seed(seed)
+    return None
 
 # Import attention processors
-if is_torch2_available():
-    try:
-        from ip_adapter.attention_processor import (
-            AttnProcessor2_0 as AttnProcessor,
-            CNAttnProcessor2_0 as CNAttnProcessor,
-            IPAttnProcessor2_0 as IPAttnProcessor,
-        )
-    except ImportError:
+try:
+    if is_torch2_available():
+        try:
+            from ip_adapter.attention_processor import (
+                AttnProcessor2_0 as AttnProcessor,
+                CNAttnProcessor2_0 as CNAttnProcessor,
+                IPAttnProcessor2_0 as IPAttnProcessor,
+            )
+        except ImportError:
+            # Fallback to basic versions
+            from ip_adapter.attention_processor import AttnProcessor, CNAttnProcessor, IPAttnProcessor
+    else:
         from ip_adapter.attention_processor import AttnProcessor, CNAttnProcessor, IPAttnProcessor
-else:
-    from ip_adapter.attention_processor import AttnProcessor, CNAttnProcessor, IPAttnProcessor
+except ImportError:
+    # Fallback implementations if IP-Adapter not available
+    class AttnProcessor:
+        def __init__(self, *args, **kwargs):
+            pass
+    
+    class CNAttnProcessor:
+        def __init__(self, *args, **kwargs):
+            pass
+    
+    class IPAttnProcessor:
+        def __init__(self, *args, **kwargs):
+            self.scale = 1.0
 
 # Import resampler
 try:
