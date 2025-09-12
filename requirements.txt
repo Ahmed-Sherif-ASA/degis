@@ -1,0 +1,37 @@
+# Core dependencies
+torch
+torchvision
+torchaudio
+tqdm
+numpy
+pandas
+matplotlib
+opencv-python-headless
+scikit-learn
+scikit-image
+einops
+ftfy
+regex
+requests
+Pillow
+diffusers
+transformers
+accelerate
+pyparsing==3.1.1
+geomloss
+psutil
+pyyaml
+safetensors
+huggingface-hub
+
+# Development dependencies
+jupyter
+jupyterlab
+ipykernel
+notebook
+pytest
+black
+flake8
+
+# IP-Adapter (from GitHub)
+git+https://github.com/Ahmed-Sherif-ASA/IP-Adapter@main

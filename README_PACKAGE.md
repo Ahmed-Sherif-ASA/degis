@@ -4,17 +4,80 @@
 
 A Python package for training disentangled representations of images using CLIP embeddings and various visual features (color histograms, edge maps, etc.).
 
-## Installation
+## Quick Setup (Recommended)
+
+**For the easiest setup, run one of these scripts:**
 
 ```bash
+# Linux/Mac
+./setup.sh
+
+# Windows
+setup.bat
+```
+
+This will automatically:
+- Install all dependencies
+- Set up Jupyter notebooks
+- Download required models
+- Configure the environment
+
+**📖 For detailed setup instructions and troubleshooting, see [SETUP_GUIDE.md](SETUP_GUIDE.md)**
+
+## Manual Installation
+
+### Option 1: Poetry (Recommended)
+
+```bash
+# Install Poetry if you don't have it
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Install the package and dependencies
+poetry install
+
+# Install development dependencies (Jupyter, etc.)
+poetry install --with dev
+
+# Models will be downloaded automatically when first used
+
+# Set up Jupyter kernel
+poetry run python -m ipykernel install --user --name=degis --display-name="DEGIS (Python 3)"
+```
+
+### Option 2: pip (Alternative)
+
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or
+venv\Scripts\activate     # Windows
+
 # Install in development mode
 pip install -e .
 
-# Or install with poetry
-poetry install
+# Install Jupyter
+pip install jupyter jupyterlab ipykernel
+
+# Models will be downloaded automatically when first used
 ```
 
 ## Quick Start
+
+### Running Jupyter Notebooks
+
+```bash
+# Start Jupyter Lab
+poetry run jupyter lab
+
+# Or start Jupyter Notebook
+poetry run jupyter notebook
+```
+
+**Available notebooks:**
+- `01_data_extraction_and_training.ipynb` - Data extraction and model training
+- `02_image_generation_ipadapter.ipynb` - Image generation with IP-Adapter (SD 1.5)
+- `02b_image_generation_ipadapter_xl.ipynb` - Image generation with IP-Adapter XL
 
 ### CLI Usage
 
@@ -238,9 +301,9 @@ This project uses a local model cache directory (`model-cache/`) to store downlo
 ### Cache Management
 
 Models are automatically cached when you:
-1. Run `python scripts/download_models.py`
-2. Use any HuggingFace model in your code
-3. Load pre-trained models with `from_pretrained()`
+1. Use any HuggingFace model in your code
+2. Load pre-trained models with `from_pretrained()`
+3. Run generation functions (IP-Adapter checkpoints)
 
 **Cache Details:**
 - **Size**: Can grow to several GB as models are downloaded
@@ -257,12 +320,7 @@ export DEGIS_CACHE_DIR="/path/to/custom/cache"
 
 ### First Time Setup
 
-Run this to download all required models:
-```bash
-python scripts/download_models.py
-```
-
-This will populate the cache with all necessary models for the project.
+Models are downloaded automatically when first used. No manual download needed!
 
 ## Examples
 

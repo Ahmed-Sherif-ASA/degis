@@ -1,10 +1,43 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: degis
 Version: 0.1.0
 Summary: Disentangled Embeddings Guided Synthesis
 Author-email: Ahmed Sherif <you@example.com>
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
+Requires-Dist: torch
+Requires-Dist: torchvision
+Requires-Dist: torchaudio
+Requires-Dist: tqdm
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: matplotlib
+Requires-Dist: opencv-python-headless
+Requires-Dist: scikit-learn
+Requires-Dist: scikit-image
+Requires-Dist: einops
+Requires-Dist: ftfy
+Requires-Dist: regex
+Requires-Dist: requests
+Requires-Dist: Pillow
+Requires-Dist: diffusers
+Requires-Dist: transformers
+Requires-Dist: accelerate
+Requires-Dist: pyparsing==3.1.1
+Requires-Dist: geomloss
+Requires-Dist: ip-adapter@ git+https://github.com/Ahmed-Sherif-ASA/IP-Adapter@main
+Requires-Dist: psutil
+Requires-Dist: pyyaml
+Requires-Dist: safetensors
+Requires-Dist: huggingface-hub
+Provides-Extra: dev
+Requires-Dist: jupyter; extra == "dev"
+Requires-Dist: jupyterlab; extra == "dev"
+Requires-Dist: ipykernel; extra == "dev"
+Requires-Dist: notebook; extra == "dev"
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: flake8; extra == "dev"
 
 # DEGIS Package
 
@@ -12,17 +45,82 @@ Description-Content-Type: text/markdown
 
 A Python package for training disentangled representations of images using CLIP embeddings and various visual features (color histograms, edge maps, etc.).
 
-## Installation
+## Quick Setup (Recommended)
+
+**For the easiest setup, run one of these scripts:**
 
 ```bash
+# Linux/Mac
+./setup.sh
+
+# Windows
+setup.bat
+```
+
+This will automatically:
+- Install all dependencies
+- Set up Jupyter notebooks
+- Download required models
+- Configure the environment
+
+**📖 For detailed setup instructions and troubleshooting, see [SETUP_GUIDE.md](SETUP_GUIDE.md)**
+
+## Manual Installation
+
+### Option 1: Poetry (Recommended)
+
+```bash
+# Install Poetry if you don't have it
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Install the package and dependencies
+poetry install
+
+# Install development dependencies (Jupyter, etc.)
+poetry install --with dev
+
+# Download required models
+poetry run python scripts/download_models.py
+
+# Set up Jupyter kernel
+poetry run python -m ipykernel install --user --name=degis --display-name="DEGIS (Python 3)"
+```
+
+### Option 2: pip (Alternative)
+
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# or
+venv\Scripts\activate     # Windows
+
 # Install in development mode
 pip install -e .
 
-# Or install with poetry
-poetry install
+# Install Jupyter
+pip install jupyter jupyterlab ipykernel
+
+# Download required models
+python scripts/download_models.py
 ```
 
 ## Quick Start
+
+### Running Jupyter Notebooks
+
+```bash
+# Start Jupyter Lab
+poetry run jupyter lab
+
+# Or start Jupyter Notebook
+poetry run jupyter notebook
+```
+
+**Available notebooks:**
+- `01_data_extraction_and_training.ipynb` - Data extraction and model training
+- `02_image_generation_ipadapter.ipynb` - Image generation with IP-Adapter (SD 1.5)
+- `02b_image_generation_ipadapter_xl.ipynb` - Image generation with IP-Adapter XL
 
 ### CLI Usage
 
@@ -231,6 +329,46 @@ The commented code in `main.py` for histogram and edge generation is now availab
 ## Configuration
 
 The package uses the existing `config.py` for default paths and settings. You can override these by passing arguments to the functions or CLI commands.
+
+## Model Cache
+
+This project uses a local model cache directory (`model-cache/`) to store downloaded machine learning models.
+
+### What Gets Cached
+
+- **Stable Diffusion models** (SD 1.5, SDXL)
+- **ControlNet models** (Canny, etc.)
+- **CLIP models** (ViT-H-14, ViT-bigG-14)
+- **IP-Adapter models** (when downloaded via script)
+
+### Cache Management
+
+Models are automatically cached when you:
+1. Run `python scripts/download_models.py`
+2. Use any HuggingFace model in your code
+3. Load pre-trained models with `from_pretrained()`
+
+**Cache Details:**
+- **Size**: Can grow to several GB as models are downloaded
+- **Location**: Local to this project (not system-wide)
+- **Cleanup**: Safe to delete - models will be re-downloaded as needed
+- **Git**: Contents are ignored, but directory and README are tracked
+
+### Environment Variables
+
+You can override the cache location by setting:
+```bash
+export DEGIS_CACHE_DIR="/path/to/custom/cache"
+```
+
+### First Time Setup
+
+Run this to download all required models:
+```bash
+python scripts/download_models.py
+```
+
+This will populate the cache with all necessary models for the project.
 
 ## Examples
 

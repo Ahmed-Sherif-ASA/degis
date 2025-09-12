@@ -18,3 +18,17 @@ transformers
 accelerate
 pyparsing==3.1.1
 geomloss
+ip-adapter@ git+https://github.com/Ahmed-Sherif-ASA/IP-Adapter@main
+psutil
+pyyaml
+safetensors
+huggingface-hub
+
+[dev]
+jupyter
+jupyterlab
+ipykernel
+notebook
+pytest
+black
+flake8

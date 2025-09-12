@@ -35,6 +35,17 @@ dependencies = [
     "huggingface-hub",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "jupyter",
+    "jupyterlab",
+    "ipykernel",
+    "notebook",
+    "pytest",
+    "black",
+    "flake8",
+]
+
 [project.scripts]
 degis-embeddings = "degis.cli.generate_embeddings:main"
 degis-features = "degis.cli.generate_features:main"
@@ -49,3 +60,54 @@ build-backend = "setuptools.build_meta"
 where = ["."]
 include = ["degis*"]
 exclude = ["tests*", "runs*", "*.ipynb", "*.pyc", "__pycache__*"]
+
+[tool.poetry]
+name = "degis"
+version = "0.1.0"
+description = "Disentangled Embeddings Guided Synthesis"
+authors = ["Ahmed Sherif <you@example.com>"]
+readme = "README_PACKAGE.md"
+packages = [{include = "degis"}]
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+torch = "*"
+torchvision = "*"
+torchaudio = "*"
+tqdm = "*"
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
+opencv-python-headless = "*"
+scikit-learn = "*"
+scikit-image = "*"
+einops = "*"
+ftfy = "*"
+regex = "*"
+requests = "*"
+Pillow = "*"
+diffusers = "*"
+transformers = "*"
+accelerate = "*"
+pyparsing = "3.1.1"
+geomloss = "*"
+ip-adapter = {git = "https://github.com/Ahmed-Sherif-ASA/IP-Adapter.git", branch = "main"}
+psutil = "*"
+pyyaml = "*"
+safetensors = "*"
+huggingface-hub = "*"
+
+[tool.poetry.group.dev.dependencies]
+jupyter = "*"
+jupyterlab = "*"
+ipykernel = "*"
+notebook = "*"
+pytest = "*"
+black = "*"
+flake8 = "*"
+
+[tool.poetry.scripts]
+degis-embeddings = "degis.cli.generate_embeddings:main"
+degis-features = "degis.cli.generate_features:main"
+degis-train-color = "degis.cli.train_color:main"
+degis-train-edge = "degis.cli.train_edge:main"
