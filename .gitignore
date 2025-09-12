@@ -50,9 +50,9 @@ Thumbs.db
 # *.pkl                    # Pickle files
 # *.pickle                 # Pickle files
 
-# Model cache (ignore contents, keep directory and README)
+# Model cache (ignore contents, keep directory and .keep file)
 model-cache/*
-!model-cache/README.md
+!model-cache/.keep
 .cache/
 huggingface/
 

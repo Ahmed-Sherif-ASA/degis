@@ -1,0 +1,3 @@
+# This file ensures the model-cache directory is tracked by git
+# even when it's empty. The directory contents are ignored by .gitignore
+# but the directory structure is preserved.

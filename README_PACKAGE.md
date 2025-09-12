@@ -224,6 +224,46 @@ The commented code in `main.py` for histogram and edge generation is now availab
 
 The package uses the existing `config.py` for default paths and settings. You can override these by passing arguments to the functions or CLI commands.
 
+## Model Cache
+
+This project uses a local model cache directory (`model-cache/`) to store downloaded machine learning models.
+
+### What Gets Cached
+
+- **Stable Diffusion models** (SD 1.5, SDXL)
+- **ControlNet models** (Canny, etc.)
+- **CLIP models** (ViT-H-14, ViT-bigG-14)
+- **IP-Adapter models** (when downloaded via script)
+
+### Cache Management
+
+Models are automatically cached when you:
+1. Run `python scripts/download_models.py`
+2. Use any HuggingFace model in your code
+3. Load pre-trained models with `from_pretrained()`
+
+**Cache Details:**
+- **Size**: Can grow to several GB as models are downloaded
+- **Location**: Local to this project (not system-wide)
+- **Cleanup**: Safe to delete - models will be re-downloaded as needed
+- **Git**: Contents are ignored, but directory and README are tracked
+
+### Environment Variables
+
+You can override the cache location by setting:
+```bash
+export DEGIS_CACHE_DIR="/path/to/custom/cache"
+```
+
+### First Time Setup
+
+Run this to download all required models:
+```bash
+python scripts/download_models.py
+```
+
+This will populate the cache with all necessary models for the project.
+
 ## Examples
 
 See `example_usage.py` for complete examples of both CLI and Python API usage.
