@@ -191,7 +191,7 @@ degis/
 │   ├── generate_embeddings.py
 │   ├── generate_features.py
 │   ├── train_color.py
-│   └── train_edge.py
+│   
 └── utils/                   # Utilities
     ├── logger.py
     ├── file_utils.py
@@ -314,14 +314,6 @@ results = degis.train_color_model(
     hist_kind="hcl514",
     epochs=200,
     batch_size=128
-)
-
-# Train edge model
-results = degis.train_edge_model(
-    embeddings_path="embeddings.npy",
-    edge_maps_path="edges.npy",
-    epochs=200,
-    batch_size=512
 )
 ```
 

@@ -4,7 +4,7 @@ Core functionality for DEGIS package.
 
 from .embeddings import generate_clip_embeddings, generate_xl_embeddings
 from .features import generate_color_histograms, generate_edge_maps
-from .training import train_color_model, train_edge_model
+from .training import train_color_model
 from .generation import IPAdapterGenerator, IPAdapterXLGenerator, generate_from_embeddings, load_trained_color_head, get_color_embedding
 from .emd_generation import (
     calculate_emd_distance_topk, detect_color_space, compute_histogram_for_color_space,
@@ -22,7 +22,6 @@ __all__ = [
     "generate_color_histograms", 
     "generate_edge_maps",
     "train_color_model",
-    "train_edge_model",
     "IPAdapterGenerator",
     "IPAdapterXLGenerator",
     "generate_from_embeddings",

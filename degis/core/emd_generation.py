@@ -12,7 +12,6 @@ from typing import List, Tuple, Optional, Union
 from PIL import Image
 import gc
 
-from .generation import generate_from_dataset_id_xl
 from .visualization import display_comparison_grid
 from ..features.color_histograms import compute_lab_histogram, compute_color_histogram, compute_hcl_histogram
 

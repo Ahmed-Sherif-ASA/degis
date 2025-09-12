@@ -7,7 +7,7 @@ and various visual features (color histograms, edge maps, etc.).
 
 from .core.embeddings import generate_clip_embeddings, generate_xl_embeddings
 from .core.features import generate_color_histograms, generate_edge_maps
-from .core.training import train_color_model, train_edge_model
+from .core.training import train_color_model
 from .core.generation import IPAdapterGenerator, IPAdapterXLGenerator, generate_from_embeddings, load_trained_color_head, get_color_embedding, create_edge_control_image
 from .core.visualization import (
     plot_color_palette, display_images_grid, display_comparison_grid,
@@ -25,7 +25,6 @@ __all__ = [
     "generate_color_histograms",
     "generate_edge_maps",
     "train_color_model",
-    "train_edge_model",
     "IPAdapterGenerator",
     "IPAdapterXLGenerator",
     "generate_from_embeddings",

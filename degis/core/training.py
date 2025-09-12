@@ -11,7 +11,6 @@ from torch.utils.data import DataLoader
 from ..data.dataset import PrecompClipColorDataset, PrecompClipEdgeDataset
 from ..models.color_heads import ColorHead, RestHead
 from ..models.train_color import train_color_disentanglement
-from ..models.train_edge import train_edge_decoder
 from ..utils.logger import MetricsLogger, short_git_hash
 
 
