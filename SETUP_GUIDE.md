@@ -4,18 +4,20 @@ This guide provides multiple setup options for the DEGIS project, ensuring easy 
 
 ## 🚀 Quick Start (Recommended)
 
-### Option 1: Automated Setup Script
+### Automated Setup Script
 
-**Linux/Mac:**
+**Linux/Mac/Server:**
 ```bash
 chmod +x setup.sh
 ./setup.sh
 ```
 
-**Windows:**
-```cmd
-setup.bat
-```
+This single script works on all platforms and handles:
+- Poetry/pip installation
+- Virtual environment setup
+- Jupyter kernel configuration
+- Disk space management
+- GPU/CUDA support
 
 ### Option 2: Manual Setup with Poetry
 

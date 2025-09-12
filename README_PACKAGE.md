@@ -4,40 +4,36 @@
 
 A Python package for training disentangled representations of images using CLIP embeddings and various visual features (color histograms, edge maps, etc.).
 
+## System Requirements
+
+**Before installation, ensure you have:**
+- **Python 3.10+** (3.12+ recommended)
+- **Disk Space:** At least **15GB free** (for PyTorch, CUDA, and dependencies)
+- **RAM:** At least **8GB** (16GB+ recommended for training)
+- **GPU:** NVIDIA GPU with CUDA support (**strongly recommended** for image generation)
+
+**⚠️ Note:** While IP-Adapter and ControlNet can technically run on CPU, performance will be extremely slow (10-100x slower) and may encounter compatibility issues. For practical use, GPU acceleration is essential.
+
+**💡 Check available space:**
+```bash
+df -h .  # Check current directory space
+```
+
 ## Quick Setup (Recommended)
 
-**For the easiest setup, run one of these scripts:**
+**For the easiest setup, run this script:**
 
 ```bash
-# Linux/Mac
+# Linux/Mac/Server
 ./setup.sh
-
-# Windows
-setup.bat
 ```
 
-This will automatically:
-- Install all dependencies
-- Set up Jupyter notebooks
-- Download required models
-- Configure the environment
-
-**📖 For detailed setup instructions and troubleshooting, see [SETUP_GUIDE.md](SETUP_GUIDE.md)**
-
-## Server Setup (GPU/CUDA)
-
-**For server environments with GPU/CUDA support:**
-
-```bash
-# Run the server-specific setup script
-./setup_server_fixed.sh
-```
-
-This script handles:
-- Disk space management
-- Poetry/pip fallback
-- CUDA/GPU dependencies
-- Jupyter kernel setup
+This script automatically:
+- Installs all dependencies (including open-clip-torch)
+- Sets up Jupyter notebooks with proper kernel
+- Handles disk space management
+- Supports both Poetry and pip installation
+- Works on local machines and servers with GPU/CUDA
 
 **⚠️ Important: After running the setup script, you need to select the kernel in VS Code:**
 1. Open any `.ipynb` notebook
@@ -48,6 +44,8 @@ This script handles:
 **📝 Note: The notebooks now have a simple environment check cell instead of automatic setup.**
 - Run the first cell to verify your environment is properly configured
 - No more package installation errors or conflicts
+
+**📖 For detailed setup instructions and troubleshooting, see [SETUP_GUIDE.md](SETUP_GUIDE.md)**
 
 ## Manual Installation
 
