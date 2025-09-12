@@ -1,6 +1,6 @@
 # DEGIS IP-Adapter Patch
 
-This directory contains DEGIS enhancements for the IP-Adapter library via monkey patching.
+This directory contains DEGIS enhancements for the IP-Adapter library via patching.
 
 ## What's Included
 
@@ -11,14 +11,14 @@ This directory contains DEGIS enhancements for the IP-Adapter library via monkey
 - **Backward Compatibility**: All original functionality preserved
 
 ### Files:
-- `ip_adapter_monkey_patch.py`: Main DEGIS patch file with all enhancements
+- `degis_ip_adapter_patch.py`: Main DEGIS patch file with all enhancements
 - `__init__.py`: Auto-applies DEGIS patches when imported
 
 ## Usage
 
 ### In Notebooks:
 ```python
-# Import DEGIS patches (this applies the monkey patches automatically)
+# Import DEGIS patches (this applies the patches automatically)
 import ip_adapter_patch
 
 # Now use IP-Adapter as normal - all DEGIS enhancements are available
@@ -85,4 +85,4 @@ python test_ip_adapter_patch.py
 
 ## License
 
-This DEGIS monkey patch enhances the original IP-Adapter library (Apache-2.0 licensed) with additional functionality while maintaining full backward compatibility.
+This DEGIS patch enhances the original IP-Adapter library (Apache-2.0 licensed) with additional functionality while maintaining full backward compatibility.

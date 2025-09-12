@@ -32,6 +32,7 @@ dependencies = [
     "pyyaml==6.0.2",
     "safetensors==0.6.2",
     "huggingface-hub==0.34.4",
+    "ip-adapter==0.1.0",
     "open-clip-torch @ git+https://github.com/mlfoundations/open_clip.git@8480ac990f0eda35fa21a0757188acebb11a36e6",
 ]
 

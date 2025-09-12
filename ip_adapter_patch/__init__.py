@@ -2,11 +2,11 @@
 DEGIS IP-Adapter Patch Module
 =============================
 
-This module contains DEGIS enhancements for IP-Adapter via monkey patching.
+This module contains DEGIS enhancements for IP-Adapter via patching.
 """
 
-# Auto-apply IP-Adapter patches when this module is imported
-from .ip_adapter_monkey_patch import apply_patches
+# Auto-apply DEGIS IP-Adapter patches when this module is imported
+from .degis_ip_adapter_patch import apply_patches
 
 # Apply patches immediately
 apply_patches()

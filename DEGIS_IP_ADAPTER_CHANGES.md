@@ -1,7 +1,7 @@
 # DEGIS IP-Adapter Enhancement Summary
 
 ## Overview
-This document summarizes the DEGIS enhancements applied to IP-Adapter via monkey patching.
+This document summarizes the DEGIS enhancements applied to IP-Adapter via patching.
 
 ## Changes Made
 
@@ -13,11 +13,15 @@ This document summarizes the DEGIS enhancements applied to IP-Adapter via monkey
 - **Old**: `enhanced_*` methods
 - **New**: `degis_*` methods (aligns with "Disentangled Embeddings Guided Image Synthesis")
 
-### 3. **Version Pinning**
+### 3. **File Naming Convention**
+- **Old**: `ip_adapter_monkey_patch.py`
+- **New**: `degis_ip_adapter_patch.py`
+
+### 4. **Version Pinning**
 - **Added**: `ip-adapter==0.1.0` in `requirements.txt`
 - **Reason**: Ensures reproducible builds and prevents breaking changes
 
-### 4. **Enhanced Methods**
+### 5. **Enhanced Methods**
 
 #### Core DEGIS Methods:
 - `degis_init()` - Enhanced initialization with embedding type support
@@ -30,14 +34,14 @@ This document summarizes the DEGIS enhancements applied to IP-Adapter via monkey
 #### New Classes:
 - `EmbeddingAdapter` - Universal adapter for different embedding types
 
-### 5. **Updated Files**
+### 6. **Updated Files**
 - `requirements.txt` - Pinned IP-Adapter version
 - `02_image_generation_ipadapter.ipynb` - Updated imports
 - `02b_image_generation_ipadapter_xl.ipynb` - Updated imports
 - `test_ip_adapter_patch.py` - Updated test script
 - `README_PACKAGE.md` - Updated documentation
 
-### 6. **Import Pattern**
+### 7. **Import Pattern**
 ```python
 # Old
 import patches
@@ -97,7 +101,7 @@ images = adapter.generate(
 degis/
 ├── ip_adapter_patch/           # DEGIS IP-Adapter enhancements
 │   ├── __init__.py            # Auto-applies patches
-│   ├── ip_adapter_monkey_patch.py  # Main patch file
+│   ├── degis_ip_adapter_patch.py  # Main patch file
 │   └── README.md              # Detailed documentation
 ├── requirements.txt           # Pinned IP-Adapter version
 └── notebooks/                 # Updated with new imports

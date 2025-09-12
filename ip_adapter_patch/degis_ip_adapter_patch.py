@@ -2,7 +2,7 @@
 DEGIS IP-Adapter Patch
 =====================
 
-This module provides DEGIS-enhanced IP-Adapter functionality by monkey patching
+This module provides DEGIS-enhanced IP-Adapter functionality by patching
 the original IP-Adapter classes with additional features:
 
 - EmbeddingAdapter for multiple embedding types
@@ -11,7 +11,7 @@ the original IP-Adapter classes with additional features:
 - Backward compatibility with original API
 
 Usage:
-    import ip_adapter_patch  # Apply patches
+    import ip_adapter_patch  # Apply DEGIS patches
     from ip_adapter import IPAdapter, IPAdapterXL  # Use DEGIS-enhanced classes
 """
 
@@ -338,7 +338,7 @@ def degis_init(self, sd_pipe, image_encoder_path, ip_ckpt, device, num_tokens=4,
 
 
 def apply_patches():
-    """Apply all monkey patches to IP-Adapter classes"""
+    """Apply all DEGIS patches to IP-Adapter classes"""
     
     # Add EmbeddingAdapter to the module
     import ip_adapter.ip_adapter as ip_module
@@ -369,5 +369,5 @@ def apply_patches():
     IPAdapterPlusXL._mix_text_ip_tokens = degis_mix_text_ip_tokens
 
 
-# Auto-apply patches when module is imported
+# Auto-apply DEGIS patches when module is imported
 apply_patches()

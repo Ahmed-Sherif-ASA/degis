@@ -28,7 +28,7 @@ df -h .  # Check current directory space
 ./setup.sh
 ```
 
-**Note:** The setup script automatically installs IP-Adapter with DEGIS enhancements via monkey patches. See `ip_adapter_patch/README.md` for details about the enhancements.
+**Note:** The setup script automatically installs IP-Adapter with DEGIS enhancements via patches. See `ip_adapter_patch/README.md` for details about the enhancements.
 
 This script automatically:
 - Installs all dependencies (including open-clip-torch)
