@@ -8,7 +8,7 @@ from .training import train_color_model
 from .generation import IPAdapterGenerator, IPAdapterXLGenerator, generate_from_embeddings, load_trained_color_head, get_color_embedding
 from .emd_generation import (
     calculate_emd_distance_topk, detect_color_space, compute_histogram_for_color_space,
-    generate_from_dataset_id_xl_with_emd, generate_with_emd_constraint
+    generate_from_dataset_id_xl_with_emd, generate_with_emd_constraint, generate_with_images_and_emd
 )
 from .visualization import (
     plot_color_palette, display_images_grid, display_comparison_grid,
@@ -32,6 +32,7 @@ __all__ = [
     "compute_histogram_for_color_space",
     "generate_from_dataset_id_xl_with_emd",
     "generate_with_emd_constraint",
+    "generate_with_images_and_emd",
     "plot_color_palette",
     "display_images_grid",
     "display_comparison_grid",

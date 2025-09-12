@@ -377,3 +377,154 @@ def generate_with_emd_constraint(
             break
 
     return best_images, best_emd, attempts_made
+
+
+def generate_with_images_and_emd(
+    colour_image: Image.Image,
+    edge_image: Image.Image,
+    prompt: str = "a beautiful image",
+    target_emd_threshold: float = 0.1,
+    max_attempts: int = 20,
+    top_k: int = 20,
+    guidance_scale: float = 6.5,
+    steps: int = 40,
+    controlnet_conditioning_scale: float = 0.8,
+    num_samples: int = 1,
+    attn_ip_scale: float = 0.8,
+    text_token_scale: float = 1.0,
+    ip_token_scale: Optional[float] = None,
+    ip_uncond_scale: float = 0.0,
+    zero_ip_in_uncond: bool = True,
+    color_space: Optional[str] = None,
+    blur: float = 0.01,
+    verbose: bool = True,
+    # Only the essential dependencies
+    generator=None,
+    color_head=None,
+    device=None,
+) -> Tuple[List[Image.Image], float, int]:
+    """
+    Generate images with EMD constraint using specific images (much cleaner approach).
+    
+    This is the recommended function - much cleaner than the dataset-based version.
+    
+    Args:
+        colour_image: PIL Image for color reference
+        edge_image: PIL Image for layout/edge control
+        prompt: Text prompt for generation
+        target_emd_threshold: Target EMD threshold
+        max_attempts: Maximum number of attempts
+        top_k: Number of top histogram values for EMD
+        # ... other generation parameters
+        generator: DEGIS generator instance
+        color_head: Trained color head model
+        device: Device to use
+        
+    Returns:
+        Tuple of (best_images, best_emd, attempts_made)
+    """
+    # Clear GPU memory
+    gc.collect()
+    torch.cuda.empty_cache()
+    
+    # Validate required dependencies
+    if generator is None:
+        raise ValueError("generator is required")
+    if color_head is None:
+        raise ValueError("color_head is required")
+    if device is None:
+        raise ValueError("device is required")
+
+    # Get CLIP embedding from color image
+    z_clip = generator.get_clip_embedding(colour_image, device)
+    color_embedding = generator.get_color_embedding(color_head, z_clip)
+
+    # Compute original histogram for EMD comparison
+    original_histogram = compute_histogram_for_color_space(colour_image, color_space or 'lab', bins=8)
+    
+    # Auto-detect color space if not provided
+    if color_space is None:
+        color_space = detect_color_space(original_histogram)
+    
+    if verbose:
+        print(f"Generating with EMD constraint (target: {target_emd_threshold:.3f})")
+        print(f"Prompt: '{prompt}'")
+        print(f"Max attempts: {max_attempts}")
+        print(f"EMD calculation: top-{top_k} histogram values, color_space={color_space}")
+        print("-" * 80)
+        print(f"{'Attempt':<8} {'EMD':<10} {'attn_ip_scale':<15} {'ip_token_scale':<15} {'guidance_scale':<15}")
+        print("-" * 80)
+
+    # EMD-constrained generation
+    best_images = None
+    best_emd = float("inf")
+    attempts_made = 0
+
+    for attempt in range(max_attempts):
+        # Generate images with IP-Adapter XL
+        images = generator.generate(
+            color_embedding=color_embedding,
+            control_image=edge_image,
+            prompt=prompt,
+            negative_prompt=(
+                "monochrome, lowres, bad anatomy, worst quality, low quality, blurry, "
+                "sketch, cartoon, drawing, anime:1.4, comic, illustration, posterized, "
+                "mosaic, stained glass, abstract, surreal, psychedelic, trippy, texture artifact, "
+                "embroidery, knitted, painting, oversaturated, unrealistic, bad shading"
+            ),
+            num_samples=num_samples,
+            guidance_scale=guidance_scale,
+            num_inference_steps=steps,
+            controlnet_conditioning_scale=controlnet_conditioning_scale,
+            attn_ip_scale=attn_ip_scale,
+            text_token_scale=text_token_scale,
+            ip_token_scale=ip_token_scale,
+            ip_uncond_scale=ip_uncond_scale,
+            zero_ip_in_uncond=zero_ip_in_uncond,
+        )
+
+        # Calculate histogram for generated image
+        generated_hist = compute_histogram_for_color_space(images[0], color_space, bins=8)
+        emd_distance = calculate_emd_distance_topk(
+            original_histogram, generated_hist, top_k=top_k, blur=blur
+        )
+
+        attempts_made += 1
+
+        # Structured logging
+        if verbose:
+            print(f"{attempt+1:<8} {emd_distance:<10.4f} {attn_ip_scale:<15.3f} {ip_token_scale or 0:<15.3f} {guidance_scale:<15.3f}", end="")
+
+        # Check if this is the best result so far
+        if emd_distance < best_emd:
+            best_emd = emd_distance
+            best_images = images
+            if verbose:
+                print("  ← NEW BEST!")
+        else:
+            if verbose:
+                print()
+
+        # Check if we've reached the target threshold
+        if emd_distance <= target_emd_threshold:
+            if verbose:
+                print(f"\n✓ Target EMD reached! ({emd_distance:.4f} <= {target_emd_threshold:.3f})")
+            break
+
+    # Display results
+    if best_images and verbose:
+        try:
+            from IPython.display import display
+            comparison = display_comparison_grid(
+                original=colour_image, control=edge_image, generated=best_images, cols=3
+            )
+            display(comparison)
+        except ImportError:
+            # Fallback for non-Jupyter environments
+            print("Comparison image would be displayed in Jupyter notebook")
+
+        print(f"\n✓ Generation complete!")
+        print(f"Best EMD achieved: {best_emd:.4f}")
+        print(f"Attempts made: {attempts_made}")
+
+    return best_images, best_emd, attempts_made
