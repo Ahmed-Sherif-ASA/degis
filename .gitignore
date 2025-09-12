@@ -11,6 +11,15 @@ dist/
 .eggs/
 *.egg
 
+# Virtual environments
+venv/
+env/
+ENV/
+degis-env/
+degis_env/
+.venv/
+.env/
+
 # IDE and editor files
 .vscode/
 .idea/

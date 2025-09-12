@@ -12,7 +12,7 @@ if ! command -v poetry &> /dev/null; then
     echo "❌ Poetry is not installed. Falling back to pip..."
     echo "📦 Installing DEGIS package and dependencies with pip..."
     
-    # Create virtual environment
+    # Create virtual environment (ignored by git)
     python3 -m venv degis-env
     source degis-env/bin/activate
     
@@ -58,7 +58,7 @@ else
     echo "❌ Poetry installation failed. Falling back to pip..."
     echo "📦 Installing DEGIS package and dependencies with pip..."
     
-    # Create virtual environment
+    # Create virtual environment (ignored by git)
     python3 -m venv degis-env
     source degis-env/bin/activate
     

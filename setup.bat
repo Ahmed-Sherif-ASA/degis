@@ -11,7 +11,7 @@ if %errorlevel% neq 0 (
     echo ❌ Poetry is not installed. Falling back to pip...
     echo 📦 Installing DEGIS package and dependencies with pip...
     
-    REM Create virtual environment
+    REM Create virtual environment (ignored by git)
     python -m venv degis-env
     call degis-env\Scripts\activate
     
@@ -45,7 +45,7 @@ if %errorlevel% neq 0 (
     echo ❌ Poetry installation failed. Falling back to pip...
     echo 📦 Installing DEGIS package and dependencies with pip...
     
-    REM Create virtual environment
+    REM Create virtual environment (ignored by git)
     python -m venv degis-env
     call degis-env\Scripts\activate
     
