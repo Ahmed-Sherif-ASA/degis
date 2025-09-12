@@ -17,7 +17,7 @@ from skimage.metrics import structural_similarity as ssim
 
 # --- diffusion / adapters ---
 from diffusers import ControlNetModel, StableDiffusionControlNetPipeline
-from ip_adapter import IPAdapter  # your fork
+from ip_adapter_patch.degis_ip_adapter_patch import IPAdapter  # DEGIS implementation
 from models.color_heads import ColorHead
 
 # --- CLIP for CLIPScore ---

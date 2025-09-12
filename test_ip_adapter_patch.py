@@ -11,11 +11,8 @@ def test_ip_adapter_patch():
     print("🧪 Testing DEGIS IP-Adapter patch...")
     
     try:
-        # Import the DEGIS patches (this applies the patches)
-        import ip_adapter_patch
-        
-        # Import IP-Adapter classes
-        from ip_adapter import IPAdapter, IPAdapterXL, ImageProjModel, MLPProjModel, EmbeddingAdapter
+        # Import IP-Adapter classes directly from DEGIS implementation
+        from ip_adapter_patch.degis_ip_adapter_patch import IPAdapter, IPAdapterXL, ImageProjModel, MLPProjModel, EmbeddingAdapter
         
         print("✅ Successfully imported patched IP-Adapter classes")
         

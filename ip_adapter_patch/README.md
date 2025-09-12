@@ -1,6 +1,6 @@
-# DEGIS IP-Adapter Patch
+# DEGIS IP-Adapter Implementation
 
-This directory contains the complete IP-Adapter implementation with DEGIS enhancements.
+This directory contains a complete IP-Adapter implementation with DEGIS enhancements.
 
 ## What's Included
 
@@ -11,20 +11,20 @@ This directory contains the complete IP-Adapter implementation with DEGIS enhanc
 - **Advanced Token Mixing**: Separate scaling controls for text and IP tokens
 - **Multiple Embedding Types**: Support for CLIP, DINO, and custom embeddings
 - **SDXL Support**: Full SDXL compatibility with pooled embeddings
+- **No Dependencies**: No original IP-Adapter library needed
 
 ### Files:
 - `degis_ip_adapter_patch.py`: Complete IP-Adapter implementation with DEGIS enhancements
-- `__init__.py`: Auto-applies DEGIS patches when imported
+- `__init__.py`: Exports all classes directly
 
 ## Usage
 
 ### In Notebooks:
 ```python
-# Import DEGIS patches (this applies the patches automatically)
-import ip_adapter_patch
-
-# Now use IP-Adapter as normal - all DEGIS enhancements are available
-from ip_adapter import IPAdapter, IPAdapterXL
+# Import DEGIS IP-Adapter implementation directly
+from ip_adapter_patch import IPAdapter, IPAdapterXL
+# or
+from ip_adapter_patch.degis_ip_adapter_patch import IPAdapter, IPAdapterXL
 
 # Enhanced features are now available
 adapter = IPAdapter(
@@ -49,8 +49,7 @@ images = adapter.generate(
 ### In Python Scripts:
 ```python
 # Same as notebooks
-import ip_adapter_patch
-from ip_adapter import IPAdapter
+from ip_adapter_patch import IPAdapter, IPAdapterXL
 ```
 
 ## What Changed
@@ -72,15 +71,15 @@ from ip_adapter import IPAdapter
 
 ## Installation
 
-The DEGIS patches are automatically applied when you:
+The DEGIS IP-Adapter implementation is available when you:
 1. Run the setup script: `./setup.sh`
-2. Import the patches: `import ip_adapter_patch`
+2. Import directly: `from ip_adapter_patch import IPAdapter`
 
-No additional installation steps required!
+No original IP-Adapter library needed!
 
 ## Testing
 
-To test that patches are working:
+To test that the implementation is working:
 ```bash
 # Activate environment first
 source degis-env/bin/activate
@@ -91,4 +90,4 @@ python test_ip_adapter_patch.py
 
 ## License
 
-This DEGIS patch enhances the original IP-Adapter library (Apache-2.0 licensed) with additional functionality while maintaining full backward compatibility.
+This DEGIS implementation is based on the original IP-Adapter library (Apache-2.0 licensed) with additional functionality while maintaining full backward compatibility.

@@ -11,8 +11,8 @@ from typing import List, Optional, Tuple, Union
 from pathlib import Path
 
 try:
-    import ip_adapter
-    from ip_adapter import IPAdapter, IPAdapterXL
+    # Import DEGIS IP-Adapter implementation directly (no original IP-Adapter needed)
+    from ip_adapter_patch.degis_ip_adapter_patch import IPAdapter, IPAdapterXL
     from diffusers import ControlNetModel, StableDiffusionControlNetPipeline, StableDiffusionXLControlNetPipeline
     GENERATION_AVAILABLE = True
 except ImportError:

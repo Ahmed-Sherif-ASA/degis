@@ -756,22 +756,5 @@ class IPAdapterPlusXL(IPAdapter):
         return images
 
 
-def apply_patches():
-    """Apply all DEGIS patches to IP-Adapter classes"""
-    
-    # Import the original module
-    import ip_adapter.ip_adapter as ip_module
-    
-    # Replace all classes with our enhanced versions
-    ip_module.ImageProjModel = ImageProjModel
-    ip_module.MLPProjModel = MLPProjModel
-    ip_module.EmbeddingAdapter = EmbeddingAdapter
-    ip_module.IPAdapter = IPAdapter
-    ip_module.IPAdapterXL = IPAdapterXL
-    ip_module.IPAdapterPlus = IPAdapterPlus
-    ip_module.IPAdapterFull = IPAdapterFull
-    ip_module.IPAdapterPlusXL = IPAdapterPlusXL
-
-
-# Auto-apply DEGIS patches when module is imported
-apply_patches()
+# No patching needed - we're using direct imports
+# All classes are available directly from this module
