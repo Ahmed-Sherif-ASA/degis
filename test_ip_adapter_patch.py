@@ -15,8 +15,7 @@ def test_ip_adapter_patch():
         import ip_adapter_patch
         
         # Import IP-Adapter classes
-        from ip_adapter import IPAdapter, IPAdapterXL
-        from ip_adapter.ip_adapter import EmbeddingAdapter
+        from ip_adapter import IPAdapter, IPAdapterXL, ImageProjModel, MLPProjModel, EmbeddingAdapter
         
         print("✅ Successfully imported patched IP-Adapter classes")
         
@@ -30,6 +29,14 @@ def test_ip_adapter_patch():
         # Test EmbeddingAdapter
         adapter = EmbeddingAdapter(cross_attention_dim=1024, embedding_dim=1024, num_tokens=4)
         print("✅ EmbeddingAdapter created successfully")
+        
+        # Test ImageProjModel
+        proj_model = ImageProjModel(cross_attention_dim=1024, clip_embeddings_dim=1024, clip_extra_context_tokens=4)
+        print("✅ ImageProjModel created successfully")
+        
+        # Test MLPProjModel
+        mlp_model = MLPProjModel(cross_attention_dim=1024, clip_embeddings_dim=1024)
+        print("✅ MLPProjModel created successfully")
         
         print("🎉 All tests passed! DEGIS patch is working correctly.")
         return True

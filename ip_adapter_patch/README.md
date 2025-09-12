@@ -1,17 +1,19 @@
 # DEGIS IP-Adapter Patch
 
-This directory contains DEGIS enhancements for the IP-Adapter library via patching.
+This directory contains the complete IP-Adapter implementation with DEGIS enhancements.
 
 ## What's Included
 
-### Enhanced Features:
-- **EmbeddingAdapter**: Universal adapter for different embedding types (CLIP, DINO, custom)
+### Complete Implementation:
+- **Full IP-Adapter Replacement**: Complete replacement of all IP-Adapter classes
+- **All Classes**: `IPAdapter`, `IPAdapterXL`, `IPAdapterPlus`, `IPAdapterFull`, `IPAdapterPlusXL`
+- **Core Models**: `ImageProjModel`, `MLPProjModel`, `EmbeddingAdapter`
 - **Advanced Token Mixing**: Separate scaling controls for text and IP tokens
-- **Pre-computed Embeddings**: Support for using pre-computed CLIP embeddings
-- **Backward Compatibility**: All original functionality preserved
+- **Multiple Embedding Types**: Support for CLIP, DINO, and custom embeddings
+- **SDXL Support**: Full SDXL compatibility with pooled embeddings
 
 ### Files:
-- `degis_ip_adapter_patch.py`: Main DEGIS patch file with all enhancements
+- `degis_ip_adapter_patch.py`: Complete IP-Adapter implementation with DEGIS enhancements
 - `__init__.py`: Auto-applies DEGIS patches when imported
 
 ## Usage
@@ -57,12 +59,16 @@ from ip_adapter import IPAdapter
 - Basic CLIP-based image projection
 - Simple token concatenation
 - Limited scaling options
+- Separate classes for different variants
 
 ### DEGIS-Enhanced IP-Adapter:
-- Multiple embedding type support
-- DEGIS token mixing with separate controls
+- Complete IP-Adapter implementation
+- Multiple embedding type support (CLIP, DINO, custom)
+- Advanced token mixing with separate controls
 - Pre-computed embedding support
-- Backward compatible API
+- Full SDXL compatibility
+- Unified API across all variants
+- Backward compatible with original API
 
 ## Installation
 
