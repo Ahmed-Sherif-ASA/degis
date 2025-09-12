@@ -28,7 +28,6 @@ dependencies = [
     "accelerate",
     "pyparsing==3.1.1",
     "geomloss",
-    "ip-adapter @ git+https://github.com/Ahmed-Sherif-ASA/IP-Adapter@main",
     "psutil",
     "pyyaml",
     "safetensors",
