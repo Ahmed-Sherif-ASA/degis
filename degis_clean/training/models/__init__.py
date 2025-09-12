@@ -1,0 +1,14 @@
+"""
+Training models module for DEGIS Clean.
+
+Contains model architectures and training utilities.
+"""
+
+from .color_heads import *
+from .train_color import *
+
+__all__ = [
+    "ColorHead",
+    "ColorHeadXL", 
+    "train_color_model"
+]
