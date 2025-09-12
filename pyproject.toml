@@ -3,7 +3,7 @@ name = "degis"
 version = "0.1.0"
 description = "Disentangled Embeddings Guided Synthesis"
 authors = [
-    {name = "Ahmed Sherif", email = "you@example.com"}
+    {name = "A.Sherif Akl", email = "ahmedsherifakl.asa@gmail.com"}
 ]
 readme = "README_PACKAGE.md"
 requires-python = ">=3.10,<3.13"
@@ -66,7 +66,7 @@ exclude = ["tests*", "runs*", "*.ipynb", "*.pyc", "__pycache__*"]
 name = "degis"
 version = "0.1.0"
 description = "Disentangled Embeddings Guided Synthesis"
-authors = ["Ahmed Sherif <you@example.com>"]
+authors = ["A.Sherif Akl ahmedsherifakl.asa@gmail.com"]
 readme = "README_PACKAGE.md"
 packages = [{include = "degis"}]
 

@@ -108,7 +108,7 @@ python -m ipykernel install --user --name=degis --display-name="DEGIS (Python 3)
 If you encounter any issues:
 1. Check the main README_PACKAGE.md
 2. Try the pip approach if Poetry fails
-3. Contact the author: Ahmed Sherif
+3. Contact the author: A.Sherif Akl
 
 ## 🎯 What This Project Does
 
