@@ -24,7 +24,7 @@ pyyaml==6.0.2
 safetensors==0.6.2
 huggingface-hub==0.34.4
 open-clip-torch @ git+https://github.com/mlfoundations/open_clip.git@8480ac990f0eda35fa21a0757188acebb11a36e6
-ip-adapter @ git+https://github.com/Ahmed-Sherif-ASA/IP-Adapter@00eca207cf559b57048fa5b4fe94b0bec93b91c6
+ip-adapter==0.1.0
 
 # Development dependencies
 jupyter==1.1.1
