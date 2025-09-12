@@ -24,7 +24,11 @@ if %errorlevel% neq 0 (
     
     REM Set up Jupyter kernel
     echo 📓 Setting up Jupyter kernel...
-    python -m ipykernel install --user --name=degis --display-name="DEGIS (Python 3)"
+    python -m ipykernel install --user --name=degis --display-name="DEGIS Environment"
+
+REM Update notebook kernel metadata
+echo 📝 Updating notebook kernel metadata...
+python setup_kernel.py
     
     echo ✅ Setup complete with pip!
     echo To activate the environment: call degis-env\Scripts\activate
@@ -54,7 +58,11 @@ if %errorlevel% neq 0 (
     
     REM Set up Jupyter kernel
     echo 📓 Setting up Jupyter kernel...
-    python -m ipykernel install --user --name=degis --display-name="DEGIS (Python 3)"
+    python -m ipykernel install --user --name=degis --display-name="DEGIS Environment"
+
+REM Update notebook kernel metadata
+echo 📝 Updating notebook kernel metadata...
+python setup_kernel.py
     
     echo ✅ Setup complete with pip!
     echo To activate the environment: call degis-env\Scripts\activate
@@ -71,7 +79,11 @@ echo 🤖 Models will be downloaded automatically when first used
 
 REM Set up Jupyter kernel
 echo 📓 Setting up Jupyter kernel...
-poetry run python -m ipykernel install --user --name=degis --display-name="DEGIS (Python 3)"
+poetry run python -m ipykernel install --user --name=degis --display-name="DEGIS Environment"
+
+REM Update notebook kernel metadata
+echo 📝 Updating notebook kernel metadata...
+poetry run python setup_kernel.py
 
 echo.
 echo 🎉 Setup complete!

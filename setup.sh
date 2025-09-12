@@ -25,7 +25,11 @@ if ! command -v poetry &> /dev/null; then
     
     # Set up Jupyter kernel
     echo "📓 Setting up Jupyter kernel..."
-    python -m ipykernel install --user --name=degis --display-name="DEGIS (Python 3)"
+    python -m ipykernel install --user --name=degis --display-name="DEGIS Environment"
+    
+    # Update notebook kernel metadata
+    echo "📝 Updating notebook kernel metadata..."
+    python setup_kernel.py
     
     echo "✅ Setup complete with pip!"
     echo "To activate the environment: source degis-env/bin/activate"
@@ -45,7 +49,11 @@ if poetry install; then
     
     # Set up Jupyter kernel
     echo "📓 Setting up Jupyter kernel..."
-    poetry run python -m ipykernel install --user --name=degis --display-name="DEGIS (Python 3)"
+    poetry run python -m ipykernel install --user --name=degis --display-name="DEGIS Environment"
+    
+    # Update notebook kernel metadata
+    echo "📝 Updating notebook kernel metadata..."
+    poetry run python setup_kernel.py
 else
     echo "❌ Poetry installation failed. Falling back to pip..."
     echo "📦 Installing DEGIS package and dependencies with pip..."
@@ -63,7 +71,11 @@ else
     
     # Set up Jupyter kernel
     echo "📓 Setting up Jupyter kernel..."
-    python -m ipykernel install --user --name=degis --display-name="DEGIS (Python 3)"
+    python -m ipykernel install --user --name=degis --display-name="DEGIS Environment"
+    
+    # Update notebook kernel metadata
+    echo "📝 Updating notebook kernel metadata..."
+    python setup_kernel.py
     
     echo "✅ Setup complete with pip!"
     echo "To activate the environment: source degis-env/bin/activate"
