@@ -1,42 +1,37 @@
 """
-DEGIS: Disentangled Embeddings for Generative Image Synthesis
+DEGIS - Disentangled Embeddings Guided Image Synthesis
 
-A package for training disentangled representations of images using CLIP embeddings
-and various visual features (color histograms, edge maps, etc.).
+A well-structured package for training and inference of disentangled
+image representations using CLIP embeddings and various visual features.
+
+Structure:
+- data/          : Shared data handling (used by both training & inference)
+- training/      : Training-specific code (models, training loops, CLI)
+- inference/     : Inference-specific code (generation, features, CLI)
+- shared/        : Shared utilities (embeddings, utils, config)
+- ip_adapter_patch/ : Custom IP-Adapter implementation
 """
 
-from .core.embeddings import generate_clip_embeddings, generate_xl_embeddings
-from .core.features import generate_color_histograms, generate_edge_maps
-from .core.training import train_color_model
-from .core.generation import IPAdapterGenerator, IPAdapterXLGenerator, generate_from_embeddings, load_trained_color_head, get_color_embedding, create_edge_control_image
-from .core.visualization import (
-    plot_color_palette, display_images_grid, display_comparison_grid,
-    extract_top_palette, visualize_histogram_comparison, plot_training_metrics,
-    save_generation_results, create_side_by_side_comparison
-)
+__version__ = "2.0.0"
+__author__ = "DEGIS Team"
 
-__version__ = "0.1.0"
-__author__ = "Your Name"
-__email__ = "your.email@example.com"
+# Import main functionality for easy access
+from .shared.config import *
+from .data.dataset import UnifiedImageDataset
+from .training.batch_embeddings import generate_clip_embeddings, generate_xl_embeddings
+from .shared.image_features import generate_color_histograms, generate_edge_maps
+from .training import train_color_model
+from .inference import IPAdapterGenerator, IPAdapterXLGenerator, load_trained_color_head, get_color_embedding
 
 __all__ = [
-    "generate_clip_embeddings",
-    "generate_xl_embeddings", 
+    "UnifiedImageDataset",
+    "generate_clip_embeddings", 
+    "generate_xl_embeddings",
     "generate_color_histograms",
     "generate_edge_maps",
     "train_color_model",
     "IPAdapterGenerator",
     "IPAdapterXLGenerator",
-    "generate_from_embeddings",
     "load_trained_color_head",
-    "get_color_embedding",
-    "plot_color_palette",
-    "display_images_grid",
-    "display_comparison_grid",
-    "extract_top_palette",
-    "visualize_histogram_comparison",
-    "plot_training_metrics",
-    "save_generation_results",
-    "create_side_by_side_comparison",
-    "create_edge_control_image",
+    "get_color_embedding"
 ]
