@@ -1,3 +1,4 @@
+```mermaid
 sequenceDiagram
     participant IN as Inputs (CSV with URLs, Local Images Path)
     participant Train as Training Module
