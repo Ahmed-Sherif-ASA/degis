@@ -8,12 +8,12 @@ import pandas as pd
 from torch.utils.data import DataLoader
 from multiprocessing import cpu_count
 
-from ...training.features import (
+from ...shared.image_features import (
     generate_color_histograms_batch,
-    generate_edge_maps,
     generate_rgb_histograms,
     generate_lab_histograms,
     generate_hcl_histograms,
+    generate_edge_maps
 )
 from ...data.dataset import UnifiedImageDataset
 from ...shared.config import CSV_PATH, BATCH_SIZE, COLOR_HIST_PATH_RGB, COLOR_HIST_PATH_LAB_514, COLOR_HIST_PATH_HCL_514, EDGE_MAPS_PATH

@@ -17,11 +17,9 @@ def test_complete_structure():
         "degis_clean/training", 
         "degis_clean/inference",
         "degis_clean/shared",
-        "degis_clean/training/features",
         "degis_clean/training/models",
         "degis_clean/training/cli",
-        "degis_clean/inference/cli",
-        "degis_clean/shared/embeddings",
+        "degis_clean/shared/image_features",
         "degis_clean/shared/utils",
         "degis_clean/shared/config"
     ]
@@ -47,9 +45,8 @@ def test_import_syntax():
         "degis_clean/training/__init__.py",
         "degis_clean/inference/__init__.py",
         "degis_clean/shared/__init__.py",
-        "degis_clean/training/features/__init__.py",
         "degis_clean/training/models/__init__.py",
-        "degis_clean/shared/embeddings/__init__.py",
+        "degis_clean/shared/image_features/__init__.py",
         "degis_clean/shared/utils/__init__.py"
     ]
     
@@ -89,7 +86,7 @@ def test_notebook_imports():
         print("✅ degis_clean.shared imports")
         
         # Test training imports
-        from degis_clean.training import train_color_model, generate_color_histograms, generate_edge_maps
+        from degis_clean.training import train_color_model
         print("✅ degis_clean.training imports")
         
         # Test inference imports
@@ -99,7 +96,7 @@ def test_notebook_imports():
         # Test main package convenience imports
         from degis_clean import (
             UnifiedImageDataset, generate_clip_embeddings, generate_xl_embeddings,
-            train_color_model, generate_color_histograms, generate_edge_maps,
+            generate_color_histograms, generate_edge_maps, train_color_model,
             IPAdapterGenerator, IPAdapterXLGenerator, load_trained_color_head, get_color_embedding
         )
         print("✅ degis_clean main package convenience imports")

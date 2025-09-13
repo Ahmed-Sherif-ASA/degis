@@ -9,10 +9,10 @@ from multiprocessing import cpu_count
 from tqdm import tqdm
 
 from ..data.dataset import UnifiedImageDataset
-from .clip_embeddings import generate_embeddings_fp16
-from .clip_embeddings_xl_hf import generate_embeddings_xl as generate_embeddings_xl_hf, preprocess_xl
-from .config import CSV_PATH, BATCH_SIZE, EMBEDDINGS_TARGET_PATH, HF_XL_EMBEDDINGS_TARGET_PATH
-from .utils.auto_setup import setup_environment
+from ..shared.clip_vit_h14 import generate_embeddings_fp16
+from ..shared.clip_vit_bigg14 import generate_embeddings_xl as generate_embeddings_xl_hf, preprocess_xl
+from ..shared.config import CSV_PATH, BATCH_SIZE, EMBEDDINGS_TARGET_PATH, HF_XL_EMBEDDINGS_TARGET_PATH
+from ..shared.utils.auto_setup import setup_environment
 
 
 def generate_clip_embeddings(

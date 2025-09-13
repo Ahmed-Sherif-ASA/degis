@@ -252,3 +252,54 @@ def create_side_by_side_comparison(
     
     plt.tight_layout()
     return fig
+
+
+def plot_training_curves(
+    metrics_csv_path: str,
+    output_dir: str,
+    dataset_name: str,
+    hist_kind: str
+) -> None:
+    """
+    Generate training curves (EMD and loss) from metrics CSV.
+    
+    Args:
+        metrics_csv_path: Path to metrics.csv file
+        output_dir: Directory to save plots
+        dataset_name: Name of dataset for plot titles
+        hist_kind: Type of histogram for plot titles
+    """
+    try:
+        import pandas as pd
+        import os
+        
+        df = pd.read_csv(metrics_csv_path)
+        
+        # EMD curves
+        plt.figure(figsize=(10, 6))
+        plt.plot(df.epoch, df.train_emd, label="train", linewidth=2)
+        plt.plot(df.epoch, df.val_emd, label="val", linewidth=2)
+        plt.xlabel("epoch")
+        plt.ylabel("EMD")
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.title(f"EMD Curves - {dataset_name}_{hist_kind}")
+        plt.savefig(os.path.join(output_dir, "emd_curves.png"), dpi=150, bbox_inches='tight')
+        plt.close()
+        
+        # Loss curve
+        plt.figure(figsize=(10, 6))
+        plt.plot(df.epoch, df["loss"], linewidth=2, color='red')
+        plt.xlabel("epoch")
+        plt.ylabel("loss")
+        plt.grid(True, alpha=0.3)
+        plt.title(f"Loss Curve - {dataset_name}_{hist_kind}")
+        plt.savefig(os.path.join(output_dir, "loss_curve.png"), dpi=150, bbox_inches='tight')
+        plt.close()
+        
+        print("✓ Generated training curves (emd_curves.png, loss_curve.png)")
+        
+    except ImportError:
+        print("⚠️  matplotlib not available, skipping training curves")
+    except Exception as e:
+        print(f"⚠️  Error generating training curves: {e}")

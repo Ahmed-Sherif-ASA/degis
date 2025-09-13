@@ -37,6 +37,7 @@ def _download_checkpoint_if_needed(checkpoint_path: str, model_type: str) -> str
     print(f"Downloading IP-Adapter {model_type} checkpoint...")
     
     from ..shared.utils.model_downloader import download_ip_adapter_checkpoint
+    from ..shared.utils.image_utils import create_control_edge_pil
     
     downloaded_path = download_ip_adapter_checkpoint(model_type)
     print(f"✓ Downloaded IP-Adapter {model_type} checkpoint")
@@ -206,29 +207,7 @@ class IPAdapterXLGenerator(ImageGenerator):
         )
 
 
-def create_edge_control_image(
-    edge_data: np.ndarray,
-    size: int = 512,
-    img_size: Tuple[int, int] = (224, 224)
-) -> Image.Image:
-    """Create a ControlNet-ready edge image from edge data."""
-    H, W = img_size
-    if edge_data.ndim == 1 and edge_data.shape[0] != H * W:
-        side = int(np.sqrt(edge_data.shape[0]))
-        H = W = side
-    
-    edge = edge_data.reshape(H, W)
-    
-    # Normalize to 0-255 if needed
-    if edge.dtype != np.uint8:
-        edge = (edge * 255.0).clip(0, 255).astype(np.uint8)
-    
-    # Convert to PIL and process
-    pil = Image.fromarray(edge)
-    pil = ImageOps.autocontrast(pil)
-    pil = pil.resize((size, size), Image.BILINEAR).convert("RGB")
-    
-    return pil
+# Edge control image creation moved to shared/utils/image_utils.py
 
 
 def generate_from_embeddings(
@@ -247,7 +226,7 @@ def generate_from_embeddings(
     """Generate images from color and layout embeddings."""
     
     # Create control image from edge data
-    control_image = create_edge_control_image(edge_data)
+    control_image = create_control_edge_pil(edge_data)
     
     # Generate images
     images = generator.generate(

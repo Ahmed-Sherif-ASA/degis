@@ -18,17 +18,18 @@ __author__ = "DEGIS Team"
 # Import main functionality for easy access
 from .shared.config import *
 from .data.dataset import UnifiedImageDataset
-from .shared.embeddings import generate_clip_embeddings, generate_xl_embeddings
-from .training import train_color_model, generate_color_histograms, generate_edge_maps
+from .training.batch_embeddings import generate_clip_embeddings, generate_xl_embeddings
+from .shared.image_features import generate_color_histograms, generate_edge_maps
+from .training import train_color_model
 from .inference import IPAdapterGenerator, IPAdapterXLGenerator, load_trained_color_head, get_color_embedding
 
 __all__ = [
     "UnifiedImageDataset",
     "generate_clip_embeddings", 
     "generate_xl_embeddings",
-    "train_color_model",
     "generate_color_histograms",
     "generate_edge_maps",
+    "train_color_model",
     "IPAdapterGenerator",
     "IPAdapterXLGenerator",
     "load_trained_color_head",

@@ -211,40 +211,13 @@ def train_color_model(
     )
     
     # Generate training curves
-    try:
-        import pandas as pd
-        import matplotlib.pyplot as plt
-        
-        df = pd.read_csv(os.path.join(output_dir, "metrics.csv"))
-        
-        # EMD curves
-        plt.figure(figsize=(10, 6))
-        plt.plot(df.epoch, df.train_emd, label="train", linewidth=2)
-        plt.plot(df.epoch, df.val_emd, label="val", linewidth=2)
-        plt.xlabel("epoch")
-        plt.ylabel("EMD")
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.title(f"EMD Curves - {dataset_name}_{hist_kind}")
-        plt.savefig(os.path.join(output_dir, "emd_curves.png"), dpi=150, bbox_inches='tight')
-        plt.close()
-        
-        # Loss curve
-        plt.figure(figsize=(10, 6))
-        plt.plot(df.epoch, df["loss"], linewidth=2, color='red')
-        plt.xlabel("epoch")
-        plt.ylabel("loss")
-        plt.grid(True, alpha=0.3)
-        plt.title(f"Loss Curve - {dataset_name}_{hist_kind}")
-        plt.savefig(os.path.join(output_dir, "loss_curve.png"), dpi=150, bbox_inches='tight')
-        plt.close()
-        
-        print("✓ Generated training curves (emd_curves.png, loss_curve.png)")
-        
-    except ImportError:
-        print("Warning: matplotlib/pandas not available, skipping training curves")
-    except Exception as e:
-        print(f"Warning: Failed to generate training curves: {e}")
+    from ..shared.utils.visualization import plot_training_curves
+    plot_training_curves(
+        metrics_csv_path=os.path.join(output_dir, "metrics.csv"),
+        output_dir=output_dir,
+        dataset_name=dataset_name,
+        hist_kind=hist_kind
+    )
     
     return {
         "output_dir": output_dir,

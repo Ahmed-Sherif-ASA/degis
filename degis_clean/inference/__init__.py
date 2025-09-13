@@ -5,7 +5,7 @@ Contains inference-specific functionality including generation, visualization, a
 """
 
 from .generation import IPAdapterGenerator, IPAdapterXLGenerator, load_trained_color_head, get_color_embedding
-from .visualization import plot_color_palette, display_images_grid, display_comparison_grid
+from ..shared.utils.visualization import plot_color_palette, display_images_grid, display_comparison_grid, plot_training_curves
 from .emd_generation import generate_from_dataset_id_xl_with_emd, generate_with_emd_constraint
 
 __all__ = [
@@ -16,6 +16,7 @@ __all__ = [
     "plot_color_palette",
     "display_images_grid",
     "display_comparison_grid",
+    "plot_training_curves",
     "generate_from_dataset_id_xl_with_emd",
     "generate_with_emd_constraint"
 ]

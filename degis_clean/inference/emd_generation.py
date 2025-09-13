@@ -12,8 +12,8 @@ from typing import List, Tuple, Optional, Union
 from PIL import Image
 import gc
 
-from .visualization import display_comparison_grid
-from ..training.features.color_histograms import compute_lab_histogram, compute_color_histogram, compute_hcl_histogram
+# Visualization functions moved to shared.utils.visualization
+from ..shared.image_features.color_histograms import compute_lab_histogram, compute_color_histogram, compute_hcl_histogram
 
 
 def calculate_emd_distance_topk(
@@ -229,7 +229,8 @@ def generate_from_dataset_id_xl_with_emd(
         print("-" * 80)
 
     # Create control image from edge data
-    control_image = generator.create_edge_control_image(edge_maps[layout_index], size=512)
+    from ..shared.utils.image_utils import create_control_edge_pil
+    control_image = create_control_edge_pil(edge_maps[layout_index], size=512)
 
     # EMD-constrained generation
     best_images = None
@@ -287,20 +288,11 @@ def generate_from_dataset_id_xl_with_emd(
                 print(f"\n✓ Target EMD reached! ({emd_distance:.4f} <= {target_emd_threshold:.3f})")
             break
 
-    # Display results
+    # Results are returned as data - visualization handled separately
     if best_images and verbose:
-        comparison = display_comparison_grid(
-            original=pil_img, control=control_image, generated=best_images, cols=3
-        )
-        # Note: display() is typically used in Jupyter notebooks
-        # In a regular Python script, you might want to save the image instead
-        try:
-            from IPython.display import display
-            display(comparison)
-        except ImportError:
-            # Fallback for non-Jupyter environments
-            comparison.save(f"emd_generation_comparison_{colour_index}_{layout_index}.png")
-            print(f"Comparison saved as emd_generation_comparison_{colour_index}_{layout_index}.png")
+        print(f"Generated {len(best_images)} images with EMD constraint")
+        print(f"Best EMD distance: {best_emd:.4f}")
+        print(f"Attempts made: {attempts_made}")
 
         print(f"\n✓ Generation complete!")
         print(f"Best EMD achieved: {best_emd:.4f}")
@@ -511,20 +503,11 @@ def generate_with_images_and_emd(
                 print(f"\n✓ Target EMD reached! ({emd_distance:.4f} <= {target_emd_threshold:.3f})")
             break
 
-    # Display results
+    # Results are returned as data - visualization handled separately
     if best_images and verbose:
-        try:
-            from IPython.display import display
-            comparison = display_comparison_grid(
-                original=colour_image, control=edge_image, generated=best_images, cols=3
-            )
-            display(comparison)
-        except ImportError:
-            # Fallback for non-Jupyter environments
-            print("Comparison image would be displayed in Jupyter notebook")
-
-        print(f"\n✓ Generation complete!")
-        print(f"Best EMD achieved: {best_emd:.4f}")
+        print(f"Generated {len(best_images)} images with EMD constraint")
+        print(f"Best EMD distance: {best_emd:.4f}")
         print(f"Attempts made: {attempts_made}")
+        print(f"\n✓ Generation complete!")
 
     return best_images, best_emd, attempts_made

@@ -8,7 +8,7 @@ import pandas as pd
 from torch.utils.data import DataLoader
 from multiprocessing import cpu_count
 
-from ...shared.embeddings import generate_clip_embeddings, generate_xl_embeddings
+from ...training.batch_embeddings import generate_clip_embeddings, generate_xl_embeddings
 from ...data.dataset import UnifiedImageDataset
 from ...shared.config import CSV_PATH, BATCH_SIZE, EMBEDDINGS_TARGET_PATH, HF_XL_EMBEDDINGS_TARGET_PATH
 
