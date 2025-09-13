@@ -9,6 +9,6 @@ from .train_color import *
 
 __all__ = [
     "ColorHead",
-    "ColorHeadXL", 
-    "train_color_model"
+    "RestHead",
+    "train_color_disentanglement"
 ]
