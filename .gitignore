@@ -77,4 +77,4 @@ huggingface/
 
 # Pip cache and temporary directories
 .pip-cache/
-.tmp/
+.tmp/*.egg-info/
