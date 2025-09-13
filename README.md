@@ -1,10 +1,10 @@
-# DEGIS: Data-Efficient Generation with Image Semantics
+# DEGIS: Disentagled Embeddings Guided Image Synthesis
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-1.12+-red.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-DEGIS is a novel approach for data-efficient image generation that leverages pre-trained CLIP embeddings and Earth Mover's Distance (EMD) constraints to generate high-quality images with precise color control.
+DEGIS is a novel approach for image generation that leverages pre-trained disentangled semantic specific CLIP embeddings and Earth Mover's Distance (EMD) constraints to generate high-quality images with precise color control.
 
 ## 🚀 Quick Start
 
@@ -48,7 +48,7 @@ DEGIS achieves state-of-the-art results in color-constrained image generation wi
 
 ## 🔬 Research
 
-This project implements the DEGIS methodology for data-efficient image generation with precise color control. The approach combines:
+This project implements the DEGIS methodology for precise color control. The approach combines:
 
 1. **CLIP-based color embeddings** for semantic understanding
 2. **EMD constraints** for color distribution matching
@@ -58,20 +58,16 @@ This project implements the DEGIS methodology for data-efficient image generatio
 
 ```bibtex
 @article{degis2024,
-  title={DEGIS: Data-Efficient Generation with Image Semantics},
-  author={Your Name},
-  journal={arXiv preprint},
-  year={2024}
+  title={DEGIS: Disentagled Embeddings Guided Image Synthesis},
+  author={Ahmed Sherif Akl},
+  journal={-},
+  year={2025}
 }
 ```
 
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
