@@ -412,6 +412,10 @@ class IPAdapter:
 
         generator = get_generator(seed, self.device)
 
+        # Disable tqdm globally for this generation
+        import os
+        os.environ['TQDM_DISABLE'] = '1'
+        
         images = self.pipe(
             prompt_embeds=prompt_embeds,
             negative_prompt_embeds=negative_prompt_embeds,
@@ -422,6 +426,9 @@ class IPAdapter:
             show_progress_bar=False,
             **kwargs,
         ).images
+        
+        # Re-enable tqdm
+        os.environ.pop('TQDM_DISABLE', None)
 
         return images
 
@@ -559,6 +566,10 @@ class IPAdapterXL(IPAdapter):
 
         self.generator = get_generator(seed, self.device)
         
+        # Disable tqdm globally for this generation
+        import os
+        os.environ['TQDM_DISABLE'] = '1'
+        
         images = self.pipe(
             prompt_embeds=prompt_embeds,
             negative_prompt_embeds=negative_prompt_embeds,
@@ -571,6 +582,9 @@ class IPAdapterXL(IPAdapter):
             show_progress_bar=False,
             **kwargs,
         ).images
+        
+        # Re-enable tqdm
+        os.environ.pop('TQDM_DISABLE', None)
 
         return images
 
@@ -758,6 +772,10 @@ class IPAdapterPlusXL(IPAdapter):
 
         generator = get_generator(seed, self.device)
 
+        # Disable tqdm globally for this generation
+        import os
+        os.environ['TQDM_DISABLE'] = '1'
+        
         images = self.pipe(
             prompt_embeds=prompt_embeds,
             negative_prompt_embeds=negative_prompt_embeds,
@@ -770,6 +788,9 @@ class IPAdapterPlusXL(IPAdapter):
             show_progress_bar=False,
             **kwargs,
         ).images
+        
+        # Re-enable tqdm
+        os.environ.pop('TQDM_DISABLE', None)
 
         return images
 
