@@ -28,7 +28,7 @@ from PIL import Image
 from transformers import CLIPVisionModelWithProjection, CLIPImageProcessor
 
 # ---- config ----
-from ..models_config.models import get_clip_vit_bigg14_path
+from .models_config.models import get_clip_vit_bigg14_path
 from .config import MODEL_CACHE
 
 # Get model ID from registry (same as IPAdapterXL's image_encoder_path)

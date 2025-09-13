@@ -6,7 +6,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Use model management system
 from .config import MODEL_CACHE
-from ..models_config.models import get_clip_vit_h14_path
+from .models_config.models import get_clip_vit_h14_path
 
 # Get model info from registry
 model_id = get_clip_vit_h14_path()
