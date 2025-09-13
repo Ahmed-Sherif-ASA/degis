@@ -18,6 +18,7 @@ import gc
 # Visualization functions moved to shared.utils.visualization
 from ..shared.image_features.color_histograms import compute_lab_histogram, compute_color_histogram, compute_hcl_histogram
 from ..shared.clip_vit_h14 import compute_clip_embedding
+from ..inference.core_generation import get_color_embedding
 
 
 def calculate_emd_distance_topk(
@@ -594,8 +595,10 @@ def generate_with_images_and_emd(
         raise ValueError("device is required")
 
     # Get CLIP embedding from color image
-    z_clip = generator.get_clip_embedding(colour_image, device)
-    color_embedding = generator.get_color_embedding(color_head, z_clip)
+    from ..shared.clip_vit_h14 import preprocess
+    image_tensor = preprocess(colour_image).to(device)  # [3,H,W]
+    z_clip = compute_clip_embedding(image_tensor).unsqueeze(0)  # Add batch dim
+    color_embedding = get_color_embedding(color_head, z_clip)
 
     # Compute original histogram for EMD comparison
     original_histogram = compute_histogram_for_color_space(colour_image, color_space or 'lab', bins=8)
