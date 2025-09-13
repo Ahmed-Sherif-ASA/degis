@@ -145,10 +145,16 @@ def calculate_cosine_similarity(
         
         _ensure_model_loaded()
         
+        # Re-import preprocess after model loading to ensure we get the updated global
+        from ..shared.clip_vit_h14 import preprocess as current_preprocess
+        
         # Verify preprocess is loaded
-        if preprocess is None:
+        if current_preprocess is None:
             print("Error: preprocess is None after model loading")
             return 0.0
+        
+        # Use the current preprocess
+        preprocess = current_preprocess
         
         # Convert PIL Image to tensor (preprocess returns [C,H,W])
         image_tensor = preprocess(image).to(device_obj)  # [3,H,W]
