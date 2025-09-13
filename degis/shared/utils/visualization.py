@@ -4,9 +4,10 @@ Visualization utilities for generated images and color palettes.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from PIL import Image
-from typing import List, Tuple, Optional
+from PIL import Image, ImageDraw, ImageFont
+from typing import List, Tuple, Optional, Dict, Any
 from skimage.color import lab2rgb
+import time
 
 
 def plot_color_palette(
@@ -335,3 +336,188 @@ def plot_training_curves(
         print("⚠️  matplotlib not available, skipping training curves")
     except Exception as e:
         print(f"⚠️  Error generating training curves: {e}")
+
+
+def visualize_generation_comparison(
+    color_source_image: Image.Image,
+    edge_map_image: Image.Image,
+    style_generated_image: Image.Image,
+    emd_generated_image: Image.Image,
+    color_histogram: np.ndarray,
+    color_space: str = "lab",
+    style_metrics: Optional[Dict[str, Any]] = None,
+    emd_metrics: Optional[Dict[str, Any]] = None,
+    grid_size: int = 512,
+    font_size: int = 16
+) -> Image.Image:
+    """
+    Create a comprehensive visualization grid showing generation comparison.
+    
+    Grid layout:
+    1. Color source image + top 20 histogram bins
+    2. Edge map image
+    3. Style generation result + metrics
+    4. EMD generation result + metrics
+    
+    Args:
+        color_source_image: Source image for color reference
+        edge_map_image: Edge map for layout control
+        style_generated_image: Image from generate_by_style
+        emd_generated_image: Image from generate_by_colour_emd_constrained
+        color_histogram: Target color histogram
+        color_space: Color space used ('rgb', 'lab', 'hcl')
+        style_metrics: Dict with 'generation_time', 'emd', 'cosine' for style generation
+        emd_metrics: Dict with 'generation_time', 'emd', 'cosine', 'attempts' for EMD generation
+        grid_size: Size for each grid cell
+        font_size: Font size for text overlays
+        
+    Returns:
+        PIL Image containing the complete visualization grid
+    """
+    # Create the main grid (2x2)
+    main_grid_size = grid_size * 2
+    main_grid = Image.new('RGB', (main_grid_size, main_grid_size), color='white')
+    
+    # Helper function to add text overlay
+    def add_text_overlay(img, text_lines, position='bottom'):
+        """Add text overlay to an image."""
+        draw = ImageDraw.Draw(img)
+        
+        # Try to use a default font, fallback to basic if not available
+        try:
+            font = ImageFont.truetype("/System/Library/Fonts/Arial.ttf", font_size)
+        except:
+            try:
+                font = ImageFont.load_default()
+            except:
+                font = None
+        
+        # Calculate text position
+        if position == 'bottom':
+            y_start = img.height - (len(text_lines) * (font_size + 5)) - 10
+        else:
+            y_start = 10
+            
+        for i, line in enumerate(text_lines):
+            y_pos = y_start + i * (font_size + 5)
+            draw.text((10, y_pos), line, fill='black', font=font)
+    
+    # Helper function to create histogram visualization
+    def create_histogram_viz(histogram, color_space, top_k=20):
+        """Create a simple histogram visualization."""
+        # Get top-k values
+        top_indices = np.argsort(histogram)[-top_k:]
+        top_values = histogram[top_indices]
+        
+        # Create a simple bar chart
+        hist_img = Image.new('RGB', (grid_size, 100), color='white')
+        draw = ImageDraw.Draw(hist_img)
+        
+        # Draw bars
+        bar_width = grid_size // top_k
+        max_val = np.max(top_values)
+        
+        for i, (idx, val) in enumerate(zip(top_indices, top_values)):
+            x1 = i * bar_width
+            x2 = (i + 1) * bar_width - 2
+            height = int((val / max_val) * 80)
+            y1 = 90 - height
+            y2 = 90
+            
+            # Color based on color space
+            if color_space == 'rgb':
+                # Convert index to RGB
+                r = (idx // 64) * 64
+                g = ((idx % 64) // 8) * 8
+                b = (idx % 8) * 32
+                color = (r, g, b)
+            else:
+                # For LAB/HCL, use grayscale
+                color = (128, 128, 128)
+            
+            draw.rectangle([x1, y1, x2, y2], fill=color)
+        
+        return hist_img
+    
+    # 1. Color source image + histogram (top-left)
+    color_img = color_source_image.resize((grid_size, grid_size))
+    hist_viz = create_histogram_viz(color_histogram, color_space)
+    
+    # Combine color image and histogram
+    color_combo = Image.new('RGB', (grid_size, grid_size + 100), color='white')
+    color_combo.paste(color_img, (0, 0))
+    color_combo.paste(hist_viz, (0, grid_size))
+    
+    # Add labels
+    add_text_overlay(color_combo, [f"Color Source ({color_space.upper()})", f"Top 20 bins"], 'bottom')
+    
+    # 2. Edge map image (top-right)
+    edge_img = edge_map_image.resize((grid_size, grid_size))
+    add_text_overlay(edge_img, ["Edge Map"], 'bottom')
+    
+    # 3. Style generation result (bottom-left)
+    style_img = style_generated_image.resize((grid_size, grid_size))
+    
+    # Add metrics overlay
+    style_text = ["Style Generation"]
+    if style_metrics:
+        style_text.extend([
+            f"Time: {style_metrics.get('generation_time', 'N/A')}s",
+            f"EMD: {style_metrics.get('emd', 'N/A'):.4f}",
+            f"Cosine: {style_metrics.get('cosine', 'N/A'):.4f}"
+        ])
+    
+    add_text_overlay(style_img, style_text, 'bottom')
+    
+    # 4. EMD generation result (bottom-right)
+    emd_img = emd_generated_image.resize((grid_size, grid_size))
+    
+    # Add metrics overlay
+    emd_text = ["EMD Generation"]
+    if emd_metrics:
+        emd_text.extend([
+            f"Time: {emd_metrics.get('generation_time', 'N/A')}s",
+            f"EMD: {emd_metrics.get('emd', 'N/A'):.4f}",
+            f"Cosine: {emd_metrics.get('cosine', 'N/A'):.4f}",
+            f"Attempts: {emd_metrics.get('attempts', 'N/A')}"
+        ])
+    
+    add_text_overlay(emd_img, emd_text, 'bottom')
+    
+    # Paste all images into the main grid
+    main_grid.paste(color_combo, (0, 0))  # Top-left
+    main_grid.paste(edge_img, (grid_size, 0))  # Top-right
+    main_grid.paste(style_img, (0, grid_size))  # Bottom-left
+    main_grid.paste(emd_img, (grid_size, grid_size))  # Bottom-right
+    
+    return main_grid
+
+
+def create_generation_metrics(
+    generation_time: float,
+    emd_score: float,
+    cosine_score: float,
+    attempts: Optional[int] = None
+) -> Dict[str, Any]:
+    """
+    Create a metrics dictionary for generation visualization.
+    
+    Args:
+        generation_time: Time taken for generation in seconds
+        emd_score: EMD distance score
+        cosine_score: Cosine similarity score
+        attempts: Number of attempts (for EMD generation)
+        
+    Returns:
+        Dictionary with formatted metrics
+    """
+    metrics = {
+        'generation_time': f"{generation_time:.2f}",
+        'emd': emd_score,
+        'cosine': cosine_score
+    }
+    
+    if attempts is not None:
+        metrics['attempts'] = attempts
+    
+    return metrics

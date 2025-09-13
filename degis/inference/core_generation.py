@@ -59,7 +59,6 @@ class ImageGenerator:
         
     def generate(
         self,
-        color_embedding: torch.Tensor,
         control_image: Image.Image,
         prompt: str,
         negative_prompt: str = None,
@@ -67,6 +66,9 @@ class ImageGenerator:
         guidance_scale: float = 7.5,
         num_inference_steps: int = 30,
         controlnet_conditioning_scale: float = 1.0,
+        # Support both modes
+        color_embedding: torch.Tensor = None,
+        pil_image: Image.Image = None,
         **kwargs
     ) -> List[Image.Image]:
         """Generate images using the pipeline."""
@@ -75,18 +77,38 @@ class ImageGenerator:
         
         if self.ip_adapter is None:
             raise RuntimeError("Pipeline not set up. Call setup_pipeline() first.")
-            
-        return self.ip_adapter.generate(
-            clip_image_embeds=color_embedding,
-            prompt=prompt,
-            negative_prompt=negative_prompt,
-            num_samples=num_samples,
-            guidance_scale=guidance_scale,
-            num_inference_steps=num_inference_steps,
-            image=control_image,
-            controlnet_conditioning_scale=controlnet_conditioning_scale,
-            **kwargs
-        )
+        
+        # Mode detection
+        if pil_image is not None and color_embedding is not None:
+            raise ValueError("Provide either pil_image OR color_embedding, not both")
+        elif pil_image is not None:
+            # IP-Adapter mode: pass the image directly
+            return self.ip_adapter.generate(
+                pil_image=pil_image,
+                prompt=prompt,
+                negative_prompt=negative_prompt,
+                num_samples=num_samples,
+                guidance_scale=guidance_scale,
+                num_inference_steps=num_inference_steps,
+                image=control_image,
+                controlnet_conditioning_scale=controlnet_conditioning_scale,
+                **kwargs
+            )
+        elif color_embedding is not None:
+            # Pre-computed embedding mode
+            return self.ip_adapter.generate(
+                clip_image_embeds=color_embedding,
+                prompt=prompt,
+                negative_prompt=negative_prompt,
+                num_samples=num_samples,
+                guidance_scale=guidance_scale,
+                num_inference_steps=num_inference_steps,
+                image=control_image,
+                controlnet_conditioning_scale=controlnet_conditioning_scale,
+                **kwargs
+            )
+        else:
+            raise ValueError("Must provide either pil_image or color_embedding")
 
 
 class IPAdapterGenerator(ImageGenerator):

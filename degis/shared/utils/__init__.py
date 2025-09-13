@@ -7,7 +7,7 @@ Contains utility functions used by both training and inference modules.
 from .image_utils import create_control_edge_pil
 from .auto_setup import setup_environment, detect_environment, download_required_models, print_setup_summary
 from .model_downloader import download_ip_adapter_checkpoint, download_all_ip_adapter_models
-from .visualization import plot_color_palette, display_images_grid, display_comparison_grid, plot_training_curves
+from .visualization import plot_color_palette, display_images_grid, display_comparison_grid, plot_training_curves, visualize_generation_comparison, create_generation_metrics
 
 __all__ = [
     'create_control_edge_pil',
@@ -21,4 +21,6 @@ __all__ = [
     'display_images_grid',
     'display_comparison_grid',
     'plot_training_curves',
+    'visualize_generation_comparison',
+    'create_generation_metrics',
 ]

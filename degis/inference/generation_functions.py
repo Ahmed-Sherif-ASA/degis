@@ -1,8 +1,11 @@
 """
-EMD-Constrained Image Generation
+High-Level Generation Functions
 
-This module provides functions for generating images with Earth Mover's Distance (EMD) constraints
-on color histograms, supporting multiple color spaces (RGB, HCL, LAB).
+This module provides high-level generation functions with specific constraints:
+- Style-based generation using IP-Adapter
+- EMD-constrained color generation
+- Cosine similarity tracking
+- Multiple color space support (RGB, HCL, LAB)
 """
 
 import torch
@@ -14,6 +17,7 @@ import gc
 
 # Visualization functions moved to shared.utils.visualization
 from ..shared.image_features.color_histograms import compute_lab_histogram, compute_color_histogram, compute_hcl_histogram
+from ..shared.clip_vit_h14 import compute_clip_embedding
 
 
 def calculate_emd_distance_topk(
@@ -114,6 +118,48 @@ def compute_histogram_for_color_space(
         raise ValueError(f"Unsupported color space: {color_space}")
 
 
+def calculate_cosine_similarity(
+    prompt: str, 
+    image: Image.Image,
+    device: str = "cuda"
+) -> float:
+    """
+    Calculate cosine similarity between text prompt and image using CLIP.
+    
+    Args:
+        prompt: Text prompt
+        image: PIL Image
+        device: Device to run CLIP on
+        
+    Returns:
+        Cosine similarity score (0-1, higher is more similar)
+    """
+    try:
+        # Get text embedding
+        from ..shared.clip_vit_h14 import compute_clip_embedding, _ensure_model_loaded
+        _ensure_model_loaded()
+        
+        # Convert image to tensor and get embedding
+        image_tensor = compute_clip_embedding(image)
+        
+        # Get text embedding
+        from ..shared.clip_vit_h14 import clip_model, preprocess
+        text_tokens = clip_model.encode_text(prompt)
+        
+        # Normalize embeddings
+        image_embedding = image_tensor / image_tensor.norm(dim=-1, keepdim=True)
+        text_embedding = text_tokens / text_tokens.norm(dim=-1, keepdim=True)
+        
+        # Calculate cosine similarity
+        similarity = torch.cosine_similarity(image_embedding, text_embedding, dim=-1)
+        
+        return float(similarity.item())
+        
+    except Exception as e:
+        print(f"Warning: Could not calculate cosine similarity: {e}")
+        return 0.0
+
+
 def generate_from_dataset_id_xl_with_emd(
     colour_index: int,
     layout_index: int,
@@ -143,7 +189,7 @@ def generate_from_dataset_id_xl_with_emd(
     color_head=None,
     device=None,
     transforms=None,
-) -> Tuple[List[Image.Image], float, int]:
+) -> Tuple[List[Image.Image], float, float, int]:
     """
     Generate images using IP-Adapter XL with EMD constraint on color histogram values.
     
@@ -235,6 +281,7 @@ def generate_from_dataset_id_xl_with_emd(
     # EMD-constrained generation
     best_images = None
     best_emd = float("inf")
+    best_cosine_sim = 0.0
     attempts_made = 0
 
     for attempt in range(max_attempts):
@@ -265,6 +312,9 @@ def generate_from_dataset_id_xl_with_emd(
         emd_distance = calculate_emd_distance_topk(
             original_histogram, generated_hist, top_k=top_k, blur=blur
         )
+        
+        # Calculate cosine similarity between prompt and generated image
+        cosine_sim = calculate_cosine_similarity(prompt, images[0])
 
         attempts_made += 1
 
@@ -276,6 +326,7 @@ def generate_from_dataset_id_xl_with_emd(
         if emd_distance < best_emd:
             best_emd = emd_distance
             best_images = images
+            best_cosine_sim = cosine_sim
             if verbose:
                 print("  ← NEW BEST!")
         else:
@@ -292,16 +343,79 @@ def generate_from_dataset_id_xl_with_emd(
     if best_images and verbose:
         print(f"Generated {len(best_images)} images with EMD constraint")
         print(f"Best EMD distance: {best_emd:.4f}")
+        print(f"Best cosine similarity: {best_cosine_sim:.4f}")
         print(f"Attempts made: {attempts_made}")
 
         print(f"\n✓ Generation complete!")
         print(f"Best EMD achieved: {best_emd:.4f}")
+        print(f"Best cosine similarity: {best_cosine_sim:.4f}")
         print(f"Attempts made: {attempts_made}")
 
-    return best_images, best_emd, attempts_made
+    return best_images, best_emd, best_cosine_sim, attempts_made
 
 
-def generate_with_emd_constraint(
+def generate_by_style(
+    generator,
+    pil_image: Image.Image,
+    control_image: Image.Image,
+    prompt: str = "a beautiful image",
+    negative_prompt: str = None,
+    num_samples: int = 1,
+    guidance_scale: float = 7.5,
+    num_inference_steps: int = 30,
+    controlnet_conditioning_scale: float = 1.0,
+    attn_ip_scale: float = 1.0,
+    text_token_scale: float = 1.0,
+    ip_token_scale: Optional[float] = None,
+    ip_uncond_scale: float = 0.0,
+    zero_ip_in_uncond: bool = False,
+    **generation_kwargs
+) -> List[Image.Image]:
+    """
+    Generate images by style using IP-Adapter with direct PIL image input.
+    
+    This function uses IP-Adapter's direct image encoding for style transfer.
+    The IP-Adapter will encode the provided PIL image and use it for generation.
+    
+    Args:
+        generator: DEGIS generator instance
+        pil_image: PIL Image for style reference (IP-Adapter will encode this)
+        control_image: Control image for layout/edge control
+        prompt: Text prompt for generation
+        negative_prompt: Negative text prompt
+        num_samples: Number of images to generate
+        guidance_scale: Guidance scale for generation
+        num_inference_steps: Number of inference steps
+        controlnet_conditioning_scale: ControlNet conditioning scale
+        attn_ip_scale: IP attention scale
+        text_token_scale: Text token scale
+        ip_token_scale: IP token scale
+        ip_uncond_scale: IP unconditional scale
+        zero_ip_in_uncond: Zero IP in unconditional
+        **generation_kwargs: Additional generation parameters
+        
+    Returns:
+        List of generated PIL Images
+    """
+    return generator.generate(
+        control_image=control_image,
+        prompt=prompt,
+        negative_prompt=negative_prompt,
+        num_samples=num_samples,
+        guidance_scale=guidance_scale,
+        num_inference_steps=num_inference_steps,
+        controlnet_conditioning_scale=controlnet_conditioning_scale,
+        attn_ip_scale=attn_ip_scale,
+        text_token_scale=text_token_scale,
+        ip_token_scale=ip_token_scale,
+        ip_uncond_scale=ip_uncond_scale,
+        zero_ip_in_uncond=zero_ip_in_uncond,
+        pil_image=pil_image,  # Pass as pil_image to generator
+        **generation_kwargs
+    )
+
+
+def generate_by_colour_emd_constrained(
     generator,
     color_embedding: torch.Tensor,
     control_image: Image.Image,
@@ -312,42 +426,48 @@ def generate_with_emd_constraint(
     top_k: int = 20,
     color_space: Optional[str] = None,
     **generation_kwargs
-) -> Tuple[List[Image.Image], float, int]:
+) -> Tuple[List[Image.Image], float, float, int]:
     """
-    Generate images with EMD constraint using pre-computed embeddings and control image.
+    Generate images with EMD constraint on color histograms using pre-computed color embeddings.
     
-    This is a more flexible version that works with pre-computed components.
+    This function generates images that match a target color histogram using Earth Mover's Distance (EMD)
+    as a constraint. It uses pre-computed color embeddings and includes cosine similarity tracking
+    between the prompt and generated images.
     
     Args:
         generator: DEGIS generator instance
-        color_embedding: Pre-computed color embedding
-        control_image: Control image for layout
-        original_histogram: Original histogram for EMD comparison
+        color_embedding: Pre-computed color embedding from trained color head
+        control_image: Control image for layout/edge control
+        original_histogram: Target histogram for EMD comparison (RGB, HCL, or LAB)
         prompt: Text prompt for generation
-        target_emd_threshold: Target EMD threshold
-        max_attempts: Maximum number of attempts
-        top_k: Number of top histogram values for EMD
+        target_emd_threshold: Target EMD threshold (stop when reached)
+        max_attempts: Maximum number of generation attempts
+        top_k: Number of top histogram values for EMD calculation
         color_space: Color space ('rgb', 'hcl', 'lab') - auto-detect if None
         **generation_kwargs: Additional generation parameters
         
     Returns:
-        Tuple of (best_images, best_emd, attempts_made)
+        Tuple of (best_images, best_emd, best_cosine_sim, attempts_made)
     """
     # Auto-detect color space if not provided
     if color_space is None:
         color_space = detect_color_space(original_histogram)
     
+    print(f"🎨 EMD-constrained generation: Using pre-computed color embedding")
+    print(f"📊 Color space: {color_space}, Target EMD: {target_emd_threshold}")
+    
     # EMD-constrained generation
     best_images = None
     best_emd = float("inf")
+    best_cosine_sim = 0.0
     attempts_made = 0
 
     for attempt in range(max_attempts):
-        # Generate images
+        # Generate images using pre-computed color embedding
         images = generator.generate(
-            color_embedding=color_embedding,
             control_image=control_image,
             prompt=prompt,
+            color_embedding=color_embedding,
             **generation_kwargs
         )
 
@@ -356,19 +476,24 @@ def generate_with_emd_constraint(
         emd_distance = calculate_emd_distance_topk(
             original_histogram, generated_hist, top_k=top_k
         )
+        
+        # Calculate cosine similarity between prompt and generated image
+        cosine_sim = calculate_cosine_similarity(prompt, images[0])
 
         attempts_made += 1
 
-        # Check if this is the best result so far
+        # Check if this is the best result so far (based on EMD)
         if emd_distance < best_emd:
             best_emd = emd_distance
             best_images = images
+            best_cosine_sim = cosine_sim
+            best_cosine_sim = cosine_sim
 
         # Check if we've reached the target threshold
         if emd_distance <= target_emd_threshold:
             break
 
-    return best_images, best_emd, attempts_made
+    return best_images, best_emd, best_cosine_sim, attempts_made
 
 
 def generate_with_images_and_emd(
@@ -394,7 +519,7 @@ def generate_with_images_and_emd(
     generator=None,
     color_head=None,
     device=None,
-) -> Tuple[List[Image.Image], float, int]:
+) -> Tuple[List[Image.Image], float, float, int]:
     """
     Generate images with EMD constraint using specific images (much cleaner approach).
     
@@ -413,7 +538,7 @@ def generate_with_images_and_emd(
         device: Device to use
         
     Returns:
-        Tuple of (best_images, best_emd, attempts_made)
+        Tuple of (best_images, best_emd, best_cosine_sim, attempts_made)
     """
     # Clear GPU memory
     gc.collect()
@@ -450,6 +575,7 @@ def generate_with_images_and_emd(
     # EMD-constrained generation
     best_images = None
     best_emd = float("inf")
+    best_cosine_sim = 0.0
     attempts_made = 0
 
     for attempt in range(max_attempts):
@@ -480,6 +606,9 @@ def generate_with_images_and_emd(
         emd_distance = calculate_emd_distance_topk(
             original_histogram, generated_hist, top_k=top_k, blur=blur
         )
+        
+        # Calculate cosine similarity between prompt and generated image
+        cosine_sim = calculate_cosine_similarity(prompt, images[0])
 
         attempts_made += 1
 
@@ -491,6 +620,7 @@ def generate_with_images_and_emd(
         if emd_distance < best_emd:
             best_emd = emd_distance
             best_images = images
+            best_cosine_sim = cosine_sim
             if verbose:
                 print("  ← NEW BEST!")
         else:
@@ -507,7 +637,8 @@ def generate_with_images_and_emd(
     if best_images and verbose:
         print(f"Generated {len(best_images)} images with EMD constraint")
         print(f"Best EMD distance: {best_emd:.4f}")
+        print(f"Best cosine similarity: {best_cosine_sim:.4f}")
         print(f"Attempts made: {attempts_made}")
         print(f"\n✓ Generation complete!")
 
-    return best_images, best_emd, attempts_made
+    return best_images, best_emd, best_cosine_sim, attempts_made
