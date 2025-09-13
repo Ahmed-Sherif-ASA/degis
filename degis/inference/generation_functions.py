@@ -134,51 +134,78 @@ def calculate_cosine_similarity(
     Returns:
         Cosine similarity score (0-1, higher is more similar)
     """
+    print(f"\n=== DEBUGGING COSINE SIMILARITY ===")
+    print(f"Prompt: '{prompt}'")
+    print(f"Image size: {image.size}")
+    print(f"Device: {device}")
+    
     try:
         # Import and ensure model is loaded
         from ..shared.clip_vit_h14 import _ensure_model_loaded, clip_model, preprocess
         import open_clip
         import torch
         
+        print(f"Before model loading - clip_model: {clip_model is not None}, preprocess: {preprocess is not None}")
+        
         # Convert device string to torch.device
         device_obj = torch.device(device)
+        print(f"Device object: {device_obj}")
         
         _ensure_model_loaded()
         
-        # Re-import preprocess after model loading to ensure we get the updated global
-        from ..shared.clip_vit_h14 import preprocess as current_preprocess
+        # Re-import everything after model loading
+        from ..shared.clip_vit_h14 import clip_model as current_clip_model, preprocess as current_preprocess
         
-        # Verify preprocess is loaded
+        print(f"After model loading - clip_model: {current_clip_model is not None}, preprocess: {current_preprocess is not None}")
+        
+        # Verify both are loaded
         if current_preprocess is None:
-            print("Error: preprocess is None after model loading")
+            print("ERROR: preprocess is None after model loading")
+            return 0.0
+            
+        if current_clip_model is None:
+            print("ERROR: clip_model is None after model loading")
             return 0.0
         
-        # Use the current preprocess
+        # Use the current functions
         preprocess = current_preprocess
+        clip_model = current_clip_model
+        
+        print(f"Using - clip_model: {clip_model is not None}, preprocess: {preprocess is not None}")
         
         # Convert PIL Image to tensor (preprocess returns [C,H,W])
+        print("Converting image to tensor...")
         image_tensor = preprocess(image).to(device_obj)  # [3,H,W]
         print(f"Debug: PIL image converted to tensor shape: {image_tensor.shape}, device: {image_tensor.device}")
         
         # Get image embedding (compute_clip_embedding expects [C,H,W] and adds batch dim internally)
+        print("Getting image embedding...")
         image_embedding = compute_clip_embedding(image_tensor)
         print(f"Debug: image_embedding shape: {image_embedding.shape}, device: {image_embedding.device}")
         
         # Get text embedding - need to tokenize first
+        print("Tokenizing text...")
         text_tokens = open_clip.tokenize(prompt).to(device_obj)
         print(f"Debug: text_tokens shape: {text_tokens.shape}, device: {text_tokens.device}")
         
+        print("Encoding text...")
+        print(f"clip_model type: {type(clip_model)}")
+        print(f"clip_model has encode_text: {hasattr(clip_model, 'encode_text')}")
+        
         with torch.no_grad():
             if device_obj.type == "cuda":
+                print("Using CUDA autocast...")
                 with torch.cuda.amp.autocast():
                     text_embedding = clip_model.encode_text(text_tokens)
             else:
+                print("Using CPU...")
                 text_embedding = clip_model.encode_text(text_tokens)
         
         print(f"Debug: text_embedding shape: {text_embedding.shape}, device: {text_embedding.device}")
         
         # Ensure both embeddings are on the same device
         if image_embedding.device != text_embedding.device:
+            print("Moving text embedding to match image embedding device...")
             text_embedding = text_embedding.to(image_embedding.device)
         
         # Ensure both are 2D tensors [1, embedding_dim]
@@ -190,21 +217,25 @@ def calculate_cosine_similarity(
         print(f"Debug: After unsqueeze - image: {image_embedding.shape}, text: {text_embedding.shape}")
         
         # Normalize embeddings
+        print("Normalizing embeddings...")
         image_embedding = image_embedding / image_embedding.norm(dim=-1, keepdim=True)
         text_embedding = text_embedding / text_embedding.norm(dim=-1, keepdim=True)
         
         print(f"Debug: After normalization - image: {image_embedding.shape}, text: {text_embedding.shape}")
         
         # Calculate cosine similarity
+        print("Calculating cosine similarity...")
         similarity = torch.cosine_similarity(image_embedding, text_embedding, dim=-1)
         
         print(f"Debug: Cosine similarity result: {similarity.item()}")
+        print(f"=== END COSINE SIMILARITY DEBUG ===\n")
         return float(similarity.item())
         
     except Exception as e:
-        print(f"Warning: Could not calculate cosine similarity: {e}")
+        print(f"ERROR in cosine similarity calculation: {e}")
         import traceback
         traceback.print_exc()
+        print(f"=== END COSINE SIMILARITY DEBUG (ERROR) ===\n")
         return 0.0
 
 
