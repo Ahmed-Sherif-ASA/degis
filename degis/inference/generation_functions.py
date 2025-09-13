@@ -344,9 +344,6 @@ def generate_from_dataset_id_xl_with_emd(
             ip_token_scale=ip_token_scale,
             ip_uncond_scale=ip_uncond_scale,
             zero_ip_in_uncond=zero_ip_in_uncond,
-            # Disable progress bars for cleaner output
-            callback_on_step_end=None,
-            show_progress_bar=False,
         )
 
         # Calculate histogram for generated image using detected color space
@@ -513,9 +510,6 @@ def generate_by_colour_emd_constrained(
             control_image=control_image,
             prompt=prompt,
             color_embedding=color_embedding,
-            # Disable progress bars for cleaner output
-            callback_on_step_end=None,
-            show_progress_bar=False,
             **generation_kwargs
         )
 
@@ -646,9 +640,6 @@ def generate_with_images_and_emd(
             ip_token_scale=ip_token_scale,
             ip_uncond_scale=ip_uncond_scale,
             zero_ip_in_uncond=zero_ip_in_uncond,
-            # Disable progress bars for cleaner output
-            callback_on_step_end=None,
-            show_progress_bar=False,
         )
 
         # Calculate histogram for generated image
