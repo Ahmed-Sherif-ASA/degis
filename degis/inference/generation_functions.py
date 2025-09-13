@@ -138,6 +138,10 @@ def calculate_cosine_similarity(
         # Import and ensure model is loaded
         from ..shared.clip_vit_h14 import _ensure_model_loaded, clip_model, preprocess
         import open_clip
+        import torch
+        
+        # Convert device string to torch.device
+        device_obj = torch.device(device)
         
         _ensure_model_loaded()
         
@@ -147,7 +151,7 @@ def calculate_cosine_similarity(
             return 0.0
         
         # Convert PIL Image to tensor (preprocess returns [C,H,W])
-        image_tensor = preprocess(image).to(device)  # [3,H,W]
+        image_tensor = preprocess(image).to(device_obj)  # [3,H,W]
         print(f"Debug: PIL image converted to tensor shape: {image_tensor.shape}, device: {image_tensor.device}")
         
         # Get image embedding (compute_clip_embedding expects [C,H,W] and adds batch dim internally)
@@ -155,11 +159,11 @@ def calculate_cosine_similarity(
         print(f"Debug: image_embedding shape: {image_embedding.shape}, device: {image_embedding.device}")
         
         # Get text embedding - need to tokenize first
-        text_tokens = open_clip.tokenize(prompt).to(device)
+        text_tokens = open_clip.tokenize(prompt).to(device_obj)
         print(f"Debug: text_tokens shape: {text_tokens.shape}, device: {text_tokens.device}")
         
         with torch.no_grad():
-            if device.type == "cuda":
+            if device_obj.type == "cuda":
                 with torch.cuda.amp.autocast():
                     text_embedding = clip_model.encode_text(text_tokens)
             else:

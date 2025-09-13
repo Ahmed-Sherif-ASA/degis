@@ -40,6 +40,8 @@ def _ensure_model_loaded():
         except Exception as e:
             print(f"Error loading CLIP model: {e}")
             raise
+    else:
+        print(f"CLIP model already loaded. Preprocess: {preprocess is not None}")
 
 
 # features/clip_embeddings.py
