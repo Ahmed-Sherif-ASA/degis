@@ -22,9 +22,7 @@ python -m degis.training.cli.train --help
 ## 📖 Documentation
 
 - **[Setup Guide](docs/SETUP_GUIDE.md)** - Detailed installation and configuration
-- **[Package Documentation](docs/README_PACKAGE.md)** - Complete API reference
 - **[Training & Inference Workflow](docs/training_inference_workflow.md)** - How to use DEGIS
-- **[IP-Adapter Changes](docs/DEGIS_IP_ADAPTER_CHANGES.md)** - Technical modifications
 - **[IP-Adapter Patch](docs/IP_ADAPTER_PATCH_README.md)** - Patch implementation details
 
 ## 🎯 Key Features
