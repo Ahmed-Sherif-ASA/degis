@@ -450,9 +450,6 @@ def generate_by_style(
         ip_uncond_scale=ip_uncond_scale,
         zero_ip_in_uncond=zero_ip_in_uncond,
         pil_image=pil_image,  # Pass as pil_image to generator
-        # Disable progress bars for cleaner output
-        callback_on_step_end=None,
-        show_progress_bar=False,
         **generation_kwargs
     )
 
