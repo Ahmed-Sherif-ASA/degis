@@ -173,7 +173,7 @@ def calculate_cosine_similarity(
         
         with torch.no_grad():
             if device_obj.type == "cuda":
-                with torch.cuda.amp.autocast():
+                with torch.amp.autocast('cuda'):
                     text_embedding = clip_model.encode_text(text_tokens)
             else:
                 text_embedding = clip_model.encode_text(text_tokens)
@@ -308,13 +308,10 @@ def generate_from_dataset_id_xl_with_emd(
         color_space = detect_color_space(original_histogram)
     
     if verbose:
-        print(f"Generating with EMD constraint (target: {target_emd_threshold:.3f})")
-        print(f"Prompt: '{prompt}'")
-        print(f"Max attempts: {max_attempts}")
-        print(f"EMD calculation: top-{top_k} histogram values, color_space={color_space}")
-        print("-" * 80)
-        print(f"{'Attempt':<8} {'EMD':<10} {'attn_ip_scale':<15} {'ip_token_scale':<15} {'guidance_scale':<15}")
-        print("-" * 80)
+        print(f"🎨 Generating image with EMD constraint (target: {target_emd_threshold:.3f})")
+        print(f"📝 Prompt: '{prompt}'")
+        print(f"🔄 Max attempts: {max_attempts}")
+        print("-" * 60)
 
     # Create control image from edge data
     from ..shared.utils.image_utils import create_control_edge_pil
@@ -347,6 +344,9 @@ def generate_from_dataset_id_xl_with_emd(
             ip_token_scale=ip_token_scale,
             ip_uncond_scale=ip_uncond_scale,
             zero_ip_in_uncond=zero_ip_in_uncond,
+            # Disable progress bars for cleaner output
+            callback_on_step_end=None,
+            show_progress_bar=False,
         )
 
         # Calculate histogram for generated image using detected color space
@@ -361,8 +361,8 @@ def generate_from_dataset_id_xl_with_emd(
         attempts_made += 1
 
         # Structured logging
-        if verbose:
-            print(f"{attempt+1:<8} {emd_distance:<10.4f} {attn_ip_scale:<15.3f} {ip_token_scale or 0:<15.3f} {guidance_scale:<15.3f}", end="")
+        if verbose and attempt % 5 == 0:  # Only log every 5th attempt
+            print(f"  Attempt {attempt+1}/{max_attempts}: EMD={emd_distance:.4f}", end="")
 
         # Check if this is the best result so far
         if emd_distance < best_emd:
@@ -453,6 +453,9 @@ def generate_by_style(
         ip_uncond_scale=ip_uncond_scale,
         zero_ip_in_uncond=zero_ip_in_uncond,
         pil_image=pil_image,  # Pass as pil_image to generator
+        # Disable progress bars for cleaner output
+        callback_on_step_end=None,
+        show_progress_bar=False,
         **generation_kwargs
     )
 
@@ -510,6 +513,9 @@ def generate_by_colour_emd_constrained(
             control_image=control_image,
             prompt=prompt,
             color_embedding=color_embedding,
+            # Disable progress bars for cleaner output
+            callback_on_step_end=None,
+            show_progress_bar=False,
             **generation_kwargs
         )
 
@@ -608,13 +614,10 @@ def generate_with_images_and_emd(
         color_space = detect_color_space(original_histogram)
     
     if verbose:
-        print(f"Generating with EMD constraint (target: {target_emd_threshold:.3f})")
-        print(f"Prompt: '{prompt}'")
-        print(f"Max attempts: {max_attempts}")
-        print(f"EMD calculation: top-{top_k} histogram values, color_space={color_space}")
-        print("-" * 80)
-        print(f"{'Attempt':<8} {'EMD':<10} {'attn_ip_scale':<15} {'ip_token_scale':<15} {'guidance_scale':<15}")
-        print("-" * 80)
+        print(f"🎨 Generating image with EMD constraint (target: {target_emd_threshold:.3f})")
+        print(f"📝 Prompt: '{prompt}'")
+        print(f"🔄 Max attempts: {max_attempts}")
+        print("-" * 60)
 
     # EMD-constrained generation
     best_images = None
@@ -643,6 +646,9 @@ def generate_with_images_and_emd(
             ip_token_scale=ip_token_scale,
             ip_uncond_scale=ip_uncond_scale,
             zero_ip_in_uncond=zero_ip_in_uncond,
+            # Disable progress bars for cleaner output
+            callback_on_step_end=None,
+            show_progress_bar=False,
         )
 
         # Calculate histogram for generated image
@@ -657,8 +663,8 @@ def generate_with_images_and_emd(
         attempts_made += 1
 
         # Structured logging
-        if verbose:
-            print(f"{attempt+1:<8} {emd_distance:<10.4f} {attn_ip_scale:<15.3f} {ip_token_scale or 0:<15.3f} {guidance_scale:<15.3f}", end="")
+        if verbose and attempt % 5 == 0:  # Only log every 5th attempt
+            print(f"  Attempt {attempt+1}/{max_attempts}: EMD={emd_distance:.4f}", end="")
 
         # Check if this is the best result so far
         if emd_distance < best_emd:
