@@ -348,150 +348,117 @@ def visualize_generation_comparison(
     style_metrics: Optional[Dict[str, Any]] = None,
     emd_metrics: Optional[Dict[str, Any]] = None,
     grid_size: int = 512,
-    font_size: int = 16
+    font_size: int = 12
 ) -> Image.Image:
     """
-    Create a comprehensive visualization row showing generation comparison.
+    Create a simple matplotlib-based visualization row showing generation comparison.
+    Matches the clean style from the user's example.
     
     Row layout (left to right):
     1. Color source image + top 20 histogram bins
-    2. Edge map image
+    2. Edge map image  
     3. Style generation result + metrics
     4. EMD generation result + metrics
-    
-    Args:
-        color_source_image: Source image for color reference
-        edge_map_image: Edge map for layout control
-        style_generated_image: Image from generate_by_style
-        emd_generated_image: Image from generate_by_colour_emd_constrained
-        color_histogram: Target color histogram
-        color_space: Color space used ('rgb', 'lab', 'hcl')
-        style_metrics: Dict with 'generation_time', 'emd', 'cosine' for style generation
-        emd_metrics: Dict with 'generation_time', 'emd', 'cosine', 'attempts' for EMD generation
-        grid_size: Size for each grid cell
-        font_size: Font size for text overlays
-        
-    Returns:
-        PIL Image containing the complete visualization row
     """
-    # Create the main row (1x4)
-    main_row_width = grid_size * 4
-    main_row_height = grid_size + 100  # Extra space for histogram
-    main_row = Image.new('RGB', (main_row_width, main_row_height), color='white')
+    import matplotlib.pyplot as plt
+    from skimage.color import lab2rgb
     
-    # Helper function to add text overlay
-    def add_text_overlay(img, text_lines, position='bottom'):
-        """Add text overlay to an image."""
-        draw = ImageDraw.Draw(img)
-        
-        # Try to use a default font, fallback to basic if not available
-        try:
-            font = ImageFont.truetype("/System/Library/Fonts/Arial.ttf", font_size)
-        except:
-            try:
-                font = ImageFont.load_default()
-            except:
-                font = None
-        
-        # Calculate text position
-        if position == 'bottom':
-            y_start = img.height - (len(text_lines) * (font_size + 5)) - 10
+    # Helper function to get top palette colors (from user's example)
+    def _top_palette(vec, bins=8, top_k=20, space=color_space, c_max=150.0):
+        v = vec.detach().cpu().numpy() if isinstance(vec, torch.Tensor) else np.asarray(vec)
+        core = v[:bins**3]  # ignore the last 2 BW slots for palette picking
+        idxs = np.argsort(core)[-top_k:][::-1]
+        cols = []
+        if space == "rgb":
+            for flat in idxs:
+                ri = flat // (bins*bins); gi = (flat // bins) % bins; bi = flat % bins
+                cols.append(((ri+0.5)/bins, (gi+0.5)/bins, (bi+0.5)/bins))
+        elif space == "lab":
+            for flat in idxs:
+                Li = flat // (bins*bins); ai = (flat // bins) % bins; bi = flat % bins
+                L = (Li+0.5)/bins*100.0
+                a = (ai+0.5)/bins*255.0 - 128.0
+                b = (bi+0.5)/bins*255.0 - 128.0
+                cols.append(tuple(lab2rgb(np.array([[[L,a,b]]]))[0,0]))
+        elif space == "hcl":
+            for flat in idxs:
+                Li = flat // (bins*bins); Ci = (flat // bins) % bins; Hi = flat % bins
+                L = (Li+0.5)/bins*100.0
+                C = (Ci+0.5)/bins*c_max
+                H = (Hi+0.5)/bins*360.0
+                a = C*np.cos(np.deg2rad(H)); b = C*np.sin(np.deg2rad(H))
+                cols.append(tuple(lab2rgb(np.array([[[L,a,b]]]))[0,0]))
         else:
-            y_start = 10
-            
-        for i, line in enumerate(text_lines):
-            y_pos = y_start + i * (font_size + 5)
-            draw.text((10, y_pos), line, fill='black', font=font)
+            raise ValueError("space must be 'rgb' | 'lab' | 'hcl'")
+        return cols, core[idxs]
     
-    # Helper function to create histogram visualization
-    def create_histogram_viz(histogram, color_space, top_k=20):
-        """Create a simple histogram visualization."""
-        # Get top-k values
-        top_indices = np.argsort(histogram)[-top_k:]
-        top_values = histogram[top_indices]
-        
-        # Create a simple bar chart
-        hist_img = Image.new('RGB', (grid_size, 100), color='white')
-        draw = ImageDraw.Draw(hist_img)
-        
-        # Draw bars
-        bar_width = grid_size // top_k
-        max_val = np.max(top_values)
-        
-        for i, (idx, val) in enumerate(zip(top_indices, top_values)):
-            x1 = i * bar_width
-            x2 = (i + 1) * bar_width - 2
-            height = int((val / max_val) * 80)
-            y1 = 90 - height
-            y2 = 90
-            
-            # Color based on color space
-            if color_space == 'rgb':
-                # Convert index to RGB
-                r = (idx // 64) * 64
-                g = ((idx % 64) // 8) * 8
-                b = (idx % 8) * 32
-                color = (r, g, b)
-            else:
-                # For LAB/HCL, use grayscale
-                color = (128, 128, 128)
-            
-            draw.rectangle([x1, y1, x2, y2], fill=color)
-        
-        return hist_img
+    # Helper function to plot palette (from user's example)
+    def _plot_palette(ax, colors, values, title):
+        for i, (c, v) in enumerate(zip(colors, values)):
+            ax.add_patch(plt.Rectangle((i, 0), 1, 1, color=c))
+            ax.text(i+0.5, -0.08, f"{v:.3f}", ha="center", va="top", fontsize=7)
+        ax.set_xlim(0, len(colors)); ax.set_ylim(0,1); ax.axis("off")
+        ax.set_title(title, fontsize=12)
+    
+    # Create figure with 1x4 layout
+    fig, axes = plt.subplots(1, 4, figsize=(16, 4))
+    
+    # Convert PIL images to numpy arrays
+    color_np = np.array(color_source_image.resize((grid_size, grid_size)))
+    edge_np = np.array(edge_map_image.resize((grid_size, grid_size)))
+    style_np = np.array(style_generated_image.resize((grid_size, grid_size)))
+    emd_np = np.array(emd_generated_image.resize((grid_size, grid_size)))
     
     # 1. Color source image + histogram (leftmost)
-    color_img = color_source_image.resize((grid_size, grid_size))
-    hist_viz = create_histogram_viz(color_histogram, color_space)
+    axes[0].imshow(color_np)
+    axes[0].axis("off")
+    axes[0].set_title(f"Color Source ({color_space.upper()})", fontsize=font_size)
     
-    # Combine color image and histogram
-    color_combo = Image.new('RGB', (grid_size, grid_size + 100), color='white')
-    color_combo.paste(color_img, (0, 0))
-    color_combo.paste(hist_viz, (0, grid_size))
-    
-    # Add labels
-    add_text_overlay(color_combo, [f"Color Source ({color_space.upper()})", f"Top 20 bins"], 'bottom')
+    # Add histogram below
+    hist_cols, hist_vals = _top_palette(color_histogram, top_k=20)
+    _plot_palette(axes[0], hist_cols, hist_vals, f"Top 20 bins")
     
     # 2. Edge map image (second from left)
-    edge_img = edge_map_image.resize((grid_size, grid_size))
-    add_text_overlay(edge_img, ["Edge Map"], 'bottom')
+    axes[1].imshow(edge_np, cmap='gray')
+    axes[1].axis("off")
+    axes[1].set_title("Edge Map", fontsize=font_size)
     
     # 3. Style generation result (third from left)
-    style_img = style_generated_image.resize((grid_size, grid_size))
+    axes[2].imshow(style_np)
+    axes[2].axis("off")
     
-    # Add metrics overlay
-    style_text = ["Style Generation"]
+    # Add metrics text (simple, like user's example)
+    style_text = "Style Generation"
     if style_metrics:
-        style_text.extend([
-            f"Time: {style_metrics.get('generation_time', 'N/A')}s",
-            f"EMD: {style_metrics.get('emd', 'N/A'):.4f}",
-            f"Cosine: {style_metrics.get('cosine', 'N/A'):.4f}"
-        ])
-    
-    add_text_overlay(style_img, style_text, 'bottom')
+        style_text += f"\nTime: {style_metrics.get('generation_time', 'N/A')}s"
+        style_text += f"\nEMD: {style_metrics.get('emd', 'N/A'):.4f}"
+        style_text += f"\nCosine: {style_metrics.get('cosine', 'N/A'):.4f}"
+    axes[2].set_title(style_text, fontsize=font_size)
     
     # 4. EMD generation result (rightmost)
-    emd_img = emd_generated_image.resize((grid_size, grid_size))
+    axes[3].imshow(emd_np)
+    axes[3].axis("off")
     
-    # Add metrics overlay
-    emd_text = ["EMD Generation"]
+    # Add metrics text (simple, like user's example)
+    emd_text = "EMD Generation"
     if emd_metrics:
-        emd_text.extend([
-            f"Time: {emd_metrics.get('generation_time', 'N/A')}s",
-            f"EMD: {emd_metrics.get('emd', 'N/A'):.4f}",
-            f"Cosine: {emd_metrics.get('cosine', 'N/A'):.4f}",
-            f"Attempts: {emd_metrics.get('attempts', 'N/A')}"
-        ])
+        emd_text += f"\nTime: {emd_metrics.get('generation_time', 'N/A')}s"
+        emd_text += f"\nEMD: {emd_metrics.get('emd', 'N/A'):.4f}"
+        emd_text += f"\nCosine: {emd_metrics.get('cosine', 'N/A'):.4f}"
+        emd_text += f"\nAttempts: {emd_metrics.get('attempts', 'N/A')}"
+    axes[3].set_title(emd_text, fontsize=font_size)
     
-    add_text_overlay(emd_img, emd_text, 'bottom')
+    plt.tight_layout()
     
-    # Paste all images into the main row (left to right)
-    main_row.paste(color_combo, (0, 0))  # Leftmost
-    main_row.paste(edge_img, (grid_size, 0))  # Second
-    main_row.paste(style_img, (grid_size * 2, 0))  # Third
-    main_row.paste(emd_img, (grid_size * 3, 0))  # Rightmost
+    # Convert matplotlib figure to PIL Image
+    import io
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', dpi=150, bbox_inches='tight')
+    buf.seek(0)
+    pil_img = Image.open(buf)
+    plt.close()
     
-    return main_row
+    return pil_img
 
 
 def create_generation_metrics(

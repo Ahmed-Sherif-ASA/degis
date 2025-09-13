@@ -146,6 +146,16 @@ def calculate_cosine_similarity(
         from ..shared.clip_vit_h14 import clip_model, preprocess
         text_tokens = clip_model.encode_text(prompt)
         
+        # Ensure both embeddings are on the same device and have the same shape
+        if image_tensor.device != text_tokens.device:
+            text_tokens = text_tokens.to(image_tensor.device)
+        
+        # Ensure both are 2D tensors [1, embedding_dim]
+        if image_tensor.dim() == 1:
+            image_tensor = image_tensor.unsqueeze(0)
+        if text_tokens.dim() == 1:
+            text_tokens = text_tokens.unsqueeze(0)
+        
         # Normalize embeddings
         image_embedding = image_tensor / image_tensor.norm(dim=-1, keepdim=True)
         text_embedding = text_tokens / text_tokens.norm(dim=-1, keepdim=True)
