@@ -347,8 +347,9 @@ def visualize_generation_comparison(
     color_space: str = "lab",
     style_metrics: Optional[Dict[str, Any]] = None,
     emd_metrics: Optional[Dict[str, Any]] = None,
-    grid_size: int = 512,
-    font_size: int = 12
+    grid_size: int = 256,
+    font_size: int = 10,
+    figsize: Tuple[int, int] = (12, 6)
 ) -> Image.Image:
     """
     Create a simple matplotlib-based visualization row showing generation comparison.
@@ -402,7 +403,7 @@ def visualize_generation_comparison(
         ax.set_title(title, fontsize=12)
     
     # Create figure with 2x3 layout
-    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+    fig, axes = plt.subplots(2, 3, figsize=figsize)
     
     # Convert PIL images to numpy arrays
     color_np = np.array(color_source_image.resize((grid_size, grid_size)))

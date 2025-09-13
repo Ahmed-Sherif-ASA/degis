@@ -418,6 +418,8 @@ class IPAdapter:
             guidance_scale=guidance_scale,
             num_inference_steps=num_inference_steps,
             generator=generator,
+            callback_on_step_end=None,
+            show_progress_bar=False,
             **kwargs,
         ).images
 
@@ -565,6 +567,8 @@ class IPAdapterXL(IPAdapter):
             guidance_scale=guidance_scale,
             num_inference_steps=num_inference_steps,
             generator=self.generator,
+            callback_on_step_end=None,
+            show_progress_bar=False,
             **kwargs,
         ).images
 
@@ -762,6 +766,8 @@ class IPAdapterPlusXL(IPAdapter):
             guidance_scale=guidance_scale,
             num_inference_steps=num_inference_steps,
             generator=generator,
+            callback_on_step_end=None,
+            show_progress_bar=False,
             **kwargs,
         ).images
 
