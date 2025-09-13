@@ -22,17 +22,24 @@ def _ensure_model_loaded():
     global clip_model, preprocess
     
     if clip_model is None:
-        clip_model, _, preprocess = open_clip.create_model_and_transforms(
-            model_name=model_name,
-            pretrained=pretrained,
-            cache_dir=MODEL_CACHE,
-        )
+        print("Loading CLIP model...")
+        try:
+            clip_model, _, preprocess = open_clip.create_model_and_transforms(
+                model_name=model_name,
+                pretrained=pretrained,
+                cache_dir=MODEL_CACHE,
+            )
+            print(f"CLIP model loaded successfully. Preprocess: {preprocess is not None}")
 
-        # half precision only on CUDA
-        clip_model = clip_model.to(device)
-        if device.type == "cuda":
-            clip_model = clip_model.half()
-        clip_model.eval()
+            # half precision only on CUDA
+            clip_model = clip_model.to(device)
+            if device.type == "cuda":
+                clip_model = clip_model.half()
+            clip_model.eval()
+            print("CLIP model ready for inference")
+        except Exception as e:
+            print(f"Error loading CLIP model: {e}")
+            raise
 
 
 # features/clip_embeddings.py

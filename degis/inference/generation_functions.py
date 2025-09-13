@@ -135,38 +135,66 @@ def calculate_cosine_similarity(
         Cosine similarity score (0-1, higher is more similar)
     """
     try:
-        # Get text embedding
-        from ..shared.clip_vit_h14 import compute_clip_embedding, _ensure_model_loaded
+        # Import and ensure model is loaded
+        from ..shared.clip_vit_h14 import _ensure_model_loaded, clip_model, preprocess
+        import open_clip
+        
         _ensure_model_loaded()
         
-        # Convert image to tensor and get embedding
-        image_tensor = compute_clip_embedding(image)
+        # Verify preprocess is loaded
+        if preprocess is None:
+            print("Error: preprocess is None after model loading")
+            return 0.0
         
-        # Get text embedding
-        from ..shared.clip_vit_h14 import clip_model, preprocess
-        text_tokens = clip_model.encode_text(prompt)
+        # Convert PIL Image to tensor (preprocess returns [C,H,W])
+        image_tensor = preprocess(image).to(device)  # [3,H,W]
+        print(f"Debug: PIL image converted to tensor shape: {image_tensor.shape}, device: {image_tensor.device}")
         
-        # Ensure both embeddings are on the same device and have the same shape
-        if image_tensor.device != text_tokens.device:
-            text_tokens = text_tokens.to(image_tensor.device)
+        # Get image embedding (compute_clip_embedding expects [C,H,W] and adds batch dim internally)
+        image_embedding = compute_clip_embedding(image_tensor)
+        print(f"Debug: image_embedding shape: {image_embedding.shape}, device: {image_embedding.device}")
+        
+        # Get text embedding - need to tokenize first
+        text_tokens = open_clip.tokenize(prompt).to(device)
+        print(f"Debug: text_tokens shape: {text_tokens.shape}, device: {text_tokens.device}")
+        
+        with torch.no_grad():
+            if device.type == "cuda":
+                with torch.cuda.amp.autocast():
+                    text_embedding = clip_model.encode_text(text_tokens)
+            else:
+                text_embedding = clip_model.encode_text(text_tokens)
+        
+        print(f"Debug: text_embedding shape: {text_embedding.shape}, device: {text_embedding.device}")
+        
+        # Ensure both embeddings are on the same device
+        if image_embedding.device != text_embedding.device:
+            text_embedding = text_embedding.to(image_embedding.device)
         
         # Ensure both are 2D tensors [1, embedding_dim]
-        if image_tensor.dim() == 1:
-            image_tensor = image_tensor.unsqueeze(0)
-        if text_tokens.dim() == 1:
-            text_tokens = text_tokens.unsqueeze(0)
+        if image_embedding.dim() == 1:
+            image_embedding = image_embedding.unsqueeze(0)
+        if text_embedding.dim() == 1:
+            text_embedding = text_embedding.unsqueeze(0)
+        
+        print(f"Debug: After unsqueeze - image: {image_embedding.shape}, text: {text_embedding.shape}")
         
         # Normalize embeddings
-        image_embedding = image_tensor / image_tensor.norm(dim=-1, keepdim=True)
-        text_embedding = text_tokens / text_tokens.norm(dim=-1, keepdim=True)
+        image_embedding = image_embedding / image_embedding.norm(dim=-1, keepdim=True)
+        text_embedding = text_embedding / text_embedding.norm(dim=-1, keepdim=True)
+        
+        print(f"Debug: After normalization - image: {image_embedding.shape}, text: {text_embedding.shape}")
         
         # Calculate cosine similarity
         similarity = torch.cosine_similarity(image_embedding, text_embedding, dim=-1)
         
+        print(f"Debug: Cosine similarity result: {similarity.item()}")
         return float(similarity.item())
         
     except Exception as e:
         print(f"Warning: Could not calculate cosine similarity: {e}")
+        import traceback
+        traceback.print_exc()
         return 0.0
 
 

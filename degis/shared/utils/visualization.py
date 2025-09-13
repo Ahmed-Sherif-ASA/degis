@@ -362,6 +362,7 @@ def visualize_generation_comparison(
     """
     import matplotlib.pyplot as plt
     from skimage.color import lab2rgb
+    import torch
     
     # Helper function to get top palette colors (from user's example)
     def _top_palette(vec, bins=8, top_k=20, space=color_space, c_max=150.0):
@@ -400,8 +401,8 @@ def visualize_generation_comparison(
         ax.set_xlim(0, len(colors)); ax.set_ylim(0,1); ax.axis("off")
         ax.set_title(title, fontsize=12)
     
-    # Create figure with 1x4 layout
-    fig, axes = plt.subplots(1, 4, figsize=(16, 4))
+    # Create figure with 2x3 layout
+    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
     
     # Convert PIL images to numpy arrays
     color_np = np.array(color_source_image.resize((grid_size, grid_size)))
@@ -409,44 +410,53 @@ def visualize_generation_comparison(
     style_np = np.array(style_generated_image.resize((grid_size, grid_size)))
     emd_np = np.array(emd_generated_image.resize((grid_size, grid_size)))
     
-    # 1. Color source image + histogram (leftmost)
-    axes[0].imshow(color_np)
-    axes[0].axis("off")
-    axes[0].set_title(f"Color Source ({color_space.upper()})", fontsize=font_size)
+    # === FIRST ROW ===
     
-    # Add histogram below
-    hist_cols, hist_vals = _top_palette(color_histogram, top_k=20)
-    _plot_palette(axes[0], hist_cols, hist_vals, f"Top 20 bins")
+    # 1. Style image (top-left)
+    axes[0, 0].imshow(color_np)
+    axes[0, 0].axis("off")
+    axes[0, 0].set_title(f"Style Image ({color_space.upper()})", fontsize=font_size)
     
-    # 2. Edge map image (second from left)
-    axes[1].imshow(edge_np, cmap='gray')
-    axes[1].axis("off")
-    axes[1].set_title("Edge Map", fontsize=font_size)
+    # 2. Edge map (top-center)
+    axes[0, 1].imshow(edge_np, cmap='gray')
+    axes[0, 1].axis("off")
+    axes[0, 1].set_title("Edge Map", fontsize=font_size)
     
-    # 3. Style generation result (third from left)
-    axes[2].imshow(style_np)
-    axes[2].axis("off")
+    # 3. Generate by style result (top-right)
+    axes[0, 2].imshow(style_np)
+    axes[0, 2].axis("off")
     
-    # Add metrics text (simple, like user's example)
-    style_text = "Style Generation"
+    # Add style generation metrics
+    style_text = "Generate by Style"
     if style_metrics:
         style_text += f"\nTime: {style_metrics.get('generation_time', 'N/A')}s"
         style_text += f"\nEMD: {style_metrics.get('emd', 'N/A'):.4f}"
         style_text += f"\nCosine: {style_metrics.get('cosine', 'N/A'):.4f}"
-    axes[2].set_title(style_text, fontsize=font_size)
+    axes[0, 2].set_title(style_text, fontsize=font_size)
     
-    # 4. EMD generation result (rightmost)
-    axes[3].imshow(emd_np)
-    axes[3].axis("off")
+    # === SECOND ROW ===
     
-    # Add metrics text (simple, like user's example)
-    emd_text = "EMD Generation"
+    # 4. Histogram (bottom-left)
+    hist_cols, hist_vals = _top_palette(color_histogram, top_k=20)
+    _plot_palette(axes[1, 0], hist_cols, hist_vals, f"Color Histogram ({color_space.upper()})")
+    
+    # 5. Edge map (bottom-center) - same as top
+    axes[1, 1].imshow(edge_np, cmap='gray')
+    axes[1, 1].axis("off")
+    axes[1, 1].set_title("Edge Map", fontsize=font_size)
+    
+    # 6. Generate by EMD result (bottom-right)
+    axes[1, 2].imshow(emd_np)
+    axes[1, 2].axis("off")
+    
+    # Add EMD generation metrics
+    emd_text = "Generate by EMD"
     if emd_metrics:
         emd_text += f"\nTime: {emd_metrics.get('generation_time', 'N/A')}s"
         emd_text += f"\nEMD: {emd_metrics.get('emd', 'N/A'):.4f}"
         emd_text += f"\nCosine: {emd_metrics.get('cosine', 'N/A'):.4f}"
         emd_text += f"\nAttempts: {emd_metrics.get('attempts', 'N/A')}"
-    axes[3].set_title(emd_text, fontsize=font_size)
+    axes[1, 2].set_title(emd_text, fontsize=font_size)
     
     plt.tight_layout()
     
