@@ -507,16 +507,22 @@ def generate_by_colour_emd_constrained(
     for attempt in range(max_attempts):
         # Generate images using pre-computed color embedding
         images = generator.generate(
+            color_embedding=color_embedding,
             control_image=control_image,
             prompt=prompt,
-            color_embedding=color_embedding,
+            negative_prompt=(
+                "monochrome, lowres, bad anatomy, worst quality, low quality, blurry, "
+                "sketch, cartoon, drawing, anime:1.4, comic, illustration, posterized, "
+                "mosaic, stained glass, abstract, surreal, psychedelic, trippy, texture artifact, "
+                "embroidery, knitted, painting, oversaturated, unrealistic, bad shading"
+            ),
             **generation_kwargs
         )
 
         # Calculate histogram for generated image
         generated_hist = compute_histogram_for_color_space(images[0], color_space, bins=8)
         emd_distance = calculate_emd_distance_topk(
-            original_histogram, generated_hist, top_k=top_k
+            original_histogram, generated_hist, top_k=top_k, blur=0.01
         )
         
         # Calculate cosine similarity between prompt and generated image

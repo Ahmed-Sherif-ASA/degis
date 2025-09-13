@@ -15,6 +15,9 @@ Usage:
 """
 
 import os
+# Disable tqdm globally for this module
+os.environ['TQDM_DISABLE'] = '1'
+
 import torch
 import torch.nn as nn
 from typing import Optional, Union, List, Tuple
@@ -412,9 +415,10 @@ class IPAdapter:
 
         generator = get_generator(seed, self.device)
 
-        # Disable tqdm globally for this generation
-        import os
-        os.environ['TQDM_DISABLE'] = '1'
+        # Disable tqdm by monkey-patching it
+        import tqdm
+        original_tqdm = tqdm.tqdm
+        tqdm.tqdm = lambda *args, **kwargs: original_tqdm(*args, **kwargs, disable=True)
         
         images = self.pipe(
             prompt_embeds=prompt_embeds,
@@ -427,8 +431,8 @@ class IPAdapter:
             **kwargs,
         ).images
         
-        # Re-enable tqdm
-        os.environ.pop('TQDM_DISABLE', None)
+        # Restore original tqdm
+        tqdm.tqdm = original_tqdm
 
         return images
 
@@ -566,9 +570,10 @@ class IPAdapterXL(IPAdapter):
 
         self.generator = get_generator(seed, self.device)
         
-        # Disable tqdm globally for this generation
-        import os
-        os.environ['TQDM_DISABLE'] = '1'
+        # Disable tqdm by monkey-patching it
+        import tqdm
+        original_tqdm = tqdm.tqdm
+        tqdm.tqdm = lambda *args, **kwargs: original_tqdm(*args, **kwargs, disable=True)
         
         images = self.pipe(
             prompt_embeds=prompt_embeds,
@@ -583,8 +588,8 @@ class IPAdapterXL(IPAdapter):
             **kwargs,
         ).images
         
-        # Re-enable tqdm
-        os.environ.pop('TQDM_DISABLE', None)
+        # Restore original tqdm
+        tqdm.tqdm = original_tqdm
 
         return images
 
@@ -772,9 +777,10 @@ class IPAdapterPlusXL(IPAdapter):
 
         generator = get_generator(seed, self.device)
 
-        # Disable tqdm globally for this generation
-        import os
-        os.environ['TQDM_DISABLE'] = '1'
+        # Disable tqdm by monkey-patching it
+        import tqdm
+        original_tqdm = tqdm.tqdm
+        tqdm.tqdm = lambda *args, **kwargs: original_tqdm(*args, **kwargs, disable=True)
         
         images = self.pipe(
             prompt_embeds=prompt_embeds,
@@ -789,8 +795,8 @@ class IPAdapterPlusXL(IPAdapter):
             **kwargs,
         ).images
         
-        # Re-enable tqdm
-        os.environ.pop('TQDM_DISABLE', None)
+        # Restore original tqdm
+        tqdm.tqdm = original_tqdm
 
         return images
 
