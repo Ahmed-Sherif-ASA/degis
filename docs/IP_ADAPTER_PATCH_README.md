@@ -1,6 +1,6 @@
 # DEGIS IP-Adapter Implementation
 
-This directory contains a complete IP-Adapter implementation with DEGIS (Disentangled Embeddings Guided Image Synthesis) enhancements. This is a **significant upgrade** over the original IP-Adapter library, providing advanced multi-embedding support, fine-grained control, and robust error handling.
+This directory contains a complete IP-Adapter implementation with DEGIS (Disentangled Embeddings Guided Image Synthesis) enhancements, providing advanced multi-embedding support, fine-grained control, and robust error handling.
 
 ## 🚀 Key Features
 
@@ -53,41 +53,26 @@ images = adapter.generate(
 from ip_adapter_patch import IPAdapter, IPAdapterXL
 ```
 
-## 📊 Detailed Comparison: Original vs DEGIS
+## 🔧 Implementation Details
 
-### 🔧 **Import Structure**
-| **Aspect** | **Original** | **DEGIS** | **Impact** |
-|------------|--------------|-----------|------------|
-| **Import Strategy** | Relative imports (`.utils`, `.attention_processor`) | Global imports with fallbacks | 🛡️ **Robust** - handles missing dependencies gracefully |
-| **Error Handling** | Crashes on missing modules | Comprehensive fallback system | 🔧 **Reliable** - never fails due to import issues |
+### **Import Structure**
+- **Global imports with fallbacks** - handles missing dependencies gracefully
 
-### 🧠 **Embedding Support**
-| **Aspect** | **Original** | **DEGIS** | **Impact** |
-|------------|--------------|-----------|------------|
-| **Embedding Types** | CLIP only | CLIP, DINO, Custom | 🚀 **Multi-modal** - supports multiple embedding architectures |
-| **EmbeddingAdapter** | ❌ Not present | ✅ New class | 🔄 **Flexible** - unified interface for different embedding types |
-| **Pre-computed Embeddings** | Limited support | Full support | ⚡ **Performance** - can reuse pre-computed embeddings |
+### **Embedding Support**
+- **Multi-modal support** - CLIP, DINO, and custom embeddings
+- **EmbeddingAdapter class** - unified interface for different embedding types
+- **Pre-computed embeddings** - can reuse pre-computed embeddings for performance
 
-### 🎨 **Token Mixing System**
-| **Aspect** | **Original** | **DEGIS** | **Impact** |
-|------------|--------------|-----------|------------|
-| **Mixing Strategy** | Simple concatenation | Advanced scaling system | 🎛️ **Fine control** - separate scaling for text vs image tokens |
-| **Scaling Parameters** | Single `scale` parameter | 6+ granular parameters | 🎨 **Precision** - fine-tune generation quality |
-| **SDXL Support** | Basic pooled embedding handling | Advanced pooled embedding mixing | 🚀 **Enhanced** - better SDXL generation quality |
+### **Token Mixing System**
+- **Advanced scaling system** - separate scaling for text vs image tokens
+- **Granular parameters** - 6+ parameters for fine-tuning generation quality
+- **SDXL support** - advanced pooled embedding mixing for better quality
 
-### 🎛️ **Generation Control**
-| **Aspect** | **Original** | **DEGIS** | **Impact** |
-|------------|--------------|-----------|------------|
-| **Parameters** | `scale=1.0` | `attn_ip_scale`, `text_token_scale`, `ip_token_scale`, `ip_uncond_scale`, `zero_ip_in_uncond` | 🎛️ **Granular** - control every aspect of generation |
-| **Method Overloads** | Basic `generate()` | `generate()` + `generate_from_embeddings()` | ⚡ **Performance** - optimized paths for different use cases |
-| **Error Validation** | Basic | Comprehensive | 🛡️ **Robust** - better error messages and validation |
+### **Generation Control**
+- **Granular parameters** - control every aspect of generation
+- **Multiple methods** - `generate()` + `generate_from_embeddings()` for different use cases
+- **Comprehensive validation** - better error messages and validation
 
-### 📚 **Code Quality**
-| **Aspect** | **Original** | **DEGIS** | **Impact** |
-|------------|--------------|-----------|------------|
-| **Documentation** | Minimal docstrings | Comprehensive documentation | 📖 **User-friendly** - clear usage instructions |
-| **Type Hints** | Basic | Enhanced | 🔍 **Developer-friendly** - better IDE support |
-| **Error Messages** | Generic | Specific and helpful | 🛠️ **Debugging** - easier to troubleshoot issues |
 
 ## 🆕 **New Features in DEGIS**
 
@@ -190,8 +175,6 @@ The DEGIS IP-Adapter implementation is available when you:
 1. Run the setup script: `./setup.sh`
 2. Import directly: `from ip_adapter_patch import IPAdapter`
 
-No original IP-Adapter library needed!
-
 ## Testing
 
 To test that the implementation is working:
@@ -203,27 +186,12 @@ source degis-env/bin/activate
 python test_ip_adapter_patch.py
 ```
 
-## 🏆 **Summary: Why DEGIS is Better**
-
-| **Category** | **Original IP-Adapter** | **DEGIS IP-Adapter** | **Improvement** |
-|--------------|-------------------------|----------------------|-----------------|
-| **Embedding Support** | CLIP only | CLIP, DINO, Custom | 🚀 **3x more flexible** |
-| **Token Control** | Single scale | 6+ granular parameters | 🎛️ **6x more control** |
-| **Error Handling** | Basic | Comprehensive fallbacks | 🛡️ **Production-ready** |
-| **Performance** | PIL images only | PIL + pre-computed embeddings | ⚡ **2x faster** |
-| **SDXL Support** | Basic | Advanced pooled embedding mixing | 🚀 **Enhanced quality** |
-| **Documentation** | Minimal | Comprehensive | 📚 **10x better** |
-| **API Design** | Rigid | Flexible + backward compatible | 🔄 **Best of both worlds** |
-
 ## 🎯 **Key Benefits**
 
 1. **🚀 Multi-Embedding Support**: Use CLIP, DINO, or custom embeddings seamlessly
 2. **🎨 Fine-Grained Control**: Separate scaling for text vs image tokens
 3. **⚡ Performance Optimization**: Pre-computed embedding support
-4. **🛡️ Production Ready**: Robust error handling and fallback systems
-5. **🔄 Backward Compatible**: Original API still works perfectly
-6. **📚 Well Documented**: Comprehensive documentation and examples
-7. **🎛️ Advanced Features**: 6+ generation parameters vs 1 in original
+4. **🔄 Backward Compatible**: Original API still works perfectly
 
 ## License
 
