@@ -10,9 +10,9 @@ os.makedirs(MODEL_CACHE, exist_ok=True)
 os.environ["HF_HOME"] = MODEL_CACHE
 
 # Dataset paths
-NAME = "laion_5m"
+# NAME = "laion_5m"
 # NAME = "coco"
-# NAME = "test"
+NAME = "demo"
 DATA_DIR = "/data/thesis/data"
 MODELS_DIR = "/data/thesis/models"
 EDGE_MAPS_PATH = f"{DATA_DIR}/{NAME}_edge_maps.npy"

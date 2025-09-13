@@ -35,9 +35,10 @@ def display_images_grid(
     cols: int = 3,
     padding: int = 10,
     bg_color: Tuple[int, int, int] = (255, 255, 255),
-    size: int = 512
+    size: int = 512,
+    labels: Optional[List[str]] = None
 ) -> Image.Image:
-    """Display multiple images in a grid layout."""
+    """Display multiple images in a grid layout with optional labels."""
     if not images:
         return None
     
@@ -47,16 +48,47 @@ def display_images_grid(
     w, h = size, size
     rows = (len(resized_images) + cols - 1) // cols
     
+    # Add space for labels if provided
+    label_height = 30 if labels else 0
     grid_w = cols * w + (cols - 1) * padding
-    grid_h = rows * h + (rows - 1) * padding
+    grid_h = rows * h + (rows - 1) * padding + rows * label_height
     
     grid_img = Image.new("RGB", (grid_w, grid_h), color=bg_color)
+    
+    # Add labels if provided
+    if labels:
+        from PIL import ImageDraw, ImageFont
+        draw = ImageDraw.Draw(grid_img)
+        
+        # Try to load a font
+        try:
+            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
+        except:
+            font = None
     
     for i, img in enumerate(resized_images):
         row, col = divmod(i, cols)
         x = col * (w + padding)
-        y = row * (h + padding)
-        grid_img.paste(img, (x, y))
+        y = row * (h + padding) + row * label_height
+        
+        # Paste image
+        grid_img.paste(img, (x, y + label_height))
+        
+        # Add label if provided
+        if labels and i < len(labels):
+            text = str(labels[i])
+            if font:
+                bbox = draw.textbbox((0, 0), text, font=font)
+                text_w = bbox[2] - bbox[0]
+            else:
+                text_w = len(text) * 10
+            
+            text_x = x + (w - text_w) // 2
+            text_y = y + 5
+            
+            # Draw label
+            draw.rectangle([text_x-5, text_y-2, text_x+text_w+5, text_y+20], fill=(0, 0, 0))
+            draw.text((text_x, text_y), text, fill=(255, 255, 255), font=font)
     
     return grid_img
 
