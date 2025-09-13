@@ -351,9 +351,9 @@ def visualize_generation_comparison(
     font_size: int = 16
 ) -> Image.Image:
     """
-    Create a comprehensive visualization grid showing generation comparison.
+    Create a comprehensive visualization row showing generation comparison.
     
-    Grid layout:
+    Row layout (left to right):
     1. Color source image + top 20 histogram bins
     2. Edge map image
     3. Style generation result + metrics
@@ -372,11 +372,12 @@ def visualize_generation_comparison(
         font_size: Font size for text overlays
         
     Returns:
-        PIL Image containing the complete visualization grid
+        PIL Image containing the complete visualization row
     """
-    # Create the main grid (2x2)
-    main_grid_size = grid_size * 2
-    main_grid = Image.new('RGB', (main_grid_size, main_grid_size), color='white')
+    # Create the main row (1x4)
+    main_row_width = grid_size * 4
+    main_row_height = grid_size + 100  # Extra space for histogram
+    main_row = Image.new('RGB', (main_row_width, main_row_height), color='white')
     
     # Helper function to add text overlay
     def add_text_overlay(img, text_lines, position='bottom'):
@@ -439,7 +440,7 @@ def visualize_generation_comparison(
         
         return hist_img
     
-    # 1. Color source image + histogram (top-left)
+    # 1. Color source image + histogram (leftmost)
     color_img = color_source_image.resize((grid_size, grid_size))
     hist_viz = create_histogram_viz(color_histogram, color_space)
     
@@ -451,11 +452,11 @@ def visualize_generation_comparison(
     # Add labels
     add_text_overlay(color_combo, [f"Color Source ({color_space.upper()})", f"Top 20 bins"], 'bottom')
     
-    # 2. Edge map image (top-right)
+    # 2. Edge map image (second from left)
     edge_img = edge_map_image.resize((grid_size, grid_size))
     add_text_overlay(edge_img, ["Edge Map"], 'bottom')
     
-    # 3. Style generation result (bottom-left)
+    # 3. Style generation result (third from left)
     style_img = style_generated_image.resize((grid_size, grid_size))
     
     # Add metrics overlay
@@ -469,7 +470,7 @@ def visualize_generation_comparison(
     
     add_text_overlay(style_img, style_text, 'bottom')
     
-    # 4. EMD generation result (bottom-right)
+    # 4. EMD generation result (rightmost)
     emd_img = emd_generated_image.resize((grid_size, grid_size))
     
     # Add metrics overlay
@@ -484,13 +485,13 @@ def visualize_generation_comparison(
     
     add_text_overlay(emd_img, emd_text, 'bottom')
     
-    # Paste all images into the main grid
-    main_grid.paste(color_combo, (0, 0))  # Top-left
-    main_grid.paste(edge_img, (grid_size, 0))  # Top-right
-    main_grid.paste(style_img, (0, grid_size))  # Bottom-left
-    main_grid.paste(emd_img, (grid_size, grid_size))  # Bottom-right
+    # Paste all images into the main row (left to right)
+    main_row.paste(color_combo, (0, 0))  # Leftmost
+    main_row.paste(edge_img, (grid_size, 0))  # Second
+    main_row.paste(style_img, (grid_size * 2, 0))  # Third
+    main_row.paste(emd_img, (grid_size * 3, 0))  # Rightmost
     
-    return main_grid
+    return main_row
 
 
 def create_generation_metrics(
