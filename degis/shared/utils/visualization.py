@@ -437,7 +437,7 @@ def visualize_generation_comparison(
     # === SECOND ROW ===
     
     # 4. Histogram (bottom-left)
-    hist_cols, hist_vals = _top_palette(color_histogram, top_k=20)
+    hist_cols, hist_vals = _top_palette(color_histogram, top_k=14)
     _plot_palette(axes[1, 0], hist_cols, hist_vals, f"Color Histogram ({color_space.upper()})")
     
     # 5. Edge map (bottom-center) - same as top
