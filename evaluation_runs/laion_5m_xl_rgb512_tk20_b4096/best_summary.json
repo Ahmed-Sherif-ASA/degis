@@ -1,7 +1,7 @@
 {
   "best_epoch": 14,
-  "best_val_emd": 0.026490934329425415,
-  "train_emd_at_best": 0.04590368989077997,
+  "best_val_sinkhorn": 0.026490934329425415,
+  "train_sinkhorn_at_best": 0.04590368989077997,
   "diag_bce_at_best": 0.016821687801118278,
   "checkpoint_color": "best_color_head_tmp.pth",
   "checkpoint_rest": "best_rest_head_tmp.pth",

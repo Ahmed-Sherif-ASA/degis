@@ -199,13 +199,13 @@ def plot_training_metrics(
     """Plot training metrics over time."""
     fig, axes = plt.subplots(2, 2, figsize=figsize)
     
-    # Plot EMD losses
-    if 'train_emd' in metrics and 'val_emd' in metrics:
-        axes[0, 0].plot(metrics['train_emd'], label='Train EMD')
-        axes[0, 0].plot(metrics['val_emd'], label='Val EMD')
-        axes[0, 0].set_title('EMD Loss')
+    # Plot Sinkhorn losses
+    if 'train_sinkhorn' in metrics and 'val_sinkhorn' in metrics:
+        axes[0, 0].plot(metrics['train_sinkhorn'], label='Train Sinkhorn')
+        axes[0, 0].plot(metrics['val_sinkhorn'], label='Val Sinkhorn')
+        axes[0, 0].set_title('Sinkhorn Loss')
         axes[0, 0].set_xlabel('Epoch')
-        axes[0, 0].set_ylabel('EMD')
+        axes[0, 0].set_ylabel('Sinkhorn')
         axes[0, 0].legend()
         axes[0, 0].grid(True)
     
@@ -294,7 +294,7 @@ def plot_training_curves(
     hist_kind: str
 ) -> None:
     """
-    Generate training curves (EMD and loss) from metrics CSV.
+    Generate training curves (Sinkhorn and loss) from metrics CSV.
     
     Args:
         metrics_csv_path: Path to metrics.csv file
@@ -308,16 +308,16 @@ def plot_training_curves(
         
         df = pd.read_csv(metrics_csv_path)
         
-        # EMD curves
+        # Sinkhorn curves
         plt.figure(figsize=(10, 6))
-        plt.plot(df.epoch, df.train_emd, label="train", linewidth=2)
-        plt.plot(df.epoch, df.val_emd, label="val", linewidth=2)
+        plt.plot(df.epoch, df.train_sinkhorn, label="train", linewidth=2)
+        plt.plot(df.epoch, df.val_sinkhorn, label="val", linewidth=2)
         plt.xlabel("epoch")
-        plt.ylabel("EMD")
+        plt.ylabel("Sinkhorn")
         plt.legend()
         plt.grid(True, alpha=0.3)
-        plt.title(f"EMD Curves - {dataset_name}_{hist_kind}")
-        plt.savefig(os.path.join(output_dir, "emd_curves.png"), dpi=150, bbox_inches='tight')
+        plt.title(f"Sinkhorn Curves - {dataset_name}_{hist_kind}")
+        plt.savefig(os.path.join(output_dir, "sinkhorn_curves.png"), dpi=150, bbox_inches='tight')
         plt.close()
         
         # Loss curve
@@ -330,7 +330,7 @@ def plot_training_curves(
         plt.savefig(os.path.join(output_dir, "loss_curve.png"), dpi=150, bbox_inches='tight')
         plt.close()
         
-        print("✓ Generated training curves (emd_curves.png, loss_curve.png)")
+        print("✓ Generated training curves (sinkhorn_curves.png, loss_curve.png)")
         
     except ImportError:
         print("⚠️  matplotlib not available, skipping training curves")
@@ -342,11 +342,11 @@ def visualize_generation_comparison(
     color_source_image: Image.Image,
     edge_map_image: Image.Image,
     style_generated_image: Image.Image,
-    emd_generated_image: Image.Image,
+    sinkhorn_generated_image: Image.Image,
     color_histogram: np.ndarray,
     color_space: str = "lab",
     style_metrics: Optional[Dict[str, Any]] = None,
-    emd_metrics: Optional[Dict[str, Any]] = None,
+    sinkhorn_metrics: Optional[Dict[str, Any]] = None,
     grid_size: int = 256,
     font_size: int = 10,
     figsize: Tuple[int, int] = (12, 6)
@@ -359,7 +359,7 @@ def visualize_generation_comparison(
     1. Color source image + top 20 histogram bins
     2. Edge map image  
     3. Style generation result + metrics
-    4. EMD generation result + metrics
+    4. Sinkhorn generation result + metrics
     """
     import matplotlib.pyplot as plt
     from skimage.color import lab2rgb
@@ -409,7 +409,7 @@ def visualize_generation_comparison(
     color_np = np.array(color_source_image.resize((grid_size, grid_size)))
     edge_np = np.array(edge_map_image.resize((grid_size, grid_size)))
     style_np = np.array(style_generated_image.resize((grid_size, grid_size)))
-    emd_np = np.array(emd_generated_image.resize((grid_size, grid_size)))
+    sinkhorn_np = np.array(sinkhorn_generated_image.resize((grid_size, grid_size)))
     
     # === FIRST ROW ===
     
@@ -431,7 +431,7 @@ def visualize_generation_comparison(
     style_text = "Generate by Style"
     if style_metrics:
         style_text += f"\nTime: {style_metrics.get('generation_time', 'N/A')}s"
-        style_text += f"\nEMD: {style_metrics.get('emd', 'N/A'):.4f}"
+        style_text += f"\nSinkhorn: {style_metrics.get('sinkhorn', 'N/A'):.4f}"
         style_text += f"\nCosine: {style_metrics.get('cosine', 'N/A'):.4f}"
     axes[0, 2].set_title(style_text, fontsize=font_size)
     
@@ -446,18 +446,18 @@ def visualize_generation_comparison(
     axes[1, 1].axis("off")
     axes[1, 1].set_title("Edge Map", fontsize=font_size)
     
-    # 6. Generate by EMD result (bottom-right)
-    axes[1, 2].imshow(emd_np)
+    # 6. Generate by Sinkhorn result (bottom-right)
+    axes[1, 2].imshow(sinkhorn_np)
     axes[1, 2].axis("off")
     
-    # Add EMD generation metrics
-    emd_text = "Generate by EMD"
-    if emd_metrics:
-        emd_text += f"\nTime: {emd_metrics.get('generation_time', 'N/A')}s"
-        emd_text += f"\nEMD: {emd_metrics.get('emd', 'N/A'):.4f}"
-        emd_text += f"\nCosine: {emd_metrics.get('cosine', 'N/A'):.4f}"
-        emd_text += f"\nAttempts: {emd_metrics.get('attempts', 'N/A')}"
-    axes[1, 2].set_title(emd_text, fontsize=font_size)
+    # Add Sinkhorn generation metrics
+    sinkhorn_text = "Generate by Sinkhorn"
+    if sinkhorn_metrics:
+        sinkhorn_text += f"\nTime: {sinkhorn_metrics.get('generation_time', 'N/A')}s"
+        sinkhorn_text += f"\nSinkhorn: {sinkhorn_metrics.get('sinkhorn', 'N/A'):.4f}"
+        sinkhorn_text += f"\nCosine: {sinkhorn_metrics.get('cosine', 'N/A'):.4f}"
+        sinkhorn_text += f"\nAttempts: {sinkhorn_metrics.get('attempts', 'N/A')}"
+    axes[1, 2].set_title(sinkhorn_text, fontsize=font_size)
     
     plt.tight_layout()
     
@@ -474,7 +474,7 @@ def visualize_generation_comparison(
 
 def create_generation_metrics(
     generation_time: float,
-    emd_score: float,
+    sinkhorn_score: float,
     cosine_score: float,
     attempts: Optional[int] = None
 ) -> Dict[str, Any]:
@@ -483,16 +483,16 @@ def create_generation_metrics(
     
     Args:
         generation_time: Time taken for generation in seconds
-        emd_score: EMD distance score
+        sinkhorn_score: Sinkhorn distance score
         cosine_score: Cosine similarity score
-        attempts: Number of attempts (for EMD generation)
+        attempts: Number of attempts (for Sinkhorn generation)
         
     Returns:
         Dictionary with formatted metrics
     """
     metrics = {
         'generation_time': f"{generation_time:.2f}",
-        'emd': emd_score,
+        'sinkhorn': sinkhorn_score,
         'cosine': cosine_score
     }
     

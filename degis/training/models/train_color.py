@@ -67,7 +67,7 @@ def train_color_disentanglement(
     wd            = 1e-2,
     patience      = 10,
     save_prefix   = "best_color_head",
-    metric_label  = "EMD",
+    metric_label  = "Sinkhorn",
     logger        = True,     # <— NEW
 ):
     # Sinkhorn loss (keep backend/blur on the object so eval can reuse them)
@@ -190,7 +190,7 @@ def train_color_disentanglement(
             total_loss = train_color + 0.25*train_leak + 0.1*train_recon + 0.1*train_ortho + lambda_consistency*train_consistency
             logger.log_epoch(
                 epoch=ep,
-                train_emd=train_color, val_emd=val_color,
+                train_sinkhorn=train_color, val_sinkhorn=val_color,
                 loss=float(total_loss),  # Required field
                 lr=float(optimizer.param_groups[0]["lr"]),
                 wall_time=epoch_seconds,  # Required field
@@ -251,8 +251,8 @@ def train_color_disentanglement(
             if logger is not None:
                 best_json = {
                     "best_epoch": ep,
-                    "best_val_emd": float(val_color),
-                    "train_emd_at_best": float(train_color),
+                    "best_val_sinkhorn": float(val_color),
+                    "train_sinkhorn_at_best": float(train_color),
                     "diag_bce_at_best": float(train_bce),
                     "checkpoint_color": os.path.basename(color_pth),
                     "checkpoint_rest":  os.path.basename(rest_pth),

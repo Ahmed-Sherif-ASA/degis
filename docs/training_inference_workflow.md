@@ -27,8 +27,8 @@ sequenceDiagram
     Infer->>Infer: Predict colour embedding (Colour Head)
     Infer->>Infer: Create Canny control image from layout reference
     Infer->>Infer: IP-Adapter token concat + scaling\n(attn_ip_scale, text_token_scale, ip_token_scale)
-    loop EMD-constrained outer loop (until EMD ≤ τ or max attempts)
+    loop Sinkhorn-constrained outer loop (until Sinkhorn ≤ τ or max attempts)
         Infer->>Infer: Generate image with UNet + ControlNet
-        Infer->>Infer: Compute EMD to target palette
+        Infer->>Infer: Compute Sinkhorn to target palette
     end
-    Infer->>OUT: Save image(s), EMD, settings, logs
+    Infer->>OUT: Save image(s), Sinkhorn, settings, logs

@@ -3,7 +3,7 @@ High-Level Generation Functions
 
 This module provides high-level generation functions with specific constraints:
 - Style-based generation using IP-Adapter
-- EMD-constrained color generation
+- Sinkhorn-constrained color generation
 - Cosine similarity tracking
 - Multiple color space support (RGB, HCL, LAB)
 """
@@ -21,24 +21,24 @@ from ..shared.clip_vit_h14 import compute_clip_embedding
 from ..inference.core_generation import get_color_embedding
 
 
-def calculate_emd_distance_topk(
+def calculate_sinkhorn_distance_topk(
     hist1: np.ndarray, 
     hist2: np.ndarray, 
     top_k: int = 20, 
     blur: float = 0.01
 ) -> float:
     """
-    Calculate Earth Mover's Distance between top-k histogram values using Sinkhorn algorithm.
+    Calculate Sinkhorn OT between top-k histogram values using Sinkhorn algorithm.
     Supports histograms of variable lengths (e.g., 512 for RGB or 514 for LAB/HCL).
     
     Args:
         hist1: First histogram (1D array)
         hist2: Second histogram (1D array)
-        top_k: Number of top values to consider for EMD calculation
+        top_k: Number of top values to consider for Sinkhorn calculation
         blur: Blur parameter for Sinkhorn algorithm
         
     Returns:
-        EMD distance as float
+        Sinkhorn distance as float
     """
     # Ensure both histograms are same length
     if hist1.shape[0] != hist2.shape[0]:
@@ -64,11 +64,11 @@ def calculate_emd_distance_topk(
     h1 = torch.tensor(h1_topk, dtype=torch.float32).unsqueeze(0)
     h2 = torch.tensor(h2_topk, dtype=torch.float32).unsqueeze(0)
 
-    # Calculate Sinkhorn EMD
+    # Calculate Sinkhorn Sinkhorn
     loss = geomloss.SamplesLoss("sinkhorn", p=2, blur=blur, backend="tensorized")
-    emd = loss(h1, h2).item()
+    sinkhorn = loss(h1, h2).item()
 
-    return emd
+    return sinkhorn
 
 
 def detect_color_space(histogram: np.ndarray) -> str:
@@ -202,11 +202,11 @@ def calculate_cosine_similarity(
         return 0.0
 
 
-def generate_from_dataset_id_xl_with_emd(
+def generate_from_dataset_id_xl_with_sinkhorn(
     colour_index: int,
     layout_index: int,
     prompt: str = "a cat playing with a ball",
-    target_emd_threshold: float = 0.1,
+    target_sinkhorn_threshold: float = 0.1,
     max_attempts: int = 20,
     top_k: int = 20,
     guidance_scale: float = 6.5,
@@ -218,7 +218,7 @@ def generate_from_dataset_id_xl_with_emd(
     ip_token_scale: Optional[float] = None,
     ip_uncond_scale: float = 0.0,
     zero_ip_in_uncond: bool = True,
-    # Additional parameters for EMD generation
+    # Additional parameters for Sinkhorn generation
     color_space: Optional[str] = None,  # Auto-detect if None
     blur: float = 0.01,
     verbose: bool = False,
@@ -233,7 +233,7 @@ def generate_from_dataset_id_xl_with_emd(
     transforms=None,
 ) -> Tuple[List[Image.Image], float, float, int]:
     """
-    Generate images using IP-Adapter XL with EMD constraint on color histogram values.
+    Generate images using IP-Adapter XL with Sinkhorn constraint on color histogram values.
     
     This function automatically detects the color space from the histogram dimension
     and uses the appropriate histogram computation method.
@@ -242,9 +242,9 @@ def generate_from_dataset_id_xl_with_emd(
         colour_index: Index in the color dataset
         layout_index: Index in the layout/edge dataset
         prompt: Text prompt for generation
-        target_emd_threshold: Target EMD threshold to achieve
+        target_sinkhorn_threshold: Target Sinkhorn threshold to achieve
         max_attempts: Maximum number of generation attempts
-        top_k: Number of top histogram values to consider for EMD
+        top_k: Number of top histogram values to consider for Sinkhorn
         guidance_scale: Guidance scale for generation
         steps: Number of inference steps
         controlnet_conditioning_scale: ControlNet conditioning scale
@@ -255,7 +255,7 @@ def generate_from_dataset_id_xl_with_emd(
         ip_uncond_scale: IP unconditional scale
         zero_ip_in_uncond: Whether to zero IP tokens in negative prompt
         color_space: Color space ('rgb', 'hcl', 'lab') - auto-detect if None
-        blur: Blur parameter for Sinkhorn EMD calculation
+        blur: Blur parameter for Sinkhorn Sinkhorn calculation
         verbose: Whether to print progress information
         # Required dependencies (passed from calling context)
         generator: DEGIS generator instance
@@ -268,7 +268,7 @@ def generate_from_dataset_id_xl_with_emd(
         transforms: Image transforms
         
     Returns:
-        Tuple of (best_images, best_emd, attempts_made)
+        Tuple of (best_images, best_sinkhorn, attempts_made)
     """
     # Clear GPU memory
     gc.collect()
@@ -300,7 +300,7 @@ def generate_from_dataset_id_xl_with_emd(
     z_clip = torch.as_tensor(embeddings[colour_index], dtype=torch.float32, device=device).unsqueeze(0)
     color_embedding = generator.get_color_embedding(color_head, z_clip)
 
-    # Get original histogram for EMD comparison
+    # Get original histogram for Sinkhorn comparison
     original_histogram = histograms[colour_index]
 
     # Auto-detect color space if not provided
@@ -308,7 +308,7 @@ def generate_from_dataset_id_xl_with_emd(
         color_space = detect_color_space(original_histogram)
     
     if verbose:
-        print(f"🎨 Generating image with EMD constraint (target: {target_emd_threshold:.3f})")
+        print(f"🎨 Generating image with Sinkhorn constraint (target: {target_sinkhorn_threshold:.3f})")
         print(f"📝 Prompt: '{prompt}'")
         print(f"🔄 Max attempts: {max_attempts}")
         print("-" * 60)
@@ -317,9 +317,9 @@ def generate_from_dataset_id_xl_with_emd(
     from ..shared.utils.image_utils import create_control_edge_pil
     control_image = create_control_edge_pil(edge_maps[layout_index], size=512)
 
-    # EMD-constrained generation
+    # Sinkhorn-constrained generation
     best_images = None
-    best_emd = float("inf")
+    best_sinkhorn = float("inf")
     best_cosine_sim = 0.0
     attempts_made = 0
 
@@ -348,7 +348,7 @@ def generate_from_dataset_id_xl_with_emd(
 
         # Calculate histogram for generated image using detected color space
         generated_hist = compute_histogram_for_color_space(images[0], color_space, bins=8)
-        emd_distance = calculate_emd_distance_topk(
+        sinkhorn_distance = calculate_sinkhorn_distance_topk(
             original_histogram, generated_hist, top_k=top_k, blur=blur
         )
         
@@ -359,11 +359,11 @@ def generate_from_dataset_id_xl_with_emd(
 
         # Structured logging
         if verbose and attempt % 5 == 0:  # Only log every 5th attempt
-            print(f"  Attempt {attempt+1}/{max_attempts}: EMD={emd_distance:.4f}", end="")
+            print(f"  Attempt {attempt+1}/{max_attempts}: Sinkhorn={sinkhorn_distance:.4f}", end="")
 
         # Check if this is the best result so far
-        if emd_distance < best_emd:
-            best_emd = emd_distance
+        if sinkhorn_distance < best_sinkhorn:
+            best_sinkhorn = sinkhorn_distance
             best_images = images
             best_cosine_sim = cosine_sim
             if verbose:
@@ -373,24 +373,24 @@ def generate_from_dataset_id_xl_with_emd(
                 print()
 
         # Check if we've reached the target threshold
-        if emd_distance <= target_emd_threshold:
+        if sinkhorn_distance <= target_sinkhorn_threshold:
             if verbose:
-                print(f"\n✓ Target EMD reached! ({emd_distance:.4f} <= {target_emd_threshold:.3f})")
+                print(f"\n✓ Target Sinkhorn reached! ({sinkhorn_distance:.4f} <= {target_sinkhorn_threshold:.3f})")
             break
 
     # Results are returned as data - visualization handled separately
     if best_images and verbose:
-        print(f"Generated {len(best_images)} images with EMD constraint")
-        print(f"Best EMD distance: {best_emd:.4f}")
+        print(f"Generated {len(best_images)} images with Sinkhorn constraint")
+        print(f"Best Sinkhorn distance: {best_sinkhorn:.4f}")
         print(f"Best cosine similarity: {best_cosine_sim:.4f}")
         print(f"Attempts made: {attempts_made}")
 
         print(f"\n✓ Generation complete!")
-        print(f"Best EMD achieved: {best_emd:.4f}")
+        print(f"Best Sinkhorn achieved: {best_sinkhorn:.4f}")
         print(f"Best cosine similarity: {best_cosine_sim:.4f}")
         print(f"Attempts made: {attempts_made}")
 
-    return best_images, best_emd, best_cosine_sim, attempts_made
+    return best_images, best_sinkhorn, best_cosine_sim, attempts_made
 
 
 def generate_by_style(
@@ -454,22 +454,22 @@ def generate_by_style(
     )
 
 
-def generate_by_colour_emd_constrained(
+def generate_by_colour_sinkhorn_constrained(
     generator,
     color_embedding: torch.Tensor,
     control_image: Image.Image,
     original_histogram: np.ndarray,
     prompt: str = "a beautiful image",
-    target_emd_threshold: float = 0.1,
+    target_sinkhorn_threshold: float = 0.1,
     max_attempts: int = 20,
     top_k: int = 20,
     color_space: Optional[str] = None,
     **generation_kwargs
 ) -> Tuple[List[Image.Image], float, float, int]:
     """
-    Generate images with EMD constraint on color histograms using pre-computed color embeddings.
+    Generate images with Sinkhorn constraint on color histograms using pre-computed color embeddings.
     
-    This function generates images that match a target color histogram using Earth Mover's Distance (EMD)
+    This function generates images that match a target color histogram using Sinkhorn OT (Sinkhorn)
     as a constraint. It uses pre-computed color embeddings and includes cosine similarity tracking
     between the prompt and generated images.
     
@@ -477,27 +477,27 @@ def generate_by_colour_emd_constrained(
         generator: DEGIS generator instance
         color_embedding: Pre-computed color embedding from trained color head
         control_image: Control image for layout/edge control
-        original_histogram: Target histogram for EMD comparison (RGB, HCL, or LAB)
+        original_histogram: Target histogram for Sinkhorn comparison (RGB, HCL, or LAB)
         prompt: Text prompt for generation
-        target_emd_threshold: Target EMD threshold (stop when reached)
+        target_sinkhorn_threshold: Target Sinkhorn threshold (stop when reached)
         max_attempts: Maximum number of generation attempts
-        top_k: Number of top histogram values for EMD calculation
+        top_k: Number of top histogram values for Sinkhorn calculation
         color_space: Color space ('rgb', 'hcl', 'lab') - auto-detect if None
         **generation_kwargs: Additional generation parameters
         
     Returns:
-        Tuple of (best_images, best_emd, best_cosine_sim, attempts_made)
+        Tuple of (best_images, best_sinkhorn, best_cosine_sim, attempts_made)
     """
     # Auto-detect color space if not provided
     if color_space is None:
         color_space = detect_color_space(original_histogram)
     
-    print(f"🎨 EMD-constrained generation: Using pre-computed color embedding")
-    print(f"📊 Color space: {color_space}, Target EMD: {target_emd_threshold}")
+    print(f"🎨 Sinkhorn-constrained generation: Using pre-computed color embedding")
+    print(f"📊 Color space: {color_space}, Target Sinkhorn: {target_sinkhorn_threshold}")
     
-    # EMD-constrained generation
+    # Sinkhorn-constrained generation
     best_images = None
-    best_emd = float("inf")
+    best_sinkhorn = float("inf")
     best_cosine_sim = 0.0
     attempts_made = 0
 
@@ -518,7 +518,7 @@ def generate_by_colour_emd_constrained(
 
         # Calculate histogram for generated image
         generated_hist = compute_histogram_for_color_space(images[0], color_space, bins=8)
-        emd_distance = calculate_emd_distance_topk(
+        sinkhorn_distance = calculate_sinkhorn_distance_topk(
             original_histogram, generated_hist, top_k=top_k, blur=0.01
         )
         
@@ -527,25 +527,25 @@ def generate_by_colour_emd_constrained(
 
         attempts_made += 1
 
-        # Check if this is the best result so far (based on EMD)
-        if emd_distance < best_emd:
-            best_emd = emd_distance
+        # Check if this is the best result so far (based on Sinkhorn)
+        if sinkhorn_distance < best_sinkhorn:
+            best_sinkhorn = sinkhorn_distance
             best_images = images
             best_cosine_sim = cosine_sim
             best_cosine_sim = cosine_sim
 
         # Check if we've reached the target threshold
-        if emd_distance <= target_emd_threshold:
+        if sinkhorn_distance <= target_sinkhorn_threshold:
             break
 
-    return best_images, best_emd, best_cosine_sim, attempts_made
+    return best_images, best_sinkhorn, best_cosine_sim, attempts_made
 
 
-def generate_with_images_and_emd(
+def generate_with_images_and_sinkhorn(
     colour_image: Image.Image,
     edge_image: Image.Image,
     prompt: str = "a beautiful image",
-    target_emd_threshold: float = 0.1,
+    target_sinkhorn_threshold: float = 0.1,
     max_attempts: int = 20,
     top_k: int = 20,
     guidance_scale: float = 6.5,
@@ -566,7 +566,7 @@ def generate_with_images_and_emd(
     device=None,
 ) -> Tuple[List[Image.Image], float, float, int]:
     """
-    Generate images with EMD constraint using specific images (much cleaner approach).
+    Generate images with Sinkhorn constraint using specific images (much cleaner approach).
     
     This is the recommended function - much cleaner than the dataset-based version.
     
@@ -574,16 +574,16 @@ def generate_with_images_and_emd(
         colour_image: PIL Image for color reference
         edge_image: PIL Image for layout/edge control
         prompt: Text prompt for generation
-        target_emd_threshold: Target EMD threshold
+        target_sinkhorn_threshold: Target Sinkhorn threshold
         max_attempts: Maximum number of attempts
-        top_k: Number of top histogram values for EMD
+        top_k: Number of top histogram values for Sinkhorn
         # ... other generation parameters
         generator: DEGIS generator instance
         color_head: Trained color head model
         device: Device to use
         
     Returns:
-        Tuple of (best_images, best_emd, best_cosine_sim, attempts_made)
+        Tuple of (best_images, best_sinkhorn, best_cosine_sim, attempts_made)
     """
     # Clear GPU memory
     gc.collect()
@@ -603,7 +603,7 @@ def generate_with_images_and_emd(
     z_clip = compute_clip_embedding(image_tensor).unsqueeze(0)  # Add batch dim
     color_embedding = get_color_embedding(color_head, z_clip)
 
-    # Compute original histogram for EMD comparison
+    # Compute original histogram for Sinkhorn comparison
     original_histogram = compute_histogram_for_color_space(colour_image, color_space or 'lab', bins=8)
     
     # Auto-detect color space if not provided
@@ -611,14 +611,14 @@ def generate_with_images_and_emd(
         color_space = detect_color_space(original_histogram)
     
     if verbose:
-        print(f"🎨 Generating image with EMD constraint (target: {target_emd_threshold:.3f})")
+        print(f"🎨 Generating image with Sinkhorn constraint (target: {target_sinkhorn_threshold:.3f})")
         print(f"📝 Prompt: '{prompt}'")
         print(f"🔄 Max attempts: {max_attempts}")
         print("-" * 60)
 
-    # EMD-constrained generation
+    # Sinkhorn-constrained generation
     best_images = None
-    best_emd = float("inf")
+    best_sinkhorn = float("inf")
     best_cosine_sim = 0.0
     attempts_made = 0
 
@@ -647,7 +647,7 @@ def generate_with_images_and_emd(
 
         # Calculate histogram for generated image
         generated_hist = compute_histogram_for_color_space(images[0], color_space, bins=8)
-        emd_distance = calculate_emd_distance_topk(
+        sinkhorn_distance = calculate_sinkhorn_distance_topk(
             original_histogram, generated_hist, top_k=top_k, blur=blur
         )
         
@@ -658,11 +658,11 @@ def generate_with_images_and_emd(
 
         # Structured logging
         if verbose and attempt % 5 == 0:  # Only log every 5th attempt
-            print(f"  Attempt {attempt+1}/{max_attempts}: EMD={emd_distance:.4f}", end="")
+            print(f"  Attempt {attempt+1}/{max_attempts}: Sinkhorn={sinkhorn_distance:.4f}", end="")
 
         # Check if this is the best result so far
-        if emd_distance < best_emd:
-            best_emd = emd_distance
+        if sinkhorn_distance < best_sinkhorn:
+            best_sinkhorn = sinkhorn_distance
             best_images = images
             best_cosine_sim = cosine_sim
             if verbose:
@@ -672,17 +672,17 @@ def generate_with_images_and_emd(
                 print()
 
         # Check if we've reached the target threshold
-        if emd_distance <= target_emd_threshold:
+        if sinkhorn_distance <= target_sinkhorn_threshold:
             if verbose:
-                print(f"\n✓ Target EMD reached! ({emd_distance:.4f} <= {target_emd_threshold:.3f})")
+                print(f"\n✓ Target Sinkhorn reached! ({sinkhorn_distance:.4f} <= {target_sinkhorn_threshold:.3f})")
             break
 
     # Results are returned as data - visualization handled separately
     if best_images and verbose:
-        print(f"Generated {len(best_images)} images with EMD constraint")
-        print(f"Best EMD distance: {best_emd:.4f}")
+        print(f"Generated {len(best_images)} images with Sinkhorn constraint")
+        print(f"Best Sinkhorn distance: {best_sinkhorn:.4f}")
         print(f"Best cosine similarity: {best_cosine_sim:.4f}")
         print(f"Attempts made: {attempts_made}")
         print(f"\n✓ Generation complete!")
 
-    return best_images, best_emd, best_cosine_sim, attempts_made
+    return best_images, best_sinkhorn, best_cosine_sim, attempts_made
