@@ -402,8 +402,8 @@ def visualize_generation_comparison(
         ax.set_xlim(0, len(colors)); ax.set_ylim(0,1); ax.axis("off")
         ax.set_title(title, fontsize=12)
     
-    # Create figure with 2x3 layout
-    fig, axes = plt.subplots(2, 3, figsize=figsize)
+    # Create figure with 2x4 layout
+    fig, axes = plt.subplots(2, 4, figsize=figsize)
     
     # Convert PIL images to numpy arrays
     color_np = np.array(color_source_image.resize((grid_size, grid_size)))
@@ -416,7 +416,7 @@ def visualize_generation_comparison(
     # 1. Style image (top-left)
     axes[0, 0].imshow(color_np)
     axes[0, 0].axis("off")
-    axes[0, 0].set_title(f"Style Image ({color_space.upper()})", fontsize=font_size)
+    axes[0, 0].set_title(f"Style Image", fontsize=font_size)
     
     # 2. Edge map (top-center)
     axes[0, 1].imshow(edge_np, cmap='gray')
@@ -426,38 +426,46 @@ def visualize_generation_comparison(
     # 3. Generate by style result (top-right)
     axes[0, 2].imshow(style_np)
     axes[0, 2].axis("off")
+    axes[0, 2].set_title("Generate by Style", fontsize=font_size)
     
-    # Add style generation metrics
-    style_text = "Generate by Style"
+    # 4. Style metrics (top-right)
+    axes[0, 3].axis("off")
+    style_text = "Style Metrics:"
     if style_metrics:
         style_text += f"\nTime: {style_metrics.get('generation_time', 'N/A')}s"
         style_text += f"\nSinkhorn: {style_metrics.get('sinkhorn', 'N/A'):.4f}"
         style_text += f"\nCosine: {style_metrics.get('cosine', 'N/A'):.4f}"
-    axes[0, 2].set_title(style_text, fontsize=font_size)
+        style_text += f"\nIoU: {style_metrics.get('iou', 'N/A'):.4f}"
+    axes[0, 3].text(0.1, 0.9, style_text, transform=axes[0, 3].transAxes, 
+                    fontsize=font_size, verticalalignment='top', fontweight='bold')
     
     # === SECOND ROW ===
     
-    # 4. Histogram (bottom-left)
+    # 5. Histogram (bottom-left)
     hist_cols, hist_vals = _top_palette(color_histogram, top_k=14)
-    _plot_palette(axes[1, 0], hist_cols, hist_vals, f"Color Histogram ({color_space.upper()})")
+    _plot_palette(axes[1, 0], hist_cols, hist_vals, f"Color Histogram")
     
-    # 5. Edge map (bottom-center) - same as top
+    # 6. Edge map (bottom-center) - same as top
     axes[1, 1].imshow(edge_np, cmap='gray')
     axes[1, 1].axis("off")
     axes[1, 1].set_title("Edge Map", fontsize=font_size)
     
-    # 6. Generate by Sinkhorn result (bottom-right)
+    # 7. Generate by Sinkhorn result (bottom-right)
     axes[1, 2].imshow(sinkhorn_np)
     axes[1, 2].axis("off")
+    axes[1, 2].set_title("Generate by Sinkhorn", fontsize=font_size)
     
-    # Add Sinkhorn generation metrics
-    sinkhorn_text = "Generate by Sinkhorn"
+    # 8. Sinkhorn metrics (bottom-right)
+    axes[1, 3].axis("off")
+    sinkhorn_text = "Sinkhorn Metrics:"
     if sinkhorn_metrics:
         sinkhorn_text += f"\nTime: {sinkhorn_metrics.get('generation_time', 'N/A')}s"
         sinkhorn_text += f"\nSinkhorn: {sinkhorn_metrics.get('sinkhorn', 'N/A'):.4f}"
         sinkhorn_text += f"\nCosine: {sinkhorn_metrics.get('cosine', 'N/A'):.4f}"
+        sinkhorn_text += f"\nIoU: {sinkhorn_metrics.get('iou', 'N/A'):.4f}"
         sinkhorn_text += f"\nAttempts: {sinkhorn_metrics.get('attempts', 'N/A')}"
-    axes[1, 2].set_title(sinkhorn_text, fontsize=font_size)
+    axes[1, 3].text(0.1, 0.9, sinkhorn_text, transform=axes[1, 3].transAxes, 
+                    fontsize=font_size, verticalalignment='top', fontweight='bold')
     
     plt.tight_layout()
     
