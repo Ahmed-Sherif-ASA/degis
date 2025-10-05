@@ -134,10 +134,10 @@ if str(project_root) not in sys.path:
 
 # This file contains the setup_environment function
 
-print("✅ Environment configured:")
-print(f"  📁 Data directory: {paths['data_dir']}")
-print(f"  📁 Models directory: {paths['models_dir']}")
-print(f"  📁 Cache directory: {paths['cache_dir']}")
+print("Environment configured:")
+print(f"  Data directory: {paths['data_dir']}")
+print(f"  Models directory: {paths['models_dir']}")
+print(f"  Cache directory: {paths['cache_dir']}")
 
 # Set up paths for this notebook
 DATA_DIR = paths['data_dir']
@@ -151,11 +151,11 @@ EMBEDDINGS_PATH = os.path.join(MODELS_DIR, f"{DATASET_NAME}_embeddings.npy")
 HISTOGRAMS_PATH = os.path.join(DATA_DIR, f"{DATASET_NAME}_color_histograms_hcl_514.npy")
 EDGE_MAPS_PATH = os.path.join(DATA_DIR, f"{DATASET_NAME}_edge_maps.npy")
 
-print("\\n📋 Dataset paths configured:")
-print(f"  📄 CSV: {CSV_PATH}")
-print(f"  🧠 Embeddings: {EMBEDDINGS_PATH}")
-print(f"  🎨 Histograms: {HISTOGRAMS_PATH}")
-print(f"  📐 Edge maps: {EDGE_MAPS_PATH}")
+print("\\nDataset paths configured:")
+print(f"  CSV: {CSV_PATH}")
+print(f"  Embeddings: {EMBEDDINGS_PATH}")
+print(f"  Histograms: {HISTOGRAMS_PATH}")
+print(f"  Edge maps: {EDGE_MAPS_PATH}")
 
 # Check if files exist
 missing_files = []
@@ -165,13 +165,13 @@ for name, path in [("CSV", CSV_PATH), ("Embeddings", EMBEDDINGS_PATH),
         missing_files.append(f"{name}: {path}")
 
 if missing_files:
-    print("\\n⚠️  Missing files (will be generated if needed):")
+    print("\\n Missing files (will be generated if needed):")
     for file in missing_files:
         print(f"  - {file}")
 else:
-    print("\\n✅ All dataset files found!")
+    print("\\nAll dataset files found!")
 
-print("\\n🚀 Ready to run the notebook!")
+print("\\nReady to run the notebook!")
 '''
     
     return config_code
@@ -208,7 +208,7 @@ def download_required_models(force_download: bool = False) -> bool:
                 cache_dir=MODEL_CACHE,
                 local_dir=os.getenv("DEGIS_MODELS_DIR", "./models")
             )
-            print(f"✅ Downloaded IP-Adapter SD 1.5: {sd15_path}")
+            print(f"Downloaded IP-Adapter SD 1.5: {sd15_path}")
             
             # Download IP-Adapter SDXL
             sdxl_path = hf_hub_download(
@@ -217,20 +217,20 @@ def download_required_models(force_download: bool = False) -> bool:
                 cache_dir=MODEL_CACHE,
                 local_dir=os.getenv("DEGIS_MODELS_DIR", "./models")
             )
-            print(f"✅ Downloaded IP-Adapter SDXL: {sdxl_path}")
+            print(f"Downloaded IP-Adapter SDXL: {sdxl_path}")
             
         except ImportError:
-            print("⚠️  huggingface_hub not available. Install with: pip install huggingface_hub")
+            print(" huggingface_hub not available. Install with: pip install huggingface_hub")
             return False
         except Exception as e:
-            print(f"❌ Failed to download models: {e}")
+            print(f"Failed to download models: {e}")
             return False
         
-        print("✅ All required models downloaded!")
+        print("All required models downloaded!")
         return True
         
     except Exception as e:
-        print(f"❌ Error setting up models: {e}")
+        print(f"Error setting up models: {e}")
         return False
 
 def print_setup_summary():
@@ -242,7 +242,7 @@ def print_setup_summary():
         "cache_dir": os.getenv("DEGIS_CACHE_DIR", "./model-cache"),
     }
     
-    print("🔧 DEGIS Setup Summary")
+    print("DEGIS Setup Summary")
     print("=" * 50)
     print(f"Environment: {'Server' if env_info['is_server'] else 'Local'}")
     print(f"GPU Available: {'Yes' if env_info['has_gpu'] else 'No'}")

@@ -333,9 +333,9 @@ def plot_training_curves(
         print("✓ Generated training curves (sinkhorn_curves.png, loss_curve.png)")
         
     except ImportError:
-        print("⚠️  matplotlib not available, skipping training curves")
+        print(" matplotlib not available, skipping training curves")
     except Exception as e:
-        print(f"⚠️  Error generating training curves: {e}")
+        print(f" Error generating training curves: {e}")
 
 
 def visualize_generation_comparison(

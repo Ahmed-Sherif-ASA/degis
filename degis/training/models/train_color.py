@@ -56,7 +56,7 @@ def train_color_disentanglement(
     device,
     num_epochs    = 200,
     lambda_ortho  = 0.1,
-    lambda_consistency = 0.1,  # New: consistency loss weight
+    lambda_consistency = 0.1,  # consistency loss weight
     lambda_leak   = 0.25,
     top_k         = None,
     use_weighting = False,

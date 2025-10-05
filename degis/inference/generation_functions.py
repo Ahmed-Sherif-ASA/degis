@@ -15,7 +15,6 @@ from typing import List, Tuple, Optional, Union
 from PIL import Image
 import gc
 
-# Visualization functions moved to shared.utils.visualization
 from ..shared.image_features.color_histograms import compute_lab_histogram, compute_color_histogram, compute_hcl_histogram
 from ..shared.clip_vit_h14 import compute_clip_embedding
 from ..inference.core_generation import get_color_embedding
@@ -86,8 +85,6 @@ def detect_color_space(histogram: np.ndarray) -> str:
         return "rgb"
     elif length == 514:
         # For 514-length histograms, we need to determine if it's HCL or LAB
-        # This is a heuristic - in practice, you might want to store this info
-        # For now, we'll default to LAB as it's more common
         return "lab"
     else:
         raise ValueError(f"Unsupported histogram length: {length}. Expected 512 (RGB) or 514 (LAB/HCL)")
@@ -158,7 +155,6 @@ def calculate_cosine_similarity(
             print("Error: clip_model is None after model loading")
             return 0.0
         
-        # Use the current functions
         preprocess = current_preprocess
         clip_model = current_clip_model
         
@@ -308,9 +304,9 @@ def generate_from_dataset_id_xl_with_sinkhorn(
         color_space = detect_color_space(original_histogram)
     
     if verbose:
-        print(f"🎨 Generating image with Sinkhorn constraint (target: {target_sinkhorn_threshold:.3f})")
-        print(f"📝 Prompt: '{prompt}'")
-        print(f"🔄 Max attempts: {max_attempts}")
+        print(f"Generating image with Sinkhorn constraint (target: {target_sinkhorn_threshold:.3f})")
+        print(f"Prompt: '{prompt}'")
+        print(f"Max attempts: {max_attempts}")
         print("-" * 60)
 
     # Create control image from edge data
@@ -492,8 +488,8 @@ def generate_by_colour_sinkhorn_constrained(
     if color_space is None:
         color_space = detect_color_space(original_histogram)
     
-    print(f"🎨 Sinkhorn-constrained generation: Using pre-computed color embedding")
-    print(f"📊 Color space: {color_space}, Target Sinkhorn: {target_sinkhorn_threshold}")
+    print(f"Sinkhorn-constrained generation: Using pre-computed color embedding")
+    print(f"Color space: {color_space}, Target Sinkhorn: {target_sinkhorn_threshold}")
     
     # Sinkhorn-constrained generation
     best_images = None
@@ -566,7 +562,7 @@ def generate_with_images_and_sinkhorn(
     device=None,
 ) -> Tuple[List[Image.Image], float, float, int]:
     """
-    Generate images with Sinkhorn constraint using specific images (much cleaner approach).
+    Generate images with Sinkhorn constraint using specific images.
     
     This is the recommended function - much cleaner than the dataset-based version.
     
@@ -611,9 +607,9 @@ def generate_with_images_and_sinkhorn(
         color_space = detect_color_space(original_histogram)
     
     if verbose:
-        print(f"🎨 Generating image with Sinkhorn constraint (target: {target_sinkhorn_threshold:.3f})")
-        print(f"📝 Prompt: '{prompt}'")
-        print(f"🔄 Max attempts: {max_attempts}")
+        print(f"Generating image with Sinkhorn constraint (target: {target_sinkhorn_threshold:.3f})")
+        print(f"Prompt: '{prompt}'")
+        print(f"Max attempts: {max_attempts}")
         print("-" * 60)
 
     # Sinkhorn-constrained generation

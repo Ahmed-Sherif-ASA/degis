@@ -2,7 +2,7 @@
 
 This guide provides multiple setup options for the DEGIS project, ensuring easy installation regardless of the system configuration.
 
-## 🚀 Quick Start (Recommended)
+## Quick Start (Recommended)
 
 ### Automated Setup Script
 
@@ -56,7 +56,7 @@ pip install jupyter jupyterlab ipykernel
 jupyter lab
 ```
 
-## 📓 Running the Notebooks
+## Running the Notebooks
 
 1. **Start Jupyter:**
    ```bash
@@ -76,7 +76,7 @@ jupyter lab
    - If using Poetry: Select "DEGIS (Python 3)" kernel
    - If using pip: Select "Python 3" kernel
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Poetry Issues
 If Poetry doesn't work, use the pip approach (Option 3 above).
@@ -96,7 +96,7 @@ If notebooks don't work, try:
 python -m ipykernel install --user --name=degis --display-name="DEGIS (Python 3)"
 ```
 
-## 📦 Package Information
+## Package Information
 
 - **Python Version:** 3.10+
 - **Main Dependencies:** PyTorch, Transformers, Diffusers, OpenCV

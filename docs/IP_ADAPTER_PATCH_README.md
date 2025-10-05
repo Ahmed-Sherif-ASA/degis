@@ -2,7 +2,7 @@
 
 This directory contains a complete IP-Adapter implementation with DEGIS (Disentangled Embeddings Guided Image Synthesis) enhancements, providing advanced multi-embedding support, fine-grained control, and robust error handling.
 
-## 🚀 Key Features
+## Key Features
 
 ### Complete Implementation:
 - **Full IP-Adapter Replacement**: Complete replacement of all IP-Adapter classes
@@ -53,7 +53,7 @@ images = adapter.generate(
 from ip_adapter_patch import IPAdapter, IPAdapterXL
 ```
 
-## 🔧 Implementation Details
+## Implementation Details
 
 ### **Import Structure**
 - **Global imports with fallbacks** - handles missing dependencies gracefully
@@ -89,7 +89,7 @@ class EmbeddingAdapter(torch.nn.Module):
             'custom': torch.nn.Sequential(...)
         })
 ```
-**Impact:** 🚀 **Multi-embedding support** - use CLIP, DINO, or custom embeddings seamlessly.
+**Impact:** **Multi-embedding support** - use CLIP, DINO, or custom embeddings seamlessly.
 
 ### 2. **Advanced Token Mixing**
 ```python
@@ -108,7 +108,7 @@ def _mix_text_ip_tokens(
     negative_pooled_prompt_embeds=None,
 ):
 ```
-**Impact:** 🎨 **Fine-grained control** - separate scaling for different token types.
+**Impact:** **Fine-grained control** - separate scaling for different token types.
 
 ### 3. **Enhanced Generation Methods**
 ```python
@@ -149,7 +149,7 @@ def generate_from_embeddings(
 ```
 **Impact:** ⚡ **Performance optimization** - reuse pre-computed embeddings for faster generation.
 
-## 🔄 **Backward Compatibility**
+## **Backward Compatibility**
 
 The DEGIS implementation maintains **full backward compatibility** with the original IP-Adapter API:
 
@@ -188,10 +188,10 @@ python test_ip_adapter_patch.py
 
 ## 🎯 **Key Benefits**
 
-1. **🚀 Multi-Embedding Support**: Use CLIP, DINO, or custom embeddings seamlessly
-2. **🎨 Fine-Grained Control**: Separate scaling for text vs image tokens
+1. **Multi-Embedding Support**: Use CLIP, DINO, or custom embeddings seamlessly
+2. **Fine-Grained Control**: Separate scaling for text vs image tokens
 3. **⚡ Performance Optimization**: Pre-computed embedding support
-4. **🔄 Backward Compatible**: Original API still works perfectly
+4. **Backward Compatible**: Original API still works perfectly
 
 ## License
 

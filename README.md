@@ -6,7 +6,7 @@
 
 DEGIS is a novel approach for image generation that leverages pre-trained disentangled semantic specific CLIP embeddings and Sinkhorn (Sinkhorn) constraints to generate high-quality images with precise color control.
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Install dependencies
@@ -37,7 +37,7 @@ python -m degis.training.cli.train --help
 
 ![Architecture](docs/Architecture.png)
 
-## 📊 Results
+## Results
 
 DEGIS achieves state-of-the-art results in color-constrained image generation with:
 - **Low Sinkhorn scores** (0.01-0.1) for color fidelity
@@ -52,7 +52,7 @@ This project implements the DEGIS methodology for precise color control. The app
 2. **Sinkhorn constraints** for color distribution matching
 3. **IP-Adapter integration** for style transfer capabilities
 
-## 📝 Citation
+## Citation
 
 ```bibtex
 @article{degis2024,

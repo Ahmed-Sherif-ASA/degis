@@ -8,7 +8,7 @@ import torch
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 
-from ..data.dataset import PrecompClipColorDataset, PrecompClipEdgeDataset
+from ..data.dataset import PrecompClipColorDataset
 from .models.color_heads import ColorHead, RestHead
 from .models.train_color import train_color_disentanglement
 from ..shared.utils.logger import MetricsLogger, short_git_hash
@@ -26,12 +26,12 @@ def train_color_model(
     weight_decay=1e-2,
     blur=0.05,
     lambda_ortho=0.1,
-    lambda_consistency=0.1,  # New: consistency loss weight
+    lambda_consistency=0.1,  # consistency loss weight
     top_k=None,
     weighting=False,
     device=None,
-    csv_name=None,  # New: dataset name for run naming
-    emb_kind=None,  # New: embedding kind for run naming
+    csv_name=None,  # dataset name for run naming
+    emb_kind=None,  # embedding kind for run naming
     **kwargs
 ):
     """
