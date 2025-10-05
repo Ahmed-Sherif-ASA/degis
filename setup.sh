@@ -1,6 +1,5 @@
 #!/bin/bash
 # DEGIS Setup Script for Server Environment with GPU/CUDA
-# Fixed version that handles disk space and cache issues
 
 set -e  # Exit on any error
 
@@ -100,7 +99,7 @@ if [ "$USE_PIP" = true ]; then
     echo "Installing DEGIS package and dependencies with pip..."
     
     # Create virtual environment (ignored by git)
-    echo "🏗️  Creating virtual environment..."
+    echo "Creating virtual environment..."
     python3 -m venv degis-env
     source degis-env/bin/activate
     

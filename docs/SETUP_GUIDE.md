@@ -103,14 +103,14 @@ python -m ipykernel install --user --name=degis --display-name="DEGIS (Python 3)
 - **Development Dependencies:** Jupyter, JupyterLab, pytest
 - **Package Size:** ~2GB (including models)
 
-## 🆘 Getting Help
+## Getting Help
 
 If you encounter any issues:
 1. Check the main README_PACKAGE.md
 2. Try the pip approach if Poetry fails
 3. Contact the author: A.Sherif Akl
 
-## 🎯 What This Project Does
+## What This Project Does
 
 DEGIS (Disentangled Embeddings Guided Synthesis) is a Python package for:
 - Training disentangled representations of images using CLIP embeddings

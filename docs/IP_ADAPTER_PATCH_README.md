@@ -74,7 +74,7 @@ from ip_adapter_patch import IPAdapter, IPAdapterXL
 - **Comprehensive validation** - better error messages and validation
 
 
-## 🆕 **New Features in DEGIS**
+## New Features in DEGIS
 
 ### 1. **EmbeddingAdapter Class**
 ```python
@@ -130,7 +130,7 @@ def generate(
     **kwargs,
 ):
 ```
-**Impact:** 🎛️ **Granular control** - fine-tune every aspect of generation.
+**Impact:** **Granular control** - fine-tune every aspect of generation.
 
 ### 4. **Pre-computed Embedding Support**
 ```python
@@ -147,7 +147,7 @@ def generate_from_embeddings(
         # ... pass through all parameters
     )
 ```
-**Impact:** ⚡ **Performance optimization** - reuse pre-computed embeddings for faster generation.
+**Impact:** **Performance optimization** - reuse pre-computed embeddings for faster generation.
 
 ## **Backward Compatibility**
 
@@ -186,11 +186,11 @@ source degis-env/bin/activate
 python test_ip_adapter_patch.py
 ```
 
-## 🎯 **Key Benefits**
+## Key Benefits
 
 1. **Multi-Embedding Support**: Use CLIP, DINO, or custom embeddings seamlessly
 2. **Fine-Grained Control**: Separate scaling for text vs image tokens
-3. **⚡ Performance Optimization**: Pre-computed embedding support
+3. **Performance Optimization**: Pre-computed embedding support
 4. **Backward Compatible**: Original API still works perfectly
 
 ## License

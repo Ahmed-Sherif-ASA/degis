@@ -95,7 +95,7 @@ def run_training_experiment(emb_kind, csv_name, hist_kind, base_params, verbose=
         duration = end_time - start_time
         
         if verbose:
-            print(f"\n✓ Experiment {run_name} completed successfully in {duration:.2f} seconds")
+            print(f"\nExperiment {run_name} completed successfully in {duration:.2f} seconds")
         return True, duration
         
     except subprocess.CalledProcessError as e:
@@ -103,7 +103,7 @@ def run_training_experiment(emb_kind, csv_name, hist_kind, base_params, verbose=
         duration = end_time - start_time
         
         if verbose:
-            print(f"\n✗ Experiment {run_name} failed after {duration:.2f} seconds")
+            print(f"\nExperiment {run_name} failed after {duration:.2f} seconds")
             print(f"Error: {e}")
         return False, duration
 
@@ -235,7 +235,7 @@ def main():
     if verbose:
         print(f"\nDetailed results:")
         for r in results:
-            status = "✓" if r['success'] else "✗"
+            status = "PASS" if r['success'] else "FAIL"
             print(f"  {status} {r['experiment']} ({r['duration']:.2f}s)")
     
     if failed > 0:

@@ -102,7 +102,7 @@ def main():
             force_recompute=args.force_recompute
         )
     
-    print("\n✓ Feature generation complete!")
+    print("\nFeature generation complete!")
 
 
 if __name__ == "__main__":

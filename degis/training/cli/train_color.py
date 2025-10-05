@@ -81,7 +81,7 @@ def main():
         device=args.device,
     )
     
-    print(f"\n✓ Training complete!")
+    print(f"\nTraining complete!")
     print(f"Output directory: {results['output_dir']}")
 
 

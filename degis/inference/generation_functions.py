@@ -371,7 +371,7 @@ def generate_from_dataset_id_xl_with_sinkhorn(
         # Check if we've reached the target threshold
         if sinkhorn_distance <= target_sinkhorn_threshold:
             if verbose:
-                print(f"\n✓ Target Sinkhorn reached! ({sinkhorn_distance:.4f} <= {target_sinkhorn_threshold:.3f})")
+                print(f"\nTarget Sinkhorn reached! ({sinkhorn_distance:.4f} <= {target_sinkhorn_threshold:.3f})")
             break
 
     # Results are returned as data - visualization handled separately
@@ -381,7 +381,7 @@ def generate_from_dataset_id_xl_with_sinkhorn(
         print(f"Best cosine similarity: {best_cosine_sim:.4f}")
         print(f"Attempts made: {attempts_made}")
 
-        print(f"\n✓ Generation complete!")
+        print(f"\nGeneration complete!")
         print(f"Best Sinkhorn achieved: {best_sinkhorn:.4f}")
         print(f"Best cosine similarity: {best_cosine_sim:.4f}")
         print(f"Attempts made: {attempts_made}")
@@ -573,7 +573,6 @@ def generate_with_images_and_sinkhorn(
         target_sinkhorn_threshold: Target Sinkhorn threshold
         max_attempts: Maximum number of attempts
         top_k: Number of top histogram values for Sinkhorn
-        # ... other generation parameters
         generator: DEGIS generator instance
         color_head: Trained color head model
         device: Device to use
@@ -670,7 +669,7 @@ def generate_with_images_and_sinkhorn(
         # Check if we've reached the target threshold
         if sinkhorn_distance <= target_sinkhorn_threshold:
             if verbose:
-                print(f"\n✓ Target Sinkhorn reached! ({sinkhorn_distance:.4f} <= {target_sinkhorn_threshold:.3f})")
+                print(f"\nTarget Sinkhorn reached! ({sinkhorn_distance:.4f} <= {target_sinkhorn_threshold:.3f})")
             break
 
     # Results are returned as data - visualization handled separately
@@ -679,6 +678,6 @@ def generate_with_images_and_sinkhorn(
         print(f"Best Sinkhorn distance: {best_sinkhorn:.4f}")
         print(f"Best cosine similarity: {best_cosine_sim:.4f}")
         print(f"Attempts made: {attempts_made}")
-        print(f"\n✓ Generation complete!")
+        print(f"\nGeneration complete!")
 
     return best_images, best_sinkhorn, best_cosine_sim, attempts_made

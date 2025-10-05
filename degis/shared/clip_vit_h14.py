@@ -43,8 +43,6 @@ def _ensure_model_loaded():
     # CLIP model already loaded
 
 
-# features/clip_embeddings.py
-
 def compute_clip_embedding(image_tensor: torch.Tensor) -> torch.Tensor:
     _ensure_model_loaded()
     

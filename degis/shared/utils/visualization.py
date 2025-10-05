@@ -330,7 +330,7 @@ def plot_training_curves(
         plt.savefig(os.path.join(output_dir, "loss_curve.png"), dpi=150, bbox_inches='tight')
         plt.close()
         
-        print("✓ Generated training curves (sinkhorn_curves.png, loss_curve.png)")
+        print("Generated training curves (sinkhorn_curves.png, loss_curve.png)")
         
     except ImportError:
         print(" matplotlib not available, skipping training curves")

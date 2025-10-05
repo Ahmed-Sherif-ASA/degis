@@ -40,7 +40,7 @@ def _download_checkpoint_if_needed(checkpoint_path: str, model_type: str) -> str
     from ..shared.utils.image_utils import create_control_edge_pil
     
     downloaded_path = download_ip_adapter_checkpoint(model_type)
-    print(f"✓ Downloaded IP-Adapter {model_type} checkpoint")
+    print(f"Downloaded IP-Adapter {model_type} checkpoint")
     return downloaded_path
 
 

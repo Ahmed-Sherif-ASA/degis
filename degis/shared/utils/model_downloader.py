@@ -73,12 +73,12 @@ def download_all_ip_adapter_models(cache_dir: Optional[str] = None) -> dict:
     # Download SD 1.5
     print("Downloading IP-Adapter SD 1.5...")
     models['sd15'] = download_ip_adapter_checkpoint('sd15', cache_dir)
-    print("✓ Downloaded IP-Adapter SD 1.5")
+    print("Downloaded IP-Adapter SD 1.5")
     
     # Download SDXL
     print("Downloading IP-Adapter SDXL...")
     models['sdxl'] = download_ip_adapter_checkpoint('sdxl', cache_dir)
-    print("✓ Downloaded IP-Adapter SDXL")
+    print("Downloaded IP-Adapter SDXL")
     
-    print("\n✓ All IP-Adapter models downloaded!")
+    print("\nAll IP-Adapter models downloaded!")
     return models

@@ -60,7 +60,7 @@ def main():
             force_recompute=args.force_recompute
         )
     
-    print(f"✓ Generated embeddings with shape: {embeddings.shape}")
+    print(f"Generated embeddings with shape: {embeddings.shape}")
 
 
 if __name__ == "__main__":

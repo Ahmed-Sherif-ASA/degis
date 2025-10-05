@@ -17,7 +17,7 @@ def generate_edge_maps(loader, edge_maps_path, method="canny", resize_size=(224,
     if not force_recompute:
         try:
             edge_maps = np.load(edge_maps_path)
-            print(f"[✓] Loaded cached edge maps from {edge_maps_path}")
+            print(f"[OK] Loaded cached edge maps from {edge_maps_path}")
             return edge_maps
         except Exception:
             print("[!] Cache not found -> recompute")
@@ -40,6 +40,6 @@ def generate_edge_maps(loader, edge_maps_path, method="canny", resize_size=(224,
             idx += 1
 
     np.save(edge_maps_path, edge_maps)
-    print(f"[✓] Edge maps saved to {edge_maps_path}")
+    print(f"[OK] Edge maps saved to {edge_maps_path}")
     return edge_maps
 

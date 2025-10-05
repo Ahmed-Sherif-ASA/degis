@@ -19,13 +19,13 @@ bash setup.sh
 python -m degis.training.cli.train --help
 ```
 
-## 📖 Documentation
+## Documentation
 
 - **[Setup Guide](docs/SETUP_GUIDE.md)** - Detailed installation and configuration
 - **[Training & Inference Workflow](docs/training_inference_workflow.md)** - How to use DEGIS
 - **[IP-Adapter Patch](docs/IP_ADAPTER_PATCH_README.md)** - Patch implementation details
 
-## 🎯 Key Features
+## Key Features
 
 - **Color-Aware Generation**: Precise control over color palettes using Sinkhorn constraints
 - **Style Transfer**: Direct image-to-image style transfer with IP-Adapter
@@ -33,7 +33,7 @@ python -m degis.training.cli.train --help
 - **Multiple Color Spaces**: Support for RGB, LAB, and HCL color representations
 - **Comprehensive Metrics**: Sinkhorn and cosine similarity evaluation
 
-## 🏗️ Architecture
+## Architecture
 
 ![Architecture](docs/Architecture.png)
 
@@ -44,7 +44,7 @@ DEGIS achieves state-of-the-art results in color-constrained image generation wi
 - **High cosine similarity** (0.2-0.8) for semantic consistency
 - **Fast generation** (6-8 seconds per image)
 
-## 🔬 Research
+## Research
 
 This project implements the DEGIS methodology for precise color control. The approach combines:
 
@@ -63,11 +63,11 @@ This project implements the DEGIS methodology for precise color control. The app
 }
 ```
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [CLIP](https://github.com/openai/CLIP) for vision-language understanding
 - [IP-Adapter](https://github.com/tencent-ailab/IP-Adapter) for image prompt adaptation

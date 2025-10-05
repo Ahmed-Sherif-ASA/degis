@@ -1,4 +1,3 @@
-# models/train_color.py
 import os, json, time
 import torch
 import torch.nn.functional as F
@@ -245,7 +244,7 @@ def train_color_disentanglement(
                 import traceback
                 traceback.print_exc()
             
-            print("✓ saved best")
+            print("Saved best")
 
             # JSON summary for the paper
             if logger is not None:

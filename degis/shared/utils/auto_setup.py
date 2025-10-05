@@ -195,7 +195,7 @@ def download_required_models(force_download: bool = False) -> bool:
             models_dir=os.getenv("DEGIS_MODELS_DIR", "./models")
         )
         
-        print("📥 Downloading required models...")
+        print("Downloading required models...")
         
         # Download IP-Adapter models
         try:
