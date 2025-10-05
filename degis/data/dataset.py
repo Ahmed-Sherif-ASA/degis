@@ -65,7 +65,7 @@ CSV FORMAT REQUIREMENTS:
 
 TRANSFORMS:
 - Default: Resize to specified size + Convert to PyTorch tensor
-- Custom: Pass your own torchvision.transforms.Compose object
+- Custom: Pass the torchvision.transforms.Compose object
 
 ERROR HANDLING:
 - Invalid URLs: Returns None (filtered out during iteration)

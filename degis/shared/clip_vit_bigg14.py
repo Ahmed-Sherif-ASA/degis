@@ -147,12 +147,12 @@ def generate_embeddings_xl(
     return embeddings
 
 
-# Function to check compatibility with your IP-Adapter model
+# Function to check compatibility with the IP-Adapter model
 def check_ip_adapter_compatibility(ip_adapter_model):
     """
-    Check if the embeddings from this script are compatible with your IP-Adapter model.
+    Check if the embeddings from this script are compatible with the IP-Adapter model.
     
-    ip_adapter_model: Your IPAdapterXL instance
+    ip_adapter_model: the IPAdapterXL instance
     
     Returns: (is_compatible, expected_dim, actual_dim)
     """
@@ -174,11 +174,10 @@ def check_ip_adapter_compatibility(ip_adapter_model):
     return is_compatible, expected_dim, actual_dim
 
 
-# Update the model to match your IP-Adapter
 def update_model_id(ip_adapter_model):
     """
-    Update the model ID to match your IP-Adapter model.
-    Call this after loading your IP-Adapter model.
+    Update the model ID to match the IP-Adapter model.
+    Call this after loading the IP-Adapter model.
     """
     global MODEL_ID, _vision, preprocess_xl, XL_EMB_DIM
     

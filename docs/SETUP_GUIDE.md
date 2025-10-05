@@ -1,6 +1,6 @@
 # DEGIS Setup Guide for Professors/Researchers
 
-This guide provides multiple setup options for the DEGIS project, ensuring easy installation regardless of your system configuration.
+This guide provides multiple setup options for the DEGIS project, ensuring easy installation regardless of the system configuration.
 
 ## 🚀 Quick Start (Recommended)
 
@@ -86,7 +86,7 @@ If models fail to download, you can manually download them:
 ```bash
 # The models will be cached in model-cache/ directory
 # You can also set a custom cache directory:
-export DEGIS_CACHE_DIR="/path/to/your/cache"
+export DEGIS_CACHE_DIR="/path/to/cache"
 ```
 
 ### Jupyter Kernel Issues

@@ -163,7 +163,6 @@ class ModelManager:
             keep_latest: Number of latest models to keep
         """
         # This would implement logic to keep only the latest N model versions
-        # Implementation depends on your naming convention
         logger.info(f"Cleanup not implemented yet. Would keep latest {keep_latest} models.")
 
 
