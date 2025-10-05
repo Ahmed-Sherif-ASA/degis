@@ -116,7 +116,6 @@ class EmbeddingAdapter(torch.nn.Module):
         self.embedding_dim = embedding_dim
         self.num_tokens = num_tokens
         
-        Projection layers for different embedding types
         self.proj_layers = torch.nn.ModuleDict({
             'clip': ImageProjModel(
                 cross_attention_dim=cross_attention_dim,
