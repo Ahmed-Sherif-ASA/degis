@@ -150,7 +150,7 @@ def generate_color_histograms(
             print(f"Loaded from {hist_path}")
             return histograms
         except Exception as e:
-            print(f"Loading failed: {e}. Recomputing...")
+            print(f"Loading failed. Recomputing...")
 
     all_histograms = np.zeros((num_images, hist_dim), dtype=np.float32)
 
