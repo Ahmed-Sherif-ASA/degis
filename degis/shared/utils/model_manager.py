@@ -154,17 +154,6 @@ class ModelManager:
                     models["other"].append(file)
         
         return models
-    
-    def cleanup_old_models(self, keep_latest: int = 5):
-        """
-        Clean up old model files, keeping only the latest N versions.
-        
-        Args:
-            keep_latest: Number of latest models to keep
-        """
-        # This would implement logic to keep only the latest N model versions
-        logger.info(f"Cleanup not implemented yet. Would keep latest {keep_latest} models.")
-
 
 # Global model manager instance
 _model_manager = None

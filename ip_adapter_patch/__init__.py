@@ -7,11 +7,10 @@ No patching needed - all classes are available directly.
 
 Usage:
     from ip_adapter_patch import IPAdapter, IPAdapterXL
-    # or
+    or
     from ip_adapter_patch.degis_ip_adapter_patch import IPAdapter, IPAdapterXL
 """
 
-# Export all classes directly
 from .degis_ip_adapter_patch import (
     ImageProjModel,
     MLPProjModel, 

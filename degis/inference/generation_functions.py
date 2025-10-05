@@ -374,7 +374,7 @@ def generate_from_dataset_id_xl_with_sinkhorn(
                 print(f"\nTarget Sinkhorn reached! ({sinkhorn_distance:.4f} <= {target_sinkhorn_threshold:.3f})")
             break
 
-    # Results are returned as data - visualization handled separately
+    # Results are returned as data
     if best_images and verbose:
         print(f"Generated {len(best_images)} images with Sinkhorn constraint")
         print(f"Best Sinkhorn distance: {best_sinkhorn:.4f}")
@@ -556,7 +556,6 @@ def generate_with_images_and_sinkhorn(
     color_space: Optional[str] = None,
     blur: float = 0.01,
     verbose: bool = True,
-    # Only the essential dependencies
     generator=None,
     color_head=None,
     device=None,

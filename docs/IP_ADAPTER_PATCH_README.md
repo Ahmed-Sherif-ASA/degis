@@ -49,7 +49,6 @@ images = adapter.generate(
 
 ### In Python Scripts:
 ```python
-# Same as notebooks
 from ip_adapter_patch import IPAdapter, IPAdapterXL
 ```
 

@@ -1,4 +1,4 @@
-# DEGIS Setup Guide for Professors/Researchers
+# DEGIS Setup Guide
 
 This guide provides multiple setup options for the DEGIS project, ensuring easy installation regardless of the system configuration.
 

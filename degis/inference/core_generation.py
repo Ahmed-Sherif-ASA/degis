@@ -228,10 +228,6 @@ class IPAdapterXLGenerator(ImageGenerator):
             embedding_type='clip'
         )
 
-
-# Edge control image creation moved to shared/utils/image_utils.py
-
-
 def generate_from_embeddings(
     color_embedding: torch.Tensor,
     layout_embedding: torch.Tensor,

@@ -106,7 +106,6 @@ def download_model(model_key: str, force_download: bool = False) -> str:
     # This would download from the HF model and extract specific files
     raise NotImplementedError(f"Download not implemented for {model_key}")
 
-# Convenience functions for common models
 def get_sd15_path() -> str:
     """Get path to SD 1.5 model."""
     return get_model_path("sd15")

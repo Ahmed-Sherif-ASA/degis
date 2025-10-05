@@ -1,4 +1,3 @@
-# clip_embeddings_xl_hf.py
 """
 HF CLIPVisionModelWithProjection embeddings for IPAdapterXL.
 

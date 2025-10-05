@@ -15,7 +15,6 @@ Structure:
 __version__ = "2.0.0"
 __author__ = "DEGIS Team"
 
-# Import main functionality for easy access
 from .shared.config import *
 from .data.dataset import UnifiedImageDataset
 from .training.batch_embeddings import generate_clip_embeddings, generate_xl_embeddings

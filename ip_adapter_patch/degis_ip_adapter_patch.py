@@ -10,12 +10,11 @@ It replaces the original IP-Adapter classes with enhanced versions that support:
 - Full IP-Adapter functionality
 
 Usage:
-    import ip_adapter_patch  # This automatically applies the patches
+    import ip_adapter_patch
     from ip_adapter import IPAdapter, IPAdapterXL
 """
 
 import os
-# Disable tqdm globally for this module
 os.environ['TQDM_DISABLE'] = '1'
 
 import torch
@@ -117,7 +116,7 @@ class EmbeddingAdapter(torch.nn.Module):
         self.embedding_dim = embedding_dim
         self.num_tokens = num_tokens
         
-        # Projection layers for different embedding types
+        Projection layers for different embedding types
         self.proj_layers = torch.nn.ModuleDict({
             'clip': ImageProjModel(
                 cross_attention_dim=cross_attention_dim,
@@ -313,7 +312,7 @@ class IPAdapter:
         image_prompt_embeds        = image_prompt_embeds        * ip_s
         uncond_image_prompt_embeds = uncond_image_prompt_embeds * ip_uncond_s
 
-        # finally concatenate: [text || ip]
+        # concatenate: [text || ip]
         prompt_embeds  = torch.cat([prompt_embeds_text,          image_prompt_embeds],        dim=1)
         negative_embeds = torch.cat([negative_prompt_embeds_text, uncond_image_prompt_embeds], dim=1)
         
@@ -415,7 +414,6 @@ class IPAdapter:
 
         generator = get_generator(seed, self.device)
 
-        # Disable tqdm by monkey-patching it
         import tqdm
         original_tqdm = tqdm.tqdm
         tqdm.tqdm = lambda *args, **kwargs: original_tqdm(*args, **kwargs, disable=True)
@@ -431,7 +429,6 @@ class IPAdapter:
             **kwargs,
         ).images
         
-        # Restore original tqdm
         tqdm.tqdm = original_tqdm
 
         return images
@@ -570,7 +567,6 @@ class IPAdapterXL(IPAdapter):
 
         self.generator = get_generator(seed, self.device)
         
-        # Disable tqdm by monkey-patching it
         import tqdm
         original_tqdm = tqdm.tqdm
         tqdm.tqdm = lambda *args, **kwargs: original_tqdm(*args, **kwargs, disable=True)
@@ -588,7 +584,6 @@ class IPAdapterXL(IPAdapter):
             **kwargs,
         ).images
         
-        # Restore original tqdm
         tqdm.tqdm = original_tqdm
 
         return images
@@ -777,7 +772,6 @@ class IPAdapterPlusXL(IPAdapter):
 
         generator = get_generator(seed, self.device)
 
-        # Disable tqdm by monkey-patching it
         import tqdm
         original_tqdm = tqdm.tqdm
         tqdm.tqdm = lambda *args, **kwargs: original_tqdm(*args, **kwargs, disable=True)
@@ -795,11 +789,6 @@ class IPAdapterPlusXL(IPAdapter):
             **kwargs,
         ).images
         
-        # Restore original tqdm
         tqdm.tqdm = original_tqdm
 
         return images
-
-
-# No patching needed - we're using direct imports
-# All classes are available directly from this module
