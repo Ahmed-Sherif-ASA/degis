@@ -18,8 +18,8 @@ USAGE EXAMPLES:
    import pandas as pd
    from degis.data.dataset import UnifiedImageDataset
    
-   # CSV should have column: ['image_url'] with image URLs
-   df = pd.read_csv('image_urls.csv')
+   # CSV should have column: ['url'] with image URLs
+   df = pd.read_csv('urls.csv')
    dataset = UnifiedImageDataset(df, mode='url_df', size=(512, 512))
    ```
 
@@ -59,7 +59,7 @@ USAGE EXAMPLES:
    ```
 
 CSV FORMAT REQUIREMENTS:
-- For URLs: Column named 'image_url' containing image URLs
+- For URLs: Column named 'url' containing image URLs
 - For file paths: Column named 'file_path' containing local image paths
 - Additional columns are ignored but preserved in the dataset
 
@@ -117,18 +117,18 @@ class UnifiedImageDataset(Dataset):
             self.get_img = self._get_file
 
         elif mode == "auto":
-            # Auto-detect: check if 'image_url' column exists (URLs) or 'file_path' (local files)
+            # Auto-detect: check if 'url' column exists (URLs) or 'file_path' (local files)
             df          = source.sample(frac=subset_ratio,
                                         random_state=42).reset_index(drop=True)
             self.df     = df
-            if "image_url" in self.df.columns:
+            if "url" in self.df.columns:
                 self.mode = "url_df"
                 self.get_img = self._get_url
             elif "file_path" in self.df.columns:
                 self.mode = "file_df"
                 self.get_img = self._get_file
             else:
-                raise ValueError("Auto mode requires 'image_url' or 'file_path' column")
+                raise ValueError("Auto mode requires 'url' or 'file_path' column")
 
         else:
             raise ValueError(f"mode must be one of ['url_df','file_df','auto'], got {mode!r}")
@@ -147,7 +147,7 @@ class UnifiedImageDataset(Dataset):
 
     # ─── mode: url_df ───────────────────────────────────────────────────────
     def _get_url(self, idx):
-        url = self.df.iloc[idx]["image_url"]
+        url = self.df.iloc[idx]["url"]
         try:
             r = requests.get(url, timeout=5)
             r.raise_for_status()
