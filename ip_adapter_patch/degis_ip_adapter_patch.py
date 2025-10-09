@@ -399,7 +399,7 @@ class IPAdapter:
                 negative_prompt=negative_prompt,
             )
             
-            # Use the new mixing helper with separate scales
+            # Use the mixing helper with separate scales
             prompt_embeds, negative_prompt_embeds = self._mix_text_ip_tokens(
                 prompt_embeds_text=prompt_embeds_text,
                 negative_prompt_embeds_text=negative_prompt_embeds_text,
@@ -544,7 +544,7 @@ class IPAdapterXL(IPAdapter):
                 negative_prompt=negative_prompt,
             )
             
-            # Use the new mixing helper with separate scales
+            # Use the mixing helper with separate scales
             result = self._mix_text_ip_tokens(
                 prompt_embeds_text=prompt_embeds_text,
                 negative_prompt_embeds_text=negative_prompt_embeds_text,
@@ -749,7 +749,7 @@ class IPAdapterPlusXL(IPAdapter):
                 negative_prompt=negative_prompt,
             )
             
-            # Use the new mixing helper with separate scales
+            # Use the mixing helper with separate scales
             result = self._mix_text_ip_tokens(
                 prompt_embeds_text=prompt_embeds_text,
                 negative_prompt_embeds_text=negative_prompt_embeds_text,

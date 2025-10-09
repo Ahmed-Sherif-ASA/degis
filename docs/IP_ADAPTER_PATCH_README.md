@@ -33,7 +33,7 @@ adapter = IPAdapter(
     image_encoder_path="path/to/encoder",
     ip_ckpt="path/to/checkpoint",
     device=device,
-    embedding_type='clip'  # New parameter
+    embedding_type='clip'
 )
 
 # Use enhanced generation with separate scaling
@@ -174,16 +174,6 @@ The DEGIS IP-Adapter implementation is available when you:
 1. Run the setup script: `./setup.sh`
 2. Import directly: `from ip_adapter_patch import IPAdapter`
 
-## Testing
-
-To test that the implementation is working:
-```bash
-# Activate environment first
-source degis-env/bin/activate
-
-# Run test
-python test_ip_adapter_patch.py
-```
 
 ## Key Benefits
 

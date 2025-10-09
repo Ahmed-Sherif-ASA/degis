@@ -199,7 +199,7 @@ def calculate_cosine_similarity(
 
 
 def generate_from_dataset_id_xl_with_sinkhorn(
-    colour_index: int,
+    color_index: int,
     layout_index: int,
     prompt: str = "a cat playing with a ball",
     target_sinkhorn_threshold: float = 0.1,
@@ -220,7 +220,7 @@ def generate_from_dataset_id_xl_with_sinkhorn(
     verbose: bool = False,
     # Required dependencies (should be passed from calling context)
     generator=None,
-    colour_dataset=None,
+    color_dataset=None,
     embeddings=None,
     histograms=None,
     edge_maps=None,
@@ -235,7 +235,7 @@ def generate_from_dataset_id_xl_with_sinkhorn(
     and uses the appropriate histogram computation method.
     
     Args:
-        colour_index: Index in the color dataset
+        color_index: Index in the color dataset
         layout_index: Index in the layout/edge dataset
         prompt: Text prompt for generation
         target_sinkhorn_threshold: Target Sinkhorn threshold to achieve
@@ -255,7 +255,7 @@ def generate_from_dataset_id_xl_with_sinkhorn(
         verbose: Whether to print progress information
         # Required dependencies (passed from calling context)
         generator: DEGIS generator instance
-        colour_dataset: Color dataset
+        color_dataset: Color dataset
         embeddings: CLIP embeddings
         histograms: Color histograms
         edge_maps: Edge maps for layout
@@ -273,8 +273,8 @@ def generate_from_dataset_id_xl_with_sinkhorn(
     # Validate required dependencies
     if generator is None:
         raise ValueError("generator is required")
-    if colour_dataset is None:
-        raise ValueError("colour_dataset is required")
+    if color_dataset is None:
+        raise ValueError("color_dataset is required")
     if embeddings is None:
         raise ValueError("embeddings is required")
     if histograms is None:
@@ -289,15 +289,15 @@ def generate_from_dataset_id_xl_with_sinkhorn(
         raise ValueError("transforms is required")
 
     # Get original image for display
-    img_t, _ = colour_dataset[colour_index]
+    img_t, _ = color_dataset[color_index]
     pil_img = transforms.ToPILImage()(img_t)
 
     # Get CLIP embedding and compute color embedding
-    z_clip = torch.as_tensor(embeddings[colour_index], dtype=torch.float32, device=device).unsqueeze(0)
+    z_clip = torch.as_tensor(embeddings[color_index], dtype=torch.float32, device=device).unsqueeze(0)
     color_embedding = generator.get_color_embedding(color_head, z_clip)
 
     # Get original histogram for Sinkhorn comparison
-    original_histogram = histograms[colour_index]
+    original_histogram = histograms[color_index]
 
     # Auto-detect color space if not provided
     if color_space is None:
@@ -450,7 +450,7 @@ def generate_by_style(
     )
 
 
-def generate_by_colour_sinkhorn_constrained(
+def generate_by_color_sinkhorn_constrained(
     generator,
     color_embedding: torch.Tensor,
     control_image: Image.Image,
@@ -538,7 +538,7 @@ def generate_by_colour_sinkhorn_constrained(
 
 
 def generate_with_images_and_sinkhorn(
-    colour_image: Image.Image,
+    color_image: Image.Image,
     edge_image: Image.Image,
     prompt: str = "a beautiful image",
     target_sinkhorn_threshold: float = 0.1,
@@ -566,7 +566,7 @@ def generate_with_images_and_sinkhorn(
     This is the recommended function - much cleaner than the dataset-based version.
     
     Args:
-        colour_image: PIL Image for color reference
+        color_image: PIL Image for color reference
         edge_image: PIL Image for layout/edge control
         prompt: Text prompt for generation
         target_sinkhorn_threshold: Target Sinkhorn threshold
@@ -593,12 +593,12 @@ def generate_with_images_and_sinkhorn(
 
     # Get CLIP embedding from color image
     from ..shared.clip_vit_h14 import preprocess
-    image_tensor = preprocess(colour_image).to(device)  # [3,H,W]
+    image_tensor = preprocess(color_image).to(device)  # [3,H,W]
     z_clip = compute_clip_embedding(image_tensor).unsqueeze(0)  # Add batch dim
     color_embedding = get_color_embedding(color_head, z_clip)
 
     # Compute original histogram for Sinkhorn comparison
-    original_histogram = compute_histogram_for_color_space(colour_image, color_space or 'lab', bins=8)
+    original_histogram = compute_histogram_for_color_space(color_image, color_space or 'lab', bins=8)
     
     # Auto-detect color space if not provided
     if color_space is None:
@@ -671,7 +671,7 @@ def generate_with_images_and_sinkhorn(
                 print(f"\nTarget Sinkhorn reached! ({sinkhorn_distance:.4f} <= {target_sinkhorn_threshold:.3f})")
             break
 
-    # Results are returned as data - visualization handled separately
+    # Results are returned
     if best_images and verbose:
         print(f"Generated {len(best_images)} images with Sinkhorn constraint")
         print(f"Best Sinkhorn distance: {best_sinkhorn:.4f}")

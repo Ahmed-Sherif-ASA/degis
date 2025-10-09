@@ -10,21 +10,21 @@ sequenceDiagram
     IN->>Train: Load dataset images (from CSV/URLs)
     par Compute CLIP embeddings
         Train->>Train: Compute CLIP embeddings
-    and Compute colour histograms
-        Train->>Train: Compute colour histograms (RGB/LAB/HCL)
+    and Compute color histograms
+        Train->>Train: Compute color histograms (RGB/LAB/HCL)
     end
-    Train->>Models: Save checkpoints (Colour Head)
+    Train->>Models: Save checkpoints (Color Head)
     %% Optional ack to be explicit
     Models-->>Train: Saved (path/id)
 
     Note over Models: Trained once per encoder–IP-Adapter–SD version
 
     Note over IN,OUT: INFERENCE PHASE
-    IN->>Infer: Load text prompt · colour reference · layout reference
-    Infer->>Models: Load Colour Head + encoder versions
+    IN->>Infer: Load text prompt · color reference · layout reference
+    Infer->>Models: Load Color Head + encoder versions
     Models-->>Infer: Return weights + config (ckpt, encoder_id)
-    Infer->>Infer: Encode colour reference (CLIP)
-    Infer->>Infer: Predict colour embedding (Colour Head)
+    Infer->>Infer: Encode color reference (CLIP)
+    Infer->>Infer: Predict color embedding (Color Head)
     Infer->>Infer: Create Canny control image from layout reference
     Infer->>Infer: IP-Adapter token concat + scaling\n(attn_ip_scale, text_token_scale, ip_token_scale)
     loop Sinkhorn-constrained outer loop (until Sinkhorn ≤ τ or max attempts)

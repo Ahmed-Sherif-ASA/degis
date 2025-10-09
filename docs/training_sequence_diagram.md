@@ -9,8 +9,8 @@ sequenceDiagram
     IN->>Train: Load dataset images
     par Compute CLIP embeddings
         Train->>Train: Compute CLIP embeddings
-    and Compute colour histograms
-        Train->>Train: Compute colour histograms (RGB/LAB/HCL)
+    and Compute color histograms
+        Train->>Train: Compute color histograms (RGB/LAB/HCL)
     end
-    Train->>Models: Train Colour Head (CLIP → palette embedding) and save checkpoint
+    Train->>Models: Train color Head (CLIP → palette embedding) and save checkpoint
     Models-->>Train: Saved (ckpt path · encoder_id · ip_adapter_id · sd_version)

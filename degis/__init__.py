@@ -9,7 +9,6 @@ Structure:
 - training/      : Training-specific code (models, training loops, CLI)
 - inference/     : Inference-specific code (generation, features, CLI)
 - shared/        : Shared utilities (embeddings, utils, config)
-- ip_adapter_patch/ : Custom IP-Adapter implementation
 """
 
 __version__ = "2.0.0"

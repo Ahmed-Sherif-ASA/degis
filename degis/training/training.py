@@ -66,14 +66,11 @@ def train_color_model(
         import time
         stamp = time.strftime("%Y%m%d-%H%M%S")
         
-        # Use new naming convention if csv_name and emb_kind are provided
         if csv_name and emb_kind:
             run_name = f"{csv_name}_{emb_kind}_{hist_kind}_tk{top_k or 'all'}_b{batch_size}"
-            # Use evaluation_runs directory for new naming convention
             project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             output_dir = os.path.join(project_root, "evaluation_runs", f"{run_name}-{stamp}")
         else:
-            # Fallback to old naming convention
             run_name = f"color_{hist_kind}_tk{top_k or 'all'}_b{batch_size}"
             project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             output_dir = os.path.join(project_root, "runs", f"{run_name}-{stamp}")

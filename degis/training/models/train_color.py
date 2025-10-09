@@ -55,7 +55,7 @@ def train_color_disentanglement(
     device,
     num_epochs    = 200,
     lambda_ortho  = 0.1,
-    lambda_consistency = 0.1,  # consistency loss weight
+    lambda_consistency = 0.1,
     lambda_leak   = 0.25,
     top_k         = None,
     use_weighting = False,
@@ -195,7 +195,7 @@ def train_color_disentanglement(
                 wall_time=epoch_seconds,  # Required field
                 diag_bce=train_bce,
                 leak_loss=train_leak, ortho_loss=train_ortho, recon_loss=train_recon, consistency_loss=train_consistency,
-                total_loss=float(total_loss),  # Keep original too
+                total_loss=float(total_loss),
                 grad_norm=grad_norm,
                 it_per_sec=float(logger.it_per_sec()),
                 samples_per_sec=float(logger.samples_per_sec()),
@@ -246,7 +246,7 @@ def train_color_disentanglement(
             
             print("Saved best")
 
-            # JSON summary for the paper
+            # JSON summary
             if logger is not None:
                 best_json = {
                     "best_epoch": ep,
